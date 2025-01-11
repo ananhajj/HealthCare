@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { DoctorCard } from "./DoctorCard";
 
 const doctors = [
@@ -21,11 +22,15 @@ const doctors = [
     }
 ];
 
-const handleShowMore=()=>{
-    console.log("Doctor");
-}
+ 
 
 export function FeaturedDoctors() {
+    const naivgate = useNavigate();
+    const handleShowMore = () => {
+       
+        naivgate("/doctor");
+    }
+    
     return (
         <div className="container mx-auto px-4 py-20">
             <h2 className="text-4xl font-bold text-center mb-12 text-mainColor">أطباء مميزون</h2>

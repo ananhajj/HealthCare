@@ -1,22 +1,28 @@
 import { ArrowLeft, Building2, Calendar, Clock, Home, MapPin, Stethoscope } from 'lucide-react';
-import React from 'react';
+import React, { useContext } from 'react';
 import 'swiper/css'; // استيراد الأنماط الخاصة بـ Swiper
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules'; // Import Autoplay module
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-const cities = [
-    { name: 'جنين' },
-    { name: 'نابلس' },
-    { name: 'رام الله' },
-    { name: 'غزة' },
-    { name: 'طولكرم' }
-];
+import { ClinicContext } from '../../context/ClinicContext';
+import { Link } from 'react-router-dom';
+
+const backgroundImage = 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80'
 
 function SliderHome() {
+    const {cities}=useContext(ClinicContext); 
     return (
-        <div className="w-full   bg-gradient-to-b from-blue-50 to-white">
+        <div className="w-full bg-gradient-to-b from-blue-50 to-white " style={{
+            backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0)), url(${backgroundImage})`,
+            backgroundPosition: "center",
+            backgroundSize: "cover",
+            backgroundRepeat: "no-repeat",
+            borderBottomLeftRadius: "30%",
+            borderBottomRightRadius: "30%",
+            overflow: "hidden",
+        }}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div className="relative">
                     <Swiper
@@ -100,16 +106,18 @@ function SliderHome() {
                                         <div className="grid grid-cols-2 gap-4 w-full max-w-lg">
                                             {cities.slice(0, 4).map((city, index) => (
                                                 <div
-                                                    key={city.name}
+                                                    key={city.ar_name}
                                                     className="bg-white/10 backdrop-blur-sm rounded-xl p-4 hover:bg-white/20 transition-all group cursor-pointer"
                                                 >
+                                                    <Link to={`/cities/${city.id}/clinics`}> 
                                                     <div className="flex items-center gap-3">
                                                         <Building2
                                                             className="h-6 w-6"
                                                             style={{ color: "rgb(186 412 290 / var(--tw-text-opacity, 1))" }}
                                                         />
+                                                      
                                                         <div className="text-white">
-                                                            <div className="font-semibold">{city.name}</div>
+                                                            <div className="font-semibold">{city.ar_name}</div>
                                                             <div
                                                                 className="text-sm"
                                                                 style={{ color: "rgb(186 412 290 / var(--tw-text-opacity, 1))" }}
@@ -117,7 +125,9 @@ function SliderHome() {
                                                                 متوفر الآن
                                                             </div>
                                                         </div>
+                                                        
                                                     </div>
+                                                    </Link>
                                                 </div>
                                             ))}
                                             {/* زر عرض جميع المدن */}

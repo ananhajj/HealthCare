@@ -58,6 +58,16 @@ export default function Header() {
                             العيادات
                         </NavLink>
                         <NavLink
+                            to="/doctor"
+                            className={({ isActive }) =>
+                                isActive
+                                    ? 'bg-blue-200 text-blue-600 px-4 py-2 rounded-lg text-darkText transition-all duration-200 font-medium font-arabic text-xl'
+                                    : 'text-darkText hover:bg-blue-100 hover:text-blue-600 transition-all duration-200 font-medium font-arabic text-xl'
+                            }
+                        >
+                            الدكاترة
+                        </NavLink>
+                        <NavLink
                             to="/about"
                             className={({ isActive }) =>
                                 isActive
@@ -156,6 +166,16 @@ export default function Header() {
                             }
                         >
                             العيادات
+                        </NavLink>
+                        <NavLink
+                            to="/doctor"
+                            className={({ isActive }) =>
+                                isActive
+                                    ? 'text-black font-bold text-[rgb(95,111,255)]'
+                                    : 'text-[rgb(95,111,255)] hover:text-black transition-colors duration-200 font-medium text-2xl'
+                            }
+                        >
+                            الدكاترة
                         </NavLink>
                         <NavLink
                             to="/about"

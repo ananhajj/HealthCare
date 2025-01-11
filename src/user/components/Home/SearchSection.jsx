@@ -8,9 +8,9 @@ export function SearchSection() {
 
     // دالة لمعالجة البحث
     const handleSearch = () => {
-        // هنا يمكنك إضافة المنطق الفعلي للبحث
+    
         console.log("بحث عن: ", doctorOrSpecialty, "في المدينة: ", city);
-        // مثلاً يمكن إرسال هذه البيانات إلى API أو معالجتها محليًا
+ 
     };
 
     return (

@@ -1,51 +1,83 @@
-// components/ClinicCard.jsx
-import React from 'react';
-import { Star, Phone, MapPin, Clock, Calendar } from 'lucide-react';
+import React from "react";
+import { Calendar, MapPin, User } from "lucide-react";
+import { formatScheduleArabic } from "../../utils/scheduleFormatter";
 
-export function ClinicCard({ clinic }) {
+export const ClinicCard = ({ clinic, onBooking }) => {
+    console.log("clinic",clinic);
+    const formattedSchedule = clinic.schedule ? clinic.schedule : ["غير محدد"];
     return (
-        <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-            <div className="relative">
-                <img
-                    src={clinic.image}
-                    alt={clinic.doctorName}
-                    className="w-full h-56 object-cover"
-                />
-                <div className="absolute top-4 left-4 bg-white px-3 py-1 rounded-full shadow-md">
-                    <div className="flex items-center">
-                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                        <span className="mr-1 text-gray-700 font-medium">{clinic.rating}</span>
+        <div className="relative bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
+            {/* الصورة */}
+            <div className="flex items-center gap-4 mb-6">
+                <div className="flex-shrink-0">
+                    {clinic.doctor && clinic.doctor.avatar ? (
+                        <img
+                            src={clinic.doctor.avatar}
+                            alt={clinic.doctor.full_name || "صورة الطبيب"}
+                            className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-4 sm:border-6 border-white shadow-md"
+                        />
+                    ) : (
+                        <img
+                            src="https://via.placeholder.com/64" // صورة افتراضية عند عدم وجود صورة
+                            alt="صورة افتراضية"
+                            className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-4 sm:border-6 border-white shadow-md"
+                        />
+                    )}
+                </div>
+                <div>
+                    {/* اسم العيادة */}
+                    <h3 className="text-xl font-bold text-blue-900">{clinic.ar_name}</h3>
+                    <p className="text-m text-gray-800">عيادة</p>
+                </div>
+            </div>
+
+            {/* التفاصيل */}
+            <div className="space-y-4 text-gray-600">
+                {/* الطبيب */}
+                <p className="flex items-center gap-2">
+                    <User className="h-5 w-5 text-gray-500" />
+                    <span className="font-semibold">الطبيب:</span>
+                    {clinic.doctor?.full_name || "غير محدد"}
+                </p>
+
+                {/* العنوان */}
+                <p className="flex items-center gap-2">
+                    <MapPin className="h-5 w-5 text-gray-500" />
+                    <span className="font-semibold">العنوان:</span>
+                    {clinic.address
+                        ? `${clinic.address.address_line_1 || ""}، ${clinic.address.address_line_2 || ""}، ${clinic.address.address_line_3 || ""}`
+                        : `عنوان غير محدد`}
+                </p>
+
+                {/* الجدول */}
+                <div className="flex items-start gap-2">
+                    <Calendar className="h-5 w-5 text-gray-500 mt-1" />
+                    <div>
+                        <span className="font-semibold">الجدول:</span>
+                        <ol className="list-disc pl-5 text-sm mt-1">
+                            {clinic.schedule?.length > 0
+                                ? formatScheduleArabic(clinic.schedule).map((entry, index) => (
+                                    <li key={index} className="font-semibold text-blue-900">
+                                        {entry}
+                                    </li>
+                                ))
+                                : "غير متوفر"}
+                        </ol>
                     </div>
                 </div>
             </div>
-            <div className="p-6">
-                <div className="mb-4">
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">{clinic.doctorName}</h3>
-                    <span className="inline-block bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm font-medium">
-                        {clinic.specialty}
-                    </span>
-                </div>
-                <div className="space-y-3 text-gray-600">
-                    <div className="flex items-center">
-                        <MapPin className="w-5 h-5 ml-3 text-gray-400" />
-                        <span>{clinic.city} - {clinic.address}</span>
-                    </div>
-                    <div className="flex items-center">
-                        <Phone className="w-5 h-5 ml-3 text-gray-400" />
-                        <span>{clinic.phone}</span>
-                    </div>
-                    <div className="flex items-center">
-                        <Clock className="w-5 h-5 ml-3 text-gray-400" />
-                        <span>{clinic.workingHours}</span>
-                    </div>
-                </div>
-                <div className="mt-6">
-                    <button className="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors duration-300 flex items-center justify-center">
-                        <Calendar className="w-5 h-5 ml-2" />
-                        حجز موعد
-                    </button>
-                </div>
+
+            {/* زر الحجز */}
+            <div className="mt-6">
+                <button
+                    onClick={() => onBooking(clinic.id)}
+                    className="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors duration-300 flex items-center justify-center"
+                >
+                    <Calendar className="w-5 h-5 ml-2" />
+                    حجز موعد
+                </button>
             </div>
         </div>
     );
-}
+
+};
