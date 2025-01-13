@@ -7,39 +7,38 @@ const CircularCapture = ({ onNext }) => {
     const [captured, setCaptured] = useState(false);
     const [feedbackMessage, setFeedbackMessage] = useState("استعد لالتقاط الصورة.");
 
-    // Start the camera
+    // تشغيل الكاميرا
     const startCamera = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true });
             videoRef.current.srcObject = stream;
             videoRef.current.play();
         } catch (err) {
-            console.error("Error accessing webcam:", err);
+            console.error("حدث خطأ أثناء الوصول إلى الكاميرا:", err);
         }
     };
 
-    // Capture image
-    // Capture image and store as Base64
+    // التقاط الصورة وحفظها كـ Base64
     const captureImage = () => {
         const canvas = canvasRef.current;
         const context = canvas.getContext("2d");
 
-        // تعيين أبعاد الكانفاس لتطابق الفيديو
+        // ضبط أبعاد الكانفاس لتطابق أبعاد الفيديو
         canvas.width = videoRef.current.videoWidth;
         canvas.height = videoRef.current.videoHeight;
 
         // رسم إطار الفيديو على الكانفاس
         context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
 
-        // تحويل محتويات الكانفاس إلى Base64
+        // تحويل محتوى الكانفاس إلى Base64
         const imageData = canvas.toDataURL("image/png");
 
-        // تخزين Base64 في Local Storage
+        // حفظ الصورة في Local Storage
         localStorage.setItem("capturedImage", imageData);
 
         // عرض رسالة نجاح
         setCaptured(true);
-        setFeedbackMessage("تم التقاط الصورة وتخزينها كصورة عادية بنجاح!");
+        setFeedbackMessage("تم التقاط الصورة بنجاح!");
 
         // الانتقال إلى الخطوة التالية بعد التأخير
         setTimeout(() => {
@@ -47,31 +46,33 @@ const CircularCapture = ({ onNext }) => {
         }, 1000);
     };
 
-
     useEffect(() => {
         if (isReady && !captured) {
-            startCamera(); // بدء الكاميرا بعد أن يصبح المستخدم جاهزًا
+            startCamera(); // تشغيل الكاميرا عند استعداد المستخدم
             setTimeout(() => {
-                captureImage(); // التقاط الصورة تلقائيًا بعد ثانيتين من بداية الكاميرا
+                captureImage(); // التقاط الصورة تلقائيًا بعد ثانيتين
             }, 2000);
         }
     }, [isReady, captured]);
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen text-white">
+        <div
+            className="flex flex-col items-center justify-center h-screen text-white bg-gray-900"
+            dir="rtl"
+        >
             {!isReady ? (
                 <div className="text-center">
                     <p className="text-lg">{feedbackMessage}</p>
                     <button
                         onClick={() => setIsReady(true)} // عندما يضغط المستخدم على "استعد"، يبدأ فتح الكاميرا
-                        className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg"
+                        className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                     >
                         استعد
                     </button>
                 </div>
             ) : (
                 <>
-                    {/* Circle Guide */}
+                    {/* إطار دائري */}
                     <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center pointer-events-none">
                         <div
                             className="rounded-full border-4 border-green-500"
@@ -82,10 +83,10 @@ const CircularCapture = ({ onNext }) => {
                         ></div>
                     </div>
 
-                    {/* Feedback */}
+                    {/* رسائل التغذية الراجعة */}
                     <p className="absolute top-10 text-lg text-gray-300">{feedbackMessage}</p>
 
-                    {/* Video Feed */}
+                    {/* فيديو الكاميرا */}
                     <video
                         ref={videoRef}
                         className="rounded-full w-[17rem] h-[17rem] object-cover"

@@ -14,6 +14,8 @@ import { ClinicContext } from '../../context/ClinicContext';
 
     const handleSpecialtyClick = (specialty) => {
         navigate(`/clinics?specialty=${specialty}`);
+        window.scrollTo(0, 0);  
+
     };
 
     return (

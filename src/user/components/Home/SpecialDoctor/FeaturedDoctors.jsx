@@ -1,63 +1,114 @@
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DoctorCard } from "./DoctorCard";
-
-const doctors = [
-    {
-        name: "د. محمد أحمد",
-        specialty: "أخصائي طب عام",
-        rating: 4.9,
-        image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=500&h=300&fit=crop"
-    },
-    {
-        name: "د. سارة خالد",
-        specialty: "أخصائية طب أطفال",
-        rating: 4.8,
-        image: "https://images.unsplash.com/photo-1527613426441-4da17471b66d?w=500&h=300&fit=crop"
-    },
-    {
-        name: "د. أحمد محمود",
-        specialty: "جراح عام",
-        rating: 4.9,
-        image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=500&h=300&fit=crop"
-    }
-];
-
- 
+import { DoctorContext } from "../../../context/DoctorContext";
+import Loading from "../../Loading";
 
 export function FeaturedDoctors() {
-    const naivgate = useNavigate();
-    const handleShowMore = () => {
-       
-        naivgate("/doctor");
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const { doctors, loading } = useContext(DoctorContext);
+    const navigate = useNavigate();
+
+    if (loading) {
+        return <Loading />;
     }
-    
+
+    // ترتيب الأطباء بناءً على التقييم بشكل تنازلي
+    const sortedDoctors = [...doctors]
+        .sort((a, b) => b.rating - a.rating)
+        .map((doctor) => ({
+            ...doctor,
+            rating: parseFloat(doctor.rating.toFixed(1)), // أخذ أول خانة عشرية
+        }));
+
+    // التنقل بين الأطباء
+    const prevDoctor = () => {
+        setCurrentIndex((prevIndex) =>
+            prevIndex === 0 ? sortedDoctors.length - 1 : prevIndex - 1
+        );
+    };
+
+    const nextDoctor = () => {
+        setCurrentIndex((prevIndex) =>
+            prevIndex === sortedDoctors.length - 1 ? 0 : prevIndex + 1
+        );
+    };
+
+    // تحديد الأطباء الثلاثة المرئيين
+    const visibleDoctors = () => {
+        const startIndex = currentIndex;
+        const endIndex = (currentIndex + 2) % sortedDoctors.length; // عرض 3 أطباء
+        if (startIndex <= endIndex) {
+            return sortedDoctors.slice(startIndex, endIndex + 1);
+        } else {
+            return [
+                ...sortedDoctors.slice(startIndex),
+                ...sortedDoctors.slice(0, endIndex + 1),
+            ];
+        }
+    };
+
+    const handleShowMore = () => {
+        navigate("/doctor");
+        window.scrollTo(0, 0); // يعيد التمرير إلى أعلى الصفحة
+
+    };
+
     return (
-        <div className="container mx-auto px-4 py-20">
-            <h2 className="text-4xl font-bold text-center mb-12 text-mainColor">أطباء مميزون</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {doctors.map((doctor) => (
-                    <DoctorCard key={doctor.name} {...doctor} />
-                ))}
+        <div className="container mx-auto px-4 py-20" dir="rtl">
+            <h2 className="text-4xl font-bold text-center mb-12 text-mainColor">
+                أطباء مميزون
+            </h2>
+
+            {/* كاروسيل الأطباء */}
+            <div className="relative flex items-center justify-between gap-8 max-w-5xl mx-auto">
+                {/* زر السابق (يمين - التحرك لليمين) */}
+                <button
+                    onClick={prevDoctor}
+                    className="p-3 rounded-full bg-white shadow-lg hover:bg-gray-50 transition-colors absolute right-0 z-10"
+                    aria-label="Previous doctor"
+                >
+                    <ChevronRight className="w-6 h-6 text-gray-600" />
+                </button>
+
+                {/* عرض 3 دكاترة */}
+                <div className="flex gap-4 items-center justify-center overflow-hidden">
+                    {visibleDoctors().map((doctor, index) => (
+                        <DoctorCard
+                            key={doctor.id}
+                            doctor={doctor}
+                            isActive={index === 1} // الطبيب الأوسط نشط
+                        />
+                    ))}
+                </div>
+
+                {/* زر التالي (يسار - التحرك لليسار) */}
+                <button
+                    onClick={nextDoctor}
+                    className="p-3 rounded-full bg-white shadow-lg hover:bg-gray-50 transition-colors absolute left-0 z-10"
+                    aria-label="Next doctor"
+                >
+                    <ChevronLeft className="w-6 h-6 text-gray-600" />
+                </button>
             </div>
+
+            {/* زر عرض المزيد */}
             <button
-                className="relative mx-auto mt-3 py-2 px-6 group bg-transparent border-2 border-mainColor text-mainColor hover:bg-blue-600 hover:text-white rounded-full transition-all duration-300 flex items-center justify-center gap-5"
-                onClick={() => handleShowMore()}
+                className="relative mx-auto mt-8 py-2 px-6 group bg-transparent border-2 border-mainColor text-mainColor hover:bg-blue-600 hover:text-white rounded-full transition-all duration-300 flex items-center justify-center gap-2"
+                onClick={handleShowMore}
             >
                 <span className="text-lg font-bold">عرض المزيد</span>
                 <svg
                     width="15px"
                     height="10px"
                     viewBox="0 0 13 10"
-                    className="transform group-hover:translate-x-1 transition-all duration-300"
+                    className="transform group-hover:-translate-x-1 transition-all duration-300"
                 >
                     <path d="M1,5 L11,5" />
-                    <polyline points="8 1 12 5 8 9" />
+                    <polyline points="4 1 0 5 4 9" />
                 </svg>
-                <span className="absolute top-0 left-0 block w-full h-full rounded-full bg-white opacity-10 group-hover:opacity-30 transition-all duration-300"></span>
             </button>
-
-
-
         </div>
     );
 }

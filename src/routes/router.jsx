@@ -11,6 +11,8 @@ import DoctorPage from "../user/components/Doctors/DoctorPage";
 import BookingPage from "../user/page/BookingPage";
 import CitySelection from "../user/components/CitySelection";
 import ClinicList from "../user/components/Clinics/ClinicList";
+import RegisterLayout from "../layouts/RegisterLayout";
+import PatientProfile from "../user/page/PatientProfile";
 
 const router = createBrowserRouter([
     {
@@ -30,8 +32,8 @@ const router = createBrowserRouter([
                 element: <Login />
             },
             {
-                path: '/register',
-                element: <RegisterForm />
+                path: '/profile',
+                element: <PatientProfile />
             },
             {
                 path: '/clinics',
@@ -62,6 +64,12 @@ const router = createBrowserRouter([
                 element: <PageNotFound />, // عرض صفحة 404
             },
         ]
+    },
+    {
+
+        path: '/register',
+        element: <RegisterLayout />
+
     }
 ])
 export default router

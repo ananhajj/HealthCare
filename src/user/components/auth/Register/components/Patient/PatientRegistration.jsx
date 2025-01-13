@@ -98,7 +98,7 @@ export default function PatientRegistration({
     };
 
     return (
-        <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6 overflow-auto md:overflow-visible max-h-screen" dir="rtl">
+        <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6 overflow-auto md:overflow-visible  rtl" dir="rtl">
             {/* Header Section */}
             <div className="text-center mb-8">
                 <h1 className="text-2xl font-semibold text-gray-800 flex justify-center items-center">
@@ -107,6 +107,7 @@ export default function PatientRegistration({
                 </h1>
                 <p className="text-gray-600 mb-4">
                     من فضلك، قم بملء البيانات حسب هويتك الشخصية، حيث أننا سنقوم بالتحقق منها لاحقًا.
+                    <br></br>
                     <span className="font-semibold text-gray-700"> لا داعي للقلق، ستكون جميع معلوماتك في أيد أمينة.</span>
                 </p>
             </div>

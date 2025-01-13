@@ -35,7 +35,7 @@ const iconMap = {
     Orthopedics: FaHospital,
     "ENT (Ear, Nose, and Throat)": FaLungs,
     Anesthesiology: FaSyringe,
-    "Gynecology and Obstetrics": FaFirstAid,
+    "Obstetrics and Gynecology": FaFirstAid,
     Radiology: FaMicroscope,
     Urology: FaFlask,
     Immunology: FaShieldAlt,
@@ -81,7 +81,7 @@ const ClinicContextProvider = ({ children }) => {
                 const data = response.data.data;
 
                 if (data && data.length > 0) {
-                    console.log("Fetched Data:", data);
+                   
 
                     // تحديث الأيقونات بناءً على `en_name`
                     const updatedSpecialties = data.map((specialty) => ({

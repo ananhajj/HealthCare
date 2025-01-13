@@ -1,9 +1,9 @@
 import React from "react";
-import { Calendar, MapPin, User } from "lucide-react";
+import { Calendar, Clock, MapPin, User } from "lucide-react";
 import { formatScheduleArabic } from "../../utils/scheduleFormatter";
 
 export const ClinicCard = ({ clinic, onBooking }) => {
-    console.log("clinic",clinic);
+    console.log("clinic in city",clinic);
     const formattedSchedule = clinic.schedule ? clinic.schedule : ["غير محدد"];
     return (
         <div className="relative bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
@@ -13,7 +13,7 @@ export const ClinicCard = ({ clinic, onBooking }) => {
                     {clinic.doctor && clinic.doctor.avatar ? (
                         <img
                             src={clinic.doctor.avatar}
-                            alt={clinic.doctor.full_name || "صورة الطبيب"}
+                            alt={clinic.doctor.ar_full_name || "صورة الطبيب"}
                             className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-4 sm:border-6 border-white shadow-md"
                         />
                     ) : (
@@ -37,7 +37,7 @@ export const ClinicCard = ({ clinic, onBooking }) => {
                 <p className="flex items-center gap-2">
                     <User className="h-5 w-5 text-gray-500" />
                     <span className="font-semibold">الطبيب:</span>
-                    {clinic.doctor?.full_name || "غير محدد"}
+                    {clinic.doctor?.ar_full_name || "غير محدد"}
                 </p>
 
                 {/* العنوان */}
@@ -48,7 +48,12 @@ export const ClinicCard = ({ clinic, onBooking }) => {
                         ? `${clinic.address.address_line_1 || ""}، ${clinic.address.address_line_2 || ""}، ${clinic.address.address_line_3 || ""}`
                         : `عنوان غير محدد`}
                 </p>
-
+                {/* مدة الحجز */}
+                <p className="flex items-center gap-2">
+                    <Clock className="h-5 w-5 text-gray-500" />
+                    <span className="font-semibold">المدة الزمنية لكل حجز:</span>
+                    {clinic.appointment_time} دقيقة
+                </p>
                 {/* الجدول */}
                 <div className="flex items-start gap-2">
                     <Calendar className="h-5 w-5 text-gray-500 mt-1" />

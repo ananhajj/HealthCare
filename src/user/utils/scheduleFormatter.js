@@ -14,7 +14,7 @@ const dayMap = {
  * @param {string} time - الوقت بصيغة HH:mm:ss
  * @returns {string} الوقت بصيغة 12 ساعة (صباحاً/مساءً)
  */
-const convertTo12HourFormat = (time) => {
+export const convertTo12HourFormat = (time) => {
   const [hours, minutes] = time.split(":").map(Number);
   const period = hours >= 12 ? "مساءً" : "صباحاً";
   const adjustedHours = hours % 12 || 12; // تحويل 0 إلى 12

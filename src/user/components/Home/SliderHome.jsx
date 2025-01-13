@@ -7,20 +7,19 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { ClinicContext } from '../../context/ClinicContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const backgroundImage = 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80'
 
 function SliderHome() {
     const {cities}=useContext(ClinicContext); 
+    const navigate=useNavigate();
     return (
         <div className="w-full bg-gradient-to-b from-blue-50 to-white " style={{
-            backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0)), url(${backgroundImage})`,
+            backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0)))`,
             backgroundPosition: "center",
             backgroundSize: "cover",
             backgroundRepeat: "no-repeat",
-            borderBottomLeftRadius: "30%",
-            borderBottomRightRadius: "30%",
             overflow: "hidden",
         }}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -99,47 +98,45 @@ function SliderHome() {
                                             <p className="text-xl text-gray-100">
                                                 خدمة حجز المواعيد الطبية متوفرة في جميع المدن الفلسطينية
                                             </p>
-                                            
                                         </div>
                                     </div>
                                     <div className="w-full md:w-1/2 h-full flex items-center justify-center p-8">
                                         <div className="grid grid-cols-2 gap-4 w-full max-w-lg">
+                                            {/* المدن - تظهر فقط على الشاشات الكبيرة */}
                                             {cities.slice(0, 4).map((city, index) => (
                                                 <div
                                                     key={city.ar_name}
-                                                    className="bg-white/10 backdrop-blur-sm rounded-xl p-4 hover:bg-white/20 transition-all group cursor-pointer"
+                                                    className="bg-white/10 backdrop-blur-sm rounded-xl p-4 hover:bg-white/20 transition-all group cursor-pointer hidden md:block"
                                                 >
-                                                    <Link to={`/cities/${city.id}/clinics`}> 
-                                                    <div className="flex items-center gap-3">
-                                                        <Building2
-                                                            className="h-6 w-6"
-                                                            style={{ color: "rgb(186 412 290 / var(--tw-text-opacity, 1))" }}
-                                                        />
-                                                      
-                                                        <div className="text-white">
-                                                            <div className="font-semibold">{city.ar_name}</div>
-                                                            <div
-                                                                className="text-sm"
+                                                    <Link to={`/cities/${city.id}/clinics`}>
+                                                        <div className="flex items-center gap-3">
+                                                            <Building2
+                                                                className="h-6 w-6"
                                                                 style={{ color: "rgb(186 412 290 / var(--tw-text-opacity, 1))" }}
-                                                            >
-                                                                متوفر الآن
+                                                            />
+                                                            <div className="text-white">
+                                                                <div className="font-semibold">{city.ar_name}</div>
+                                                                <div
+                                                                    className="text-sm"
+                                                                    style={{ color: "rgb(186 412 290 / var(--tw-text-opacity, 1))" }}
+                                                                >
+                                                                    متوفر الآن
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                        
-                                                    </div>
                                                     </Link>
                                                 </div>
                                             ))}
-                                            {/* زر عرض جميع المدن */}
+
+                                            {/* زر "عرض جميع المدن" - يظل ظاهرًا دائمًا */}
                                             <div
-                                                className="bg-white/10 backdrop-blur-sm rounded-xl p-4  hover:scale-105 transition-all duration-300 ease-in-out group cursor-pointer flex items-center justify-center"
-                                                onClick={() => window.location.href = "/all-cities"}
+                                                className="bg-white/10 backdrop-blur-sm rounded-xl p-4 hover:scale-105 transition-all duration-300 ease-in-out group cursor-pointer flex items-center justify-center"
+                                                onClick={() => navigate('all-cities')}
                                             >
                                                 <div className="flex items-center gap-3">
                                                     <span className="text-lg font-medium text-white transition-colors duration-300 group-hover:text-white">
                                                         عرض جميع المدن
                                                     </span>
-
                                                     <svg
                                                         xmlns="http://www.w3.org/2000/svg"
                                                         className="h-6 w-6 group-hover:rotate-45 group-hover:scale-110 transition-transform duration-300"
@@ -162,6 +159,7 @@ function SliderHome() {
                                 </div>
                             </div>
                         </SwiperSlide>
+
 
 
 

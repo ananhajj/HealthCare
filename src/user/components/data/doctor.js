@@ -26,6 +26,7 @@ export const doctors = [
     image: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=500",
     specialization: "طب الأطفال العام",
     experience: 10,
+    onlineBooking: true,
     education: [
       "بكالوريوس الطب والجراحة - جامعة الملك سعود",
       "زمالة طب الأطفال - مستشفى الملك فيصل التخصصي",

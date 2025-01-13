@@ -1,4 +1,4 @@
-import React from 'react';
+/*import React from 'react';
 import { MapPin, Phone, Clock } from 'lucide-react';
 
 function DoctorDetails({ doctor, open, onClose }) {
@@ -73,3 +73,4 @@ function DoctorDetails({ doctor, open, onClose }) {
 }
 
 export default DoctorDetails;
+*/

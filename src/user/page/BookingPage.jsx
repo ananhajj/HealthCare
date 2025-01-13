@@ -1,264 +1,209 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { clinics } from '../components/data/clinics';  // أو من الـ API إذا كان متوفرًا
-import Loading from '../components/Loading';
-import { Calendar, Clock, User, Phone, MessageSquare, Building2 } from 'lucide-react';
+import React, { useState } from "react";
+import DatePicker, { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ar from "date-fns/locale/ar";
+import {
+    Calendar as CalendarIcon,
+    Clock,
+    User,
+    Phone,
+} from "lucide-react";
+import { useParams } from "react-router-dom";
+import useFetchClinicById from "../hooks/useFetchClinicById";
+
+registerLocale("ar", ar);
 
 function BookingPage() {
-    const { clinicId } = useParams();  // الحصول على clinicId من الـ URL
-    const [clinic, setClinic] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);  // إضافة حالة تحميل
-    const [formData, setFormData] = useState({
-        name: '',
-        phone: '',
-        notes: ''
-    });
-    const [selectedDate, setSelectedDate] = useState('');
-    const [selectedTime, setSelectedTime] = useState('');
-    const [isSubmitted, setIsSubmitted] = useState(false);  // حالة تأكيد الحجز
+    const { clinicId } = useParams();
+    const [selectedDate, setSelectedDate] = useState(null);
+    const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
+    const {clinic,loading ,error}=useFetchClinicById(clinicId);
 
-    // بيانات المواعيد المتاحة
+    console.log("clinic:id", clinicId)
+    const [formData, setFormData] = useState({
+        name: "",
+        phone: "",
+        notes: "",
+    });
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     const availableSlots = {
         "2024-03-25": [
             { time: "09:00", duration: 30 },
-            { time: "10:00", duration: 30 },
             { time: "11:00", duration: 45 },
-            { time: "14:00", duration: 30 },
-            { time: "15:00", duration: 30 }
         ],
         "2024-03-26": [
-            { time: "09:00", duration: 30 },
-            { time: "11:00", duration: 45 },
-            { time: "13:00", duration: 30 },
-            { time: "14:00", duration: 30 },
-            { time: "16:00", duration: 30 }
-        ],
-        "2024-03-27": [
             { time: "10:00", duration: 30 },
-            { time: "11:00", duration: 45 },
-            { time: "13:00", duration: 30 },
-            { time: "15:00", duration: 30 },
-            { time: "16:00", duration: 30 }
-        ]
+            { time: "14:00", duration: 30 },
+        ],
     };
 
-    useEffect(() => {
-        setIsLoading(true);  // تعيين حالة التحميل إلى true عند بداية التحميل
+    const handleDateChange = (date) => {
+        setSelectedDate(date);
+        setSelectedTimeSlot(null);
+    };
 
-        // تحويل clinicId إلى عدد صحيح
-        const clinicIdInt = parseInt(clinicId, 10);  // التحويل إلى عدد صحيح باستخدام parseInt
-        console.log("clinicIdInt", clinicIdInt);
-
-        // تحميل بيانات العيادة بناءً على clinicId
-        const selectedClinic = clinics.find(clinic => clinic.id === clinicIdInt);
-        console.log("clinic", selectedClinic)
-
-        if (selectedClinic) {
-            setClinic(selectedClinic);
-        } else {
-            // التعامل مع حالة عدم العثور على العيادة
-            setClinic(null);
-        }
-
-        setIsLoading(false);  // تعيين حالة التحميل إلى false بعد الانتهاء من التحميل
-    }, [clinicId]);
+    const handleTimeSlotSelection = (time) => {
+        setSelectedTimeSlot(time);
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const confirmation = window.confirm(
-            `تأكيد حجزك؟\nالوقت: ${selectedTime}\nالمدة: ${availableSlots[selectedDate].find(slot => slot.time === selectedTime).duration} دقيقة`
-        );
-
-        if (confirmation) {
-            setIsSubmitted(true);
-        } else {
-            alert('تم إلغاء الحجز.');
+        if (!selectedDate || !selectedTimeSlot) {
+            alert("يرجى اختيار تاريخ ووقت قبل تأكيد الحجز.");
+            return;
         }
+        setIsModalOpen(true);
     };
 
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
+    const handleBookingConfirmation = () => {
+        alert(`تم تأكيد الحجز بتاريخ ${selectedDate.toLocaleDateString("ar-EG")} في الساعة ${selectedTimeSlot}.`);
+        setIsModalOpen(false);
     };
 
-    if (isLoading) {
-        return <Loading />;  // عرض شاشة التحميل
-    }
-
-    if (!clinic) {
-        return (
-            <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-6xl mx-auto text-center">
-                    <h2 className="text-2xl font-bold text-red-500">
-                        العيادة غير موجودة
-                    </h2>
-                </div>
-            </div>
-        );
-    }
+    const getAvailableTimeSlots = () => {
+        if (!selectedDate) return [];
+        const formattedDate = selectedDate.toISOString().split("T")[0];
+        return availableSlots[formattedDate] || [];
+    };
 
     return (
-        <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8" style={{ direction: 'rtl' }}>
-            <div className="max-w-6xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {/* Clinic Info */}
-                    <div className="bg-white rounded-xl shadow-lg p-6 md:col-span-1 transition-all duration-300 hover:shadow-xl">
-                        <div className="flex items-center gap-3 mb-6">
-                            <Building2 className="h-8 w-8 text-blue-900" />
-                            <h2 className="text-2xl font-bold text-blue-900">{clinic.doctorName}</h2>
-                        </div>
-                        <div className="space-y-4 text-gray-600">
-                            <p className="flex items-center gap-2">
-                                <span className="font-semibold">التخصص:</span>
-                                {clinic.specialty}
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 py-8 px-4" dir="rtl">
+            <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
+                <h1 className="text-4xl font-bold text-center text-blue-900 mb-8">
+                    حجز موعد
+                </h1>
+
+                {/* التقويم */}
+                <div className="mb-6">
+                    <h2 className="text-bold font-bold text-blue-900 flex items-center gap-2 mb-4">
+                        <CalendarIcon className="w-6 h-6 text-blue-300" />
+                        اختر التاريخ
+                    </h2>
+                    <DatePicker
+                        selected={selectedDate}
+                        onChange={handleDateChange}
+                        minDate={new Date()}
+                        inline
+                        locale="ar"
+                        highlightDates={[
+                            new Date("2024-03-25"),
+                            new Date("2024-03-26"),
+                        ]}
+                        dayClassName={(date) => {
+                            const formattedDate = date.toISOString().split("T")[0];
+                            return availableSlots[formattedDate]
+                                ? "bg-green-200 text-green-800"
+                                : "bg-gray-100 text-gray-500";
+                        }}
+                        calendarClassName="rounded-lg shadow-md border border-gray-300"
+                    />
+                </div>
+
+                {/* الأوقات المتاحة */}
+                <div className="mb-6">
+                    <h2 className="text-xl font-semibold text-blue-900 flex items-center gap-2 mb-4">
+                        <Clock className="w-6 h-6 text-blue-300" />
+                        الأوقات المتاحة
+                    </h2>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        {getAvailableTimeSlots().length > 0 ? (
+                            getAvailableTimeSlots().map(({ time, duration }) => {
+                                const timeParts = time.split(":");
+                                const hour = parseInt(timeParts[0], 10);
+                                const isAM = hour < 12;
+                                const formattedTime = `${hour % 12 || 12}:${timeParts[1]} ${isAM ? "صباحًا" : "مساءً"}`;
+                                return (
+                                    <button
+                                        key={time}
+                                        onClick={() => handleTimeSlotSelection(time)}
+                                        className={`py-2 px-3 rounded-lg font-medium border text-center transition ${selectedTimeSlot === time
+                                                ? "bg-blue-500 text-white border-blue-500"
+                                                : "bg-gray-50 hover:bg-blue-100 hover:text-blue-900 border-gray-300"
+                                            }`}
+                                    >
+                                        <span>{formattedTime}</span>
+                                        <br />
+                                        <span className="text-sm text-gray-500">{duration} دقيقة</span>
+                                    </button>
+                                );
+                            })
+                        ) : (
+                            <p className="text-gray-500 col-span-full text-center">
+                                لا توجد أوقات متاحة لهذا التاريخ.
                             </p>
-                            <p className="flex items-center gap-2">
-                                <span className="font-semibold">العنوان:</span>
-                                {clinic.address}
-                            </p>
-                            <p className="flex items-center gap-2">
-                                <span className="font-semibold">ساعات العمل:</span>
-                                {clinic.workingHours}
-                            </p>
-                            <p className="flex items-center gap-2">
-                                <span className="font-semibold">رقم الهاتف:</span>
-                                {clinic.phone}
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Booking Form */}
-                    <div className="bg-white rounded-xl shadow-lg p-6 md:col-span-2">
-                        <h2 className="text-2xl font-bold text-blue-900 mb-6">حجز موعد</h2>
-
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            {/* Personal Info */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="flex items-center gap-2 text-gray-700 mb-2">
-                                        <User className="w-5 h-5 text-blue-900" />
-                                        <span>الاسم الكامل</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        value={formData.name}
-                                        onChange={handleChange}
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        required
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="flex items-center gap-2 text-gray-700 mb-2">
-                                        <Phone className="w-5 h-5 text-blue-900" />
-                                        <span>رقم الهاتف</span>
-                                    </label>
-                                    <input
-                                        type="tel"
-                                        name="phone"
-                                        value={formData.phone}
-                                        onChange={handleChange}
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        required
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Date Selection */}
-                            <div>
-                                <label className="flex items-center gap-2 text-gray-700 mb-2">
-                                    <Calendar className="w-5 h-5 text-blue-900" />
-                                    <span>اختر اليوم</span>
-                                </label>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                    {Object.keys(availableSlots).map((date) => (
-                                        <button
-                                            key={date}
-                                            type="button"
-                                            onClick={() => {
-                                                setSelectedDate(date);
-                                                setSelectedTime('');
-                                            }}
-                                            className={`p-3 rounded-lg border ${selectedDate === date
-                                                ? 'bg-blue-900 text-white border-blue-900'
-                                                : 'border-gray-300 hover:border-blue-500'
-                                                }`}
-                                        >
-                                            {new Date(date).toLocaleDateString('ar-EG', {
-                                                weekday: 'long',
-                                                year: 'numeric',
-                                                month: 'long',
-                                                day: 'numeric'
-                                            })}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Time Slots */}
-                            {selectedDate && (
-                                <div>
-                                    <label className="flex items-center gap-2 text-gray-700 mb-2">
-                                        <Clock className="w-5 h-5 text-blue-900" />
-                                        <span>اختر الوقت المناسب</span>
-                                    </label>
-                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-                                        {availableSlots[selectedDate].map(({ time, duration }) => {
-                                            const timeParts = time.split(':');
-                                            const hour = parseInt(timeParts[0], 10);
-                                            const isAM = hour < 12;
-                                            const formattedTime = `${hour % 12 || 12}:${timeParts[1]} ${isAM ? 'صباحًا' : 'مساءً'}`;
-                                            return (
-                                                <button
-                                                    key={time}
-                                                    type="button"
-                                                    onClick={() => setSelectedTime(time)}
-                                                    className={`p-3 rounded-lg border ${selectedTime === time
-                                                        ? 'bg-blue-900 text-white border-blue-900'
-                                                        : 'border-gray-300 hover:border-blue-500'
-                                                        }`}
-                                                >
-                                                    {formattedTime} - {duration} دقيقة
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Notes */}
-                            <div>
-                                <label className="flex items-center gap-2 text-gray-700 mb-2">
-                                    <MessageSquare className="w-5 h-5 text-blue-900" />
-                                    <span>ملاحظات إضافية</span>
-                                </label>
-                                <textarea
-                                    name="notes"
-                                    value={formData.notes}
-                                    onChange={handleChange}
-                                    rows={3}
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                />
-                            </div>
-
-                            {/* Reminder and Submit Button */}
-                            <div className="text-center text-gray-700 mb-4">
-                                <p>⚠️ تذكر، هذا الحجز سيكون هامًا لحالتك الطبية. تأكد من اختيار الوقت المناسب وعدم التسرع في الحجز!</p>
-                            </div>
-
-                            <button
-                                type="submit"
-                                disabled={!selectedDate || !selectedTime}
-                                className="w-full bg-blue-900 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-800 transition duration-300 shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
-                            >
-                                تأكيد الحجز
-                            </button>
-                        </form>
+                        )}
                     </div>
                 </div>
+
+                {/* نموذج الحجز */}
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-gray-700 mb-2">الاسم الكامل</label>
+                        <input
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={(e) =>
+                                setFormData({ ...formData, name: e.target.value })
+                            }
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-gray-700 mb-2">رقم الهاتف</label>
+                        <input
+                            type="tel"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={(e) =>
+                                setFormData({ ...formData, phone: e.target.value })
+                            }
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            required
+                        />
+                    </div>
+                    <button
+                        type="submit"
+                        className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition"
+                    >
+                        تأكيد الحجز
+                    </button>
+                </form>
+
+                {/* موديل التأكيد */}
+                {isModalOpen && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div className="bg-white rounded-lg shadow-lg p-6 w-96">
+                            <h3 className="text-xl font-semibold mb-4 text-blue-900">
+                                تأكيد الحجز
+                            </h3>
+                            <p className="text-gray-600 mb-4">
+                                هل أنت متأكد من حجز الموعد التالي؟
+                            </p>
+                            <p className="text-gray-800 font-semibold mb-4">
+                                التاريخ: {selectedDate.toLocaleDateString("ar-EG")}
+                                <br />
+                                الوقت: {selectedTimeSlot}
+                            </p>
+                            <div className="flex gap-4 justify-end">
+                                <button
+                                    className="bg-gray-300 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-400 transition"
+                                    onClick={() => setIsModalOpen(false)}
+                                >
+                                    إلغاء
+                                </button>
+                                <button
+                                    className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition"
+                                    onClick={handleBookingConfirmation}
+                                >
+                                    تأكيد
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

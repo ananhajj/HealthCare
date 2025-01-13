@@ -92,7 +92,10 @@ export default function DoctorRegistration({
         } finally {
             setLoading(false);
         }*/
+        const userDetails = { ...values };
+        localStorage.setItem("userDetails", JSON.stringify(userDetails));
         console.log("values:", values);
+        onNext(values.email, values.phone,  1, userDetails);
     };
 
 
@@ -106,31 +109,32 @@ export default function DoctorRegistration({
     };
 
     return (
-        <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6 overflow-auto md:overflow-visible max-h-screen ltr" dir="ltr">
+        <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6 overflow-auto md:overflow-visible max-h-screen rtl" dir="rtl">
 
-            {/* Header Section */}
+            {/* قسم العنوان */}
             <div className="text-center mb-8">
                 <Stethoscope className="h-12 w-12 text-blue-600 mb-3" />
-                <h1 className="text-2xl font-semibold text-gray-800">Welcome Doctor</h1>
-                <p className="text-gray-600">Please fill in the form to create your account</p>
-
+                <h1 className="text-2xl font-semibold text-gray-800">مرحباً بك دكتور</h1>
+                <p className="text-gray-600">يرجى تعبئة النموذج لإنشاء حسابك</p>
             </div>
+
             <form onSubmit={formik.handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-right">
+                    {/* الاسم الأول */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            First Name
+                            الاسم الأول
                         </label>
                         <div className="relative">
                             <input
-                                name='first_name'
+                                name="first_name"
                                 type="text"
                                 value={formik.values.first_name}
                                 onChange={formik.handleChange}
-                                className="block w-full pl-10 pr-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="block w-full pr-10 pl-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
-                            <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                            <User className="absolute right-3 top-3 h-5 w-5 text-gray-400" />
                         </div>
                         {formik.errors.first_name && formik.touched.first_name && (
                             <p className="text-red-500 text-sm mt-1">{formik.errors.first_name}</p>
@@ -140,9 +144,10 @@ export default function DoctorRegistration({
                         )}
                     </div>
 
+                    {/* الاسم الأخير */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Last Name
+                            الاسم الأخير
                         </label>
                         <div className="relative">
                             <input
@@ -150,10 +155,10 @@ export default function DoctorRegistration({
                                 type="text"
                                 value={formik.values.last_name}
                                 onChange={formik.handleChange}
-                                className="block w-full pl-10 pr-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="block w-full pr-10 pl-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
-                            <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                            <User className="absolute right-3 top-3 h-5 w-5 text-gray-400" />
                         </div>
                         {formik.errors.last_name && formik.touched.last_name && (
                             <p className="text-red-500 text-sm mt-1">{formik.errors.last_name}</p>
@@ -163,20 +168,21 @@ export default function DoctorRegistration({
                         )}
                     </div>
 
+                    {/* البريد الإلكتروني */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Email Address
+                            البريد الإلكتروني
                         </label>
                         <div className="relative">
                             <input
-                                name='email'
+                                name="email"
                                 type="email"
                                 value={formik.values.email}
                                 onChange={formik.handleChange}
-                                className="block w-full pl-10 pr-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="block w-full pr-10 pl-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
-                            <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                            <Mail className="absolute right-3 top-3 h-5 w-5 text-gray-400" />
                         </div>
                         {formik.errors.email && formik.touched.email && (
                             <p className="text-red-500 text-sm mt-1">{formik.errors.email}</p>
@@ -186,20 +192,21 @@ export default function DoctorRegistration({
                         )}
                     </div>
 
+                    {/* رقم الهاتف */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Phone Number
+                            رقم الهاتف
                         </label>
                         <div className="relative">
                             <input
                                 type="tel"
-                                name='phone'
+                                name="phone"
                                 value={formik.values.phone}
                                 onChange={formik.handleChange}
-                                className="block w-full pl-10 pr-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="block w-full pr-10 pl-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
-                            <Phone className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                            <Phone className="absolute right-3 top-3 h-5 w-5 text-gray-400" />
                         </div>
                         {formik.errors.phone && formik.touched.phone && (
                             <p className="text-red-500 text-sm mt-1">{formik.errors.phone}</p>
@@ -209,20 +216,21 @@ export default function DoctorRegistration({
                         )}
                     </div>
 
+                    {/* اسم المستخدم */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            User Name
+                            اسم المستخدم
                         </label>
                         <div className="relative">
                             <input
                                 type="text"
-                                name='username'
+                                name="username"
                                 value={formik.values.username}
                                 onChange={formik.handleChange}
-                                className="block w-full pl-10 pr-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="block w-full pr-10 pl-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
-                            <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                            <User className="absolute right-3 top-3 h-5 w-5 text-gray-400" />
                         </div>
                         {formik.errors.username && formik.touched.username && (
                             <p className="text-red-500 text-sm mt-1">{formik.errors.username}</p>
@@ -232,20 +240,21 @@ export default function DoctorRegistration({
                         )}
                     </div>
 
+                    {/* تاريخ الميلاد */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Date of Birth
+                            تاريخ الميلاد
                         </label>
                         <div className="relative">
                             <input
                                 type="date"
-                                name='dob'
+                                name="dob"
                                 value={formik.values.dob}
                                 onChange={handleDateOfBirthChange}
-                                className="block w-full pl-10 pr-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="block w-full pr-10 pl-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
-                            <Calendar className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                            <Calendar className="absolute right-3 top-3 h-5 w-5 text-gray-400" />
                         </div>
                         {formik.errors.dob && formik.touched.dob && (
                             <p className="text-red-500 text-sm mt-1">{formik.errors.dob}</p>
@@ -255,20 +264,21 @@ export default function DoctorRegistration({
                         )}
                     </div>
 
+                    {/* التخصص */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Specialization
+                            التخصص
                         </label>
                         <div className="relative">
                             <input
                                 type="text"
-                                name='speciality'
+                                name="speciality"
                                 value={formik.values.speciality}
                                 onChange={formik.handleChange}
-                                className="block w-full pl-10 pr-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="block w-full pr-10 pl-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
-                            <Stethoscope className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                            <Stethoscope className="absolute right-3 top-3 h-5 w-5 text-gray-400" />
                         </div>
                         {formik.errors.speciality && formik.touched.speciality && (
                             <p className="text-red-500 text-sm mt-1">{formik.errors.speciality}</p>
@@ -278,20 +288,21 @@ export default function DoctorRegistration({
                         )}
                     </div>
 
+                    {/* رقم الهوية */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            ID Number
+                            رقم الهوية
                         </label>
                         <div className="relative">
                             <input
                                 type="text"
-                                name='id_number'
+                                name="id_number"
                                 value={formik.values.id_number}
                                 onChange={formik.handleChange}
-                                className="block w-full pl-10 pr-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="block w-full pr-10 pl-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
-                            <Award className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                            <Award className="absolute right-3 top-3 h-5 w-5 text-gray-400" />
                         </div>
                         {formik.errors.id_number && formik.touched.id_number && (
                             <p className="text-red-500 text-sm mt-1">{formik.errors.id_number}</p>
@@ -301,15 +312,16 @@ export default function DoctorRegistration({
                         )}
                     </div>
 
+                    {/* كلمة المرور */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">كلمة المرور</label>
                         <div className="relative">
                             <input
                                 type="password"
-                                name='password'
+                                name="password"
                                 value={formik.values.password}
                                 onChange={formik.handleChange}
-                                className="block w-full pl-10 pr-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="block w-full pr-10 pl-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
                         </div>
@@ -321,21 +333,24 @@ export default function DoctorRegistration({
                         )}
                     </div>
 
+                    {/* تأكيد كلمة المرور */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">تأكيد كلمة المرور</label>
                         <div className="relative">
                             <input
                                 type="password"
-                                name='password_confirmation'
+                                name="password_confirmation"
                                 value={formik.values.password_confirmation}
                                 onChange={formik.handleChange}
-                                className={`block w-full pl-10 pr-4 py-2.5 text-gray-700 bg-white border rounded-lg focus:outline-none  ${formik.values.password !== formik.values.password_confirmation ? 'border-red-500' : 'border-gray-300'
+                                className={`block w-full pr-10 pl-4 py-2.5 text-gray-700 bg-white border rounded-lg focus:outline-none ${formik.values.password !== formik.values.password_confirmation
+                                        ? 'border-red-500'
+                                        : 'border-gray-300'
                                     }`}
                                 required
                             />
                         </div>
                         {formik.values.password !== formik.values.password_confirmation && (
-                            <p className="text-red-500 text-sm mt-1">Passwords do not match</p>
+                            <p className="text-red-500 text-sm mt-1">كلمتا المرور غير متطابقتين</p>
                         )}
                     </div>
                 </div>
@@ -346,42 +361,40 @@ export default function DoctorRegistration({
                         onClick={onBack}
                         className="mt-6 w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
                     >
-                        Back
+                        الرجوع
                     </button>
                     <button
                         type="submit"
                         className="mt-6 w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center"
                     >
                         {loading ? (
-                            <>
-                                <svg
-                                    className="animate-spin h-5 w-5 mr-2 text-white"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <circle
-                                        className="opacity-25"
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        stroke="currentColor"
-                                        strokeWidth="4"
-                                    ></circle>
-                                    <path
-                                        className="opacity-75"
-                                        fill="currentColor"
-                                        d="M4 12a8 8 0 018-8v8H4z"
-                                    ></path>
-                                </svg>
-                            </>
+                            <svg
+                                className="animate-spin h-5 w-5 mr-2 text-white"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                            >
+                                <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                ></circle>
+                                <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8v8H4z"
+                                ></path>
+                            </svg>
                         ) : (
-                            'Next'
+                            'التالي'
                         )}
                     </button>
-
                 </div>
             </form>
         </div>
+
     );
 }

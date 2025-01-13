@@ -11,14 +11,14 @@ const UploadIdPhoto = ({ onNext }) => {
         if (!idPhoto) {
             Swal.fire({
                 icon: "warning",
-                title: "Missing Photo",
-                text: "Please upload your ID photo",
-                confirmButtonText: "OK",
+                title: "الصورة مفقودة",
+                text: "يرجى رفع صورة الهوية الخاصة بك",
+                confirmButtonText: "حسنًا",
             });
             return;
         }
 
-        onNext(idPhoto); // استدعاء الدالة بعد رفع الصورة
+        onNext(idPhoto);
     };
 
     const handleDragOver = (e) => {
@@ -40,9 +40,9 @@ const UploadIdPhoto = ({ onNext }) => {
         } else {
             Swal.fire({
                 icon: "error",
-                title: "Invalid File",
-                text: "Please upload a valid image file.",
-                confirmButtonText: "OK",
+                title: "ملف غير صالح",
+                text: "يرجى رفع ملف صورة صالح.",
+                confirmButtonText: "حسنًا",
             });
         }
     };
@@ -54,29 +54,33 @@ const UploadIdPhoto = ({ onNext }) => {
         } else {
             Swal.fire({
                 icon: "error",
-                title: "Invalid File",
-                text: "Please upload a valid image file.",
-                confirmButtonText: "OK",
+                title: "ملف غير صالح",
+                text: "يرجى رفع ملف صورة صالح.",
+                confirmButtonText: "حسنًا",
             });
         }
     };
 
     return (
-        <div className="flex flex-col items-center justify-center bg-white p-8 rounded-lg shadow-lg max-w-sm mx-auto">
+        <div
+            className="flex flex-col items-center justify-center bg-white p-8 rounded-lg shadow-lg max-w-sm mx-auto"
+            dir="rtl"
+        >
             <h2 className="text-2xl font-semibold text-gray-800 mb-4 text-center">
-                Upload Your ID Photo
+                قم برفع صورة الهوية الخاصة بك
             </h2>
             <p className="text-gray-600 mb-4 text-center">
-                Drag & drop your ID photo here or click to upload it manually.
+                اسحب وأفلت صورة الهوية هنا أو انقر لرفعها يدويًا.
             </p>
 
-            {/* Drag and Drop Area */}
+            {/* منطقة السحب والإفلات */}
             <div
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                onClick={() => document.getElementById("id-photo-input").click()} // Click to upload
-                className={`w-full border-2 ${dragging ? "border-blue-500" : "border-gray-300"} border-dashed rounded-lg p-6 text-center cursor-pointer bg-gray-50 hover:bg-gray-100 transition`}
+                onClick={() => document.getElementById("id-photo-input").click()}
+                className={`w-full border-2 ${dragging ? "border-blue-500" : "border-gray-300"
+                    } border-dashed rounded-lg p-6 text-center cursor-pointer bg-gray-50 hover:bg-gray-100 transition`}
             >
                 {idPhoto ? (
                     <div className="text-sm text-gray-600">
@@ -86,12 +90,12 @@ const UploadIdPhoto = ({ onNext }) => {
                 ) : (
                     <>
                         <FileText className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                        <p className="text-sm text-gray-600">Click or drag a file to upload</p>
+                        <p className="text-sm text-gray-600">انقر أو اسحب ملفًا للرفع</p>
                     </>
                 )}
             </div>
 
-            {/* Hidden File Input */}
+            {/* إدخال ملف مخفي */}
             <input
                 type="file"
                 accept="image/*"
@@ -100,7 +104,7 @@ const UploadIdPhoto = ({ onNext }) => {
                 className="hidden"
             />
 
-            {/* Upload and Verify Button */}
+            {/* زر الرفع والتحقق */}
             <button
                 onClick={handleUploadAndVerify}
                 className="mt-6 w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
@@ -128,10 +132,10 @@ const UploadIdPhoto = ({ onNext }) => {
                                 d="M4 12a8 8 0 018-8v8H4z"
                             ></path>
                         </svg>
-                        Verifying...
+                        جاري التحقق...
                     </>
                 ) : (
-                    "Upload and Verify"
+                    "رفع الصورة والتحقق"
                 )}
             </button>
         </div>

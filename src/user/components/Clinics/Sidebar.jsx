@@ -6,152 +6,96 @@ export function Sidebar({
     setSelectedSpecialty,
     selectedCity,
     setSelectedCity,
-    specialties = [], // التحقق من أن specialties قائمة افتراضية فارغة
-    cities = [], // التحقق من أن cities قائمة افتراضية فارغة
+    specialties = [],
+    cities = [],
 }) {
-    const [isSpecialtyOpen, setIsSpecialtyOpen] = useState(false);
-    const [isCityOpen, setIsCityOpen] = useState(false);
+    const [activeFilter, setActiveFilter] = useState(null); // للتحكم في القائمة المفتوحة
 
-    const toggleSpecialty = () => setIsSpecialtyOpen(!isSpecialtyOpen);
-    const toggleCity = () => setIsCityOpen(!isCityOpen);
+    const toggleFilter = (filterName) => {
+        setActiveFilter((prev) => (prev === filterName ? null : filterName));
+    };
 
     return (
         <div className="w-full md:w-64 flex-shrink-0">
-            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-24">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">تصفية النتائج</h2>
+            <div className="bg-white rounded-lg shadow-lg p-6 sticky top-24">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">تصفية النتائج</h2>
 
-                {/* التخصص */}
-                <div className="mb-4">
-                    <button
-                        className={`w-full text-left text-lg font-semibold text-gray-700 transition-all duration-300 ${isSpecialtyOpen
-                            ? 'bg-indigo-100 text-indigo-700'
-                            : 'hover:bg-indigo-100 hover:text-indigo-700'
-                            } py-2 px-4 rounded-lg flex items-center justify-between md:hidden`}
-                        onClick={toggleSpecialty}
-                    >
-                        <span>التخصصات</span>
-                        {isSpecialtyOpen ? (
-                            <ChevronUp className="h-5 w-5 text-indigo-700" />
-                        ) : (
-                            <ChevronDown className="h-5 w-5 text-indigo-700" />
-                        )}
-                    </button>
-                    {isSpecialtyOpen && (
-                        <div className="mt-2 border-t pt-2">
-                            <ul className="space-y-2">
+                {/* أزرار التبديل */}
+                <div className="flex flex-col gap-4">
+                    {/* التخصصات */}
+                    <div>
+                        <button
+                            onClick={() => toggleFilter("specialty")}
+                            className={`w-full flex items-center justify-between py-3 px-4 rounded-lg text-lg font-semibold transition-all duration-300 
+                            ${activeFilter === "specialty" ? "bg-indigo-500 text-white" : "bg-gray-100 text-gray-700"} 
+                            hover:bg-indigo-400 hover:text-white`}
+                        >
+                            <span>التخصصات</span>
+                            {activeFilter === "specialty" ? (
+                                <ChevronUp className="h-5 w-5" />
+                            ) : (
+                                <ChevronDown className="h-5 w-5" />
+                            )}
+                        </button>
+
+                        {activeFilter === "specialty" && (
+                            <div className="mt-4 space-y-2 transition-all duration-500">
                                 {specialties.map((specialty, index) => (
-                                    <li key={index} className="flex items-center gap-2">
+                                    <label
+                                        key={index}
+                                        className="flex items-center gap-2 py-2 px-3 rounded-lg bg-gray-50 hover:bg-indigo-100 cursor-pointer transition-all duration-300"
+                                    >
                                         <input
-                                            type="checkbox"
-                                            id={`specialty-${index}`}
+                                            type="radio"
+                                            name="specialty"
                                             value={specialty}
                                             checked={selectedSpecialty === specialty}
                                             onChange={() => setSelectedSpecialty(specialty)}
                                             className="cursor-pointer"
                                         />
-                                        <label
-                                            htmlFor={`specialty-${index}`}
-                                            className="cursor-pointer text-gray-700 hover:text-blue-500 transition-colors duration-300 hover:scale-105"
-                                        >
-                                            {specialty}
-                                        </label>
-                                    </li>
+                                        <span className="text-gray-800">{specialty}</span>
+                                    </label>
                                 ))}
-                            </ul>
-                        </div>
-                    )}
-                </div>
-
-                {/* المدينة */}
-                <div>
-                    <button
-                        className={`w-full text-left text-lg font-semibold text-gray-700 transition-all duration-300 ${isCityOpen
-                            ? 'bg-indigo-100 text-indigo-700'
-                            : 'hover:bg-indigo-100 hover:text-indigo-700'
-                            } py-2 px-4 rounded-lg flex items-center justify-between md:hidden`}
-                        onClick={toggleCity}
-                    >
-                        <span>المدن</span>
-                        {isCityOpen ? (
-                            <ChevronUp className="h-5 w-5 text-indigo-700" />
-                        ) : (
-                            <ChevronDown className="h-5 w-5 text-indigo-700" />
+                            </div>
                         )}
-                    </button>
-                    {isCityOpen && (
-                        <div className="mt-2 border-t pt-2">
-                            <ul className="space-y-2">
+                    </div>
+
+                    {/* المدن */}
+                    <div>
+                        <button
+                            onClick={() => toggleFilter("city")}
+                            className={`w-full flex items-center justify-between py-3 px-4 rounded-lg text-lg font-semibold transition-all duration-300 
+                            ${activeFilter === "city" ? "bg-indigo-500 text-white" : "bg-gray-100 text-gray-700"} 
+                            hover:bg-indigo-400 hover:text-white`}
+                        >
+                            <span>المدن</span>
+                            {activeFilter === "city" ? (
+                                <ChevronUp className="h-5 w-5" />
+                            ) : (
+                                <ChevronDown className="h-5 w-5" />
+                            )}
+                        </button>
+
+                        {activeFilter === "city" && (
+                            <div className="mt-4 space-y-2 transition-all duration-500">
                                 {cities.map((city, index) => (
-                                    <li key={index} className="flex items-center gap-2">
+                                    <label
+                                        key={index}
+                                        className="flex items-center gap-2 py-2 px-3 rounded-lg bg-gray-50 hover:bg-indigo-100 cursor-pointer transition-all duration-300"
+                                    >
                                         <input
-                                            type="checkbox"
-                                            id={`city-${index}`}
+                                            type="radio"
+                                            name="city"
                                             value={city}
                                             checked={selectedCity === city}
                                             onChange={() => setSelectedCity(city)}
                                             className="cursor-pointer"
                                         />
-                                        <label
-                                            htmlFor={`city-${index}`}
-                                            className="cursor-pointer text-gray-700 hover:text-blue-500 transition-colors duration-300 hover:scale-105"
-                                        >
-                                            {city}
-                                        </label>
-                                    </li>
+                                        <span className="text-gray-800">{city}</span>
+                                    </label>
                                 ))}
-                            </ul>
-                        </div>
-                    )}
-                </div>
-
-                {/* ظهور الفلاتر على الشاشات الكبيرة */}
-                <div className="hidden md:block">
-                    <div className="mb-4">
-                        <label className="block text-lg font-semibold text-gray-700 mb-2">التخصصات</label>
-                        <ul className="space-y-2">
-                            {specialties.map((specialty, index) => (
-                                <li key={index} className="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        id={`specialty-lg-${index}`}
-                                        value={specialty}
-                                        checked={selectedSpecialty === specialty}
-                                        onChange={() => setSelectedSpecialty(specialty)}
-                                        className="cursor-pointer"
-                                    />
-                                    <label
-                                        htmlFor={`specialty-lg-${index}`}
-                                        className="cursor-pointer text-gray-700 hover:text-blue-500 transition-colors duration-300 hover:scale-105"
-                                    >
-                                        {specialty}
-                                    </label>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    <div>
-                        <label className="block text-lg font-semibold text-gray-700 mb-2">المدن</label>
-                        <ul className="space-y-2">
-                            {cities.map((city, index) => (
-                                <li key={index} className="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        id={`city-lg-${index}`}
-                                        value={city}
-                                        checked={selectedCity === city}
-                                        onChange={() => setSelectedCity(city)}
-                                        className="cursor-pointer"
-                                    />
-                                    <label
-                                        htmlFor={`city-lg-${index}`}
-                                        className="cursor-pointer text-gray-700 hover:text-blue-500 transition-colors duration-300 hover:scale-105"
-                                    >
-                                        {city}
-                                    </label>
-                                </li>
-                            ))}
-                        </ul>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

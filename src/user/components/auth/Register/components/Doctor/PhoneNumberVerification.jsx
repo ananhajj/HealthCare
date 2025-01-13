@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { CheckCircle, Edit, Save } from 'lucide-react';
-import axios from 'axios';
+import React, { useState } from "react";
+import { CheckCircle, Edit, Save } from "lucide-react";
+import axios from "axios";
 
 export default function PhoneNumberVerification({ phone, user_id, onNext }) {
     const [verificationData, setVerificationData] = useState({
-        otp: '',
+        otp: "",
         user_id: user_id,
     });
 
@@ -12,7 +12,7 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState(null);
 
-    const backendUrl = '';
+    const backendUrl = "";
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -31,7 +31,7 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
                 onNext(user_id);
             }
         } catch (error) {
-            setError('Verification failed. Please try again.');
+            setError("فشل التحقق. يرجى المحاولة مرة أخرى.");
         } finally {
             setLoading(false);
         }
@@ -46,11 +46,11 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
             await axios.post(
                 `${backendUrl}api/resend-phone-otp`,
                 { user_id: verificationData.user_id },
-                { headers: { 'ngrok-skip-browser-warning': 's' } }
+                { headers: { "ngrok-skip-browser-warning": "s" } }
             );
-            setSuccess("Verification code resent successfully!");
+            setSuccess("تم إرسال رمز التحقق مرة أخرى بنجاح!");
         } catch (error) {
-            setError('Failed to resend the code. Please try again.');
+            setError("فشل في إعادة إرسال الرمز. يرجى المحاولة مرة أخرى.");
         } finally {
             setLoading(false);
         }
@@ -64,7 +64,7 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
 
     const handleSavePhone = async () => {
         if (!newPhone.match(/^[0-9]{10}$/)) {
-            setPhoneError('Please enter a valid phone number.');
+            setPhoneError("يرجى إدخال رقم هاتف صحيح.");
             return;
         }
         setLoading(true);
@@ -73,7 +73,7 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
             const response = await axios.put(
                 `${backendUrl}api/update-phone`,
                 { phone: newPhone, user_id: verificationData.user_id },
-                { headers: { 'ngrok-skip-browser-warning': 's' } }
+                { headers: { "ngrok-skip-browser-warning": "s" } }
             );
 
             if (response.status === 200) {
@@ -81,21 +81,23 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
                 setPhoneError(null);
                 setSuccess(true);
             } else {
-                setError('Failed to update phone.');
+                setError("فشل في تحديث رقم الهاتف.");
             }
         } catch (err) {
-            setPhoneError('Error updating phone. Please try again.');
+            setPhoneError("خطأ أثناء تحديث رقم الهاتف. يرجى المحاولة مرة أخرى.");
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
+        <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4" dir="rtl">
             <div className="w-full max-w-md p-6 bg-white shadow-md rounded-lg">
                 <div className="text-center mb-8">
                     <CheckCircle className="mx-auto h-12 w-12 text-blue-500" />
-                    <h2 className="mt-4 text-2xl font-bold text-gray-900">Verify Your Phone Number</h2>
+                    <h2 className="mt-4 text-2xl font-bold text-gray-900">
+                        تحقق من رقم هاتفك
+                    </h2>
 
                     <div className="flex justify-center items-center mt-2 space-x-2">
                         {isEditing ? (
@@ -103,7 +105,8 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
                                 type="tel"
                                 value={newPhone}
                                 onChange={(e) => setNewPhone(e.target.value)}
-                                className={`text-lg font-semibold text-center border-b-2 ${phoneError ? 'border-red-500' : 'border-gray-300 focus:border-blue-500'} focus:outline-none`}
+                                className={`text-lg font-semibold text-center border-b-2 ${phoneError ? "border-red-500" : "border-gray-300 focus:border-blue-500"
+                                    } focus:outline-none`}
                                 autoFocus
                             />
                         ) : (
@@ -122,13 +125,17 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Verification Code</label>
+                        <label className="block text-sm font-medium text-gray-700">
+                            رمز التحقق
+                        </label>
                         <input
                             type="text"
                             value={verificationData.otp}
-                            onChange={(e) => setVerificationData({ ...verificationData, otp: e.target.value })}
+                            onChange={(e) =>
+                                setVerificationData({ ...verificationData, otp: e.target.value })
+                            }
                             className="w-full px-4 py-2 mt-1 text-center border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Enter 6-digit code"
+                            placeholder="أدخل الرمز المكون من 6 أرقام"
                             maxLength={6}
                             required
                         />
@@ -137,27 +144,28 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
                     <button
                         type="submit"
                         disabled={loading}
-                        className={`w-full py-2 text-white font-medium rounded-md shadow ${loading ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'} transition-colors`}
+                        className={`w-full py-2 text-white font-medium rounded-md shadow ${loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
+                            } transition-colors`}
                     >
-                        {loading ? 'Verifying...' : 'Verify Phone'}
+                        {loading ? "جاري التحقق..." : "تحقق من الهاتف"}
                     </button>
                 </form>
 
                 {error && <p className="mt-4 text-center text-sm text-red-500">{error}</p>}
                 {success && (
                     <p className="mt-4 text-center text-sm text-green-500">
-                        Phone successfully verified!
+                        تم التحقق من رقم الهاتف بنجاح!
                     </p>
                 )}
 
                 <p className="mt-4 text-center text-sm text-gray-600">
-                    Didn't receive the code?{' '}
+                    لم يصلك الرمز؟{" "}
                     <button
                         type="button"
                         className="text-blue-600 hover:text-blue-500"
                         onClick={handleResend}
                     >
-                        Resend
+                        أعد الإرسال
                     </button>
                 </p>
             </div>

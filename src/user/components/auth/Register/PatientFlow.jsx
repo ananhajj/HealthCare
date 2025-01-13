@@ -94,14 +94,15 @@ export default function PatientFlow({ onBackToRoleSelection }) {
     };
 
     return (
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
         <motion.div
-            className="p-4 max-w-4xl mx-auto sm:p-6 lg:p-8"
+                className="p-6 max-w-screen-lg w-full bg-white shadow-md rounded-lg overflow-auto"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
         >
-            <div className="w-full bg-gray-300 h-2 rounded sm:h-3">
+                <div className="w-full bg-gray-300 h-2 rounded sm:h-3 mb-4">
                 <motion.div
                     className="bg-blue-500 h-2 rounded sm:h-3"
                     style={{ width: `${(currentStep / 4) * 100}%` }}
@@ -155,5 +156,6 @@ export default function PatientFlow({ onBackToRoleSelection }) {
                 )}
             </motion.div>
         </motion.div>
+        </div>
     );
 }

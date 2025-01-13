@@ -89,41 +89,6 @@ export default function RegisterForm() {
     return (
         <div className="flex flex-col items-center justify-center h-screen bg-gray-50" dir={role === "doctor" ? "ltr" : "rtl"}>
             {showResumePrompt ? (
-                role === "doctor" ? (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="flex flex-col items-center justify-center p-4 max-w-lg mx-auto bg-white shadow-md rounded-lg w-full"
-                    >
-                        <h2 className="text-2xl font-semibold text-center mb-4 text-blue-600">
-                            You have an ongoing registration process
-                        </h2>
-                        <p className="text-center text-gray-600 mb-6">
-                            Do you want to continue where you left off or start over?
-                        </p>
-                        <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
-                            <button
-                                type="button"
-                                onClick={handleResumeRegistration}
-                                className="w-full sm:w-40 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2"
-                            >
-                                <ArrowRight className="w-5 h-5" />
-                                Continue
-                            </button>
-                            <button
-                                type="button"
-                                onClick={handleBackToRoleSelection}
-                                className="w-full sm:w-40 bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400 hover:shadow-lg transition-all duration-300"
-                            >
-                                <span className="inline-flex items-center">
-                                    <User className="w-4 h-4 mr-2" />
-                                    Start Over
-                                </span>
-                            </button>
-                        </div>
-                    </motion.div>
-                ) : (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -158,7 +123,7 @@ export default function RegisterForm() {
                         </div>
                     </motion.div>
                 )
-            ) : !role ? (
+             : !role ? (
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}

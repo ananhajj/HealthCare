@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
-import { CheckCircle, Edit, Save } from 'lucide-react';
-import axios from 'axios';
+import React, { useState } from "react";
+import { CheckCircle, Edit, Save } from "lucide-react";
+import axios from "axios";
 
 export default function EmailVerification({ email, user_id, onNext }) {
     const [verificationData, setVerificationData] = useState({
-        otp: '',
+        otp: "",
         user_id: user_id,
     });
 
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState(null);
-    const backendUrl = '';
+    const backendUrl = "";
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -28,7 +29,7 @@ export default function EmailVerification({ email, user_id, onNext }) {
                 onNext();
             }
         } catch (error) {
-            setError('Verification failed. Please try again.');
+            setError("فشل التحقق. يرجى المحاولة مرة أخرى.");
         } finally {
             setLoading(false);
         }
@@ -37,17 +38,17 @@ export default function EmailVerification({ email, user_id, onNext }) {
     const handleResend = async () => {
         setError(null);
         setSuccess(false);
-        setVerificationData({ ...verificationData, otp: '' });
+        setVerificationData({ ...verificationData, otp: "" });
         setLoading(true);
 
         try {
             await axios.post(
                 `${backendUrl}api/resend-email-otp`,
                 { user_id: verificationData.user_id },
-                { headers: { 'ngrok-skip-browser-warning': 's' } }
+                { headers: { "ngrok-skip-browser-warning": "s" } }
             );
         } catch {
-            setError('Failed to resend the code. Please try again.');
+            setError("فشل في إعادة إرسال الرمز. يرجى المحاولة مرة أخرى.");
         } finally {
             setLoading(false);
         }
@@ -61,7 +62,7 @@ export default function EmailVerification({ email, user_id, onNext }) {
 
     const handleSaveEmail = async () => {
         if (!newEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-            setEmailError('Please enter a valid email address.');
+            setEmailError("يرجى إدخال بريد إلكتروني صالح.");
             return;
         }
         setLoading(true);
@@ -69,7 +70,7 @@ export default function EmailVerification({ email, user_id, onNext }) {
             const response = await axios.put(
                 `${backendUrl}api/update-email`,
                 { email: newEmail, user_id: verificationData.user_id },
-                { headers: { 'ngrok-skip-browser-warning': 's' } }
+                { headers: { "ngrok-skip-browser-warning": "s" } }
             );
 
             if (response.status === 200) {
@@ -77,29 +78,30 @@ export default function EmailVerification({ email, user_id, onNext }) {
                 setEmailError(null);
                 setSuccess(true);
             } else {
-                setError('Failed to update email.');
+                setError("فشل في تحديث البريد الإلكتروني.");
             }
         } catch {
-            setEmailError('Error updating email. Please try again.');
+            setEmailError("خطأ أثناء تحديث البريد الإلكتروني. يرجى المحاولة مرة أخرى.");
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
+        <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4" dir="rtl">
             <div className="w-full sm:max-w-md p-6 bg-white shadow-lg rounded-lg">
-                {/* Header */}
+                {/* العنوان */}
                 <div className="text-center mb-8">
                     <CheckCircle className="h-12 w-12 text-blue-500 mx-auto" />
-                    <h2 className="mt-4 text-2xl font-bold text-gray-900">Verify your email</h2>
+                    <h2 className="mt-4 text-2xl font-bold text-gray-900">تحقق من بريدك الإلكتروني</h2>
                     <div className="flex justify-center items-center mt-2 space-x-2">
                         {isEditing ? (
                             <input
                                 type="email"
                                 value={newEmail}
                                 onChange={(e) => setNewEmail(e.target.value)}
-                                className={`text-lg font-semibold text-center border-b-2 ${emailError ? 'border-red-500' : 'border-gray-300 focus:border-blue-500'} focus:outline-none`}
+                                className={`text-lg font-semibold text-center border-b-2 ${emailError ? "border-red-500" : "border-gray-300 focus:border-blue-500"
+                                    } focus:outline-none`}
                                 autoFocus
                             />
                         ) : (
@@ -116,10 +118,10 @@ export default function EmailVerification({ email, user_id, onNext }) {
                     {emailError && <p className="mt-2 text-sm text-red-500">{emailError}</p>}
                 </div>
 
-                {/* Verification Form */}
+                {/* نموذج التحقق */}
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="text-center">
-                        <label className="block text-sm font-medium text-gray-700">Verification Code</label>
+                        <label className="block text-sm font-medium text-gray-700">رمز التحقق</label>
                         <input
                             type="text"
                             value={verificationData.otp}
@@ -132,26 +134,27 @@ export default function EmailVerification({ email, user_id, onNext }) {
                     <button
                         type="submit"
                         disabled={loading}
-                        className={`w-full py-2 rounded-md text-white ${loading ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'} transition-colors`}
+                        className={`w-full py-2 rounded-md text-white ${loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
+                            } transition-colors`}
                     >
-                        {loading ? 'Verifying...' : 'Verify Email'}
+                        {loading ? "جاري التحقق..." : "تحقق من البريد الإلكتروني"}
                     </button>
                 </form>
 
-                {/* Error/Success Messages */}
+                {/* رسائل الخطأ أو النجاح */}
                 {error && <p className="mt-4 text-sm text-red-500 text-center">{error}</p>}
                 {success && (
                     <div className="mt-4 text-green-500 text-center">
                         <CheckCircle className="mx-auto h-12 w-12" />
-                        <p>Email successfully verified!</p>
+                        <p>تم التحقق من البريد الإلكتروني بنجاح!</p>
                     </div>
                 )}
 
-                {/* Resend Link */}
+                {/* رابط إعادة الإرسال */}
                 <p className="mt-4 text-center text-sm text-gray-600">
-                    Didn't receive the code?{' '}
+                    لم يصلك الرمز؟{" "}
                     <button type="button" onClick={handleResend} className="text-blue-600 hover:underline">
-                        Resend
+                        أعد الإرسال
                     </button>
                 </p>
             </div>
