@@ -25,7 +25,7 @@ const VerificationDetails = ({ idPhoto, onBack, onComplete, setCurrentStep }) =>
                         title: "الصورة مفقودة",
                         text: "يرجى تحميل صورة الهوية مرة أخرى.",
                     }).then(() => {
-                        setCurrentStep(3);
+                        setCurrentStep(5);
                     });
                     return;
                 }
@@ -62,7 +62,8 @@ const VerificationDetails = ({ idPhoto, onBack, onComplete, setCurrentStep }) =>
         return new Blob([byteArray], { type: contentType });
     };
 
-    const backendUrl = "";
+    const backendUrl = 'https://f98b-83-244-8-231.ngrok-free.app/';
+
 
     const handleDeleteUser = async () => {
         const userId = localStorage.getItem("userId");

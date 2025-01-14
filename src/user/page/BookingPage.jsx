@@ -1,50 +1,53 @@
 import React, { useState } from "react";
-import DatePicker, { registerLocale } from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import ar from "date-fns/locale/ar";
-import {
-    Calendar as CalendarIcon,
-    Clock,
-    User,
-    Phone,
-} from "lucide-react";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
+import { Calendar as CalendarIcon, Clock } from "lucide-react";
 import { useParams } from "react-router-dom";
 import useFetchClinicById from "../hooks/useFetchClinicById";
+import useFetchBookedClinicSlots from "../hooks/useFetchBookedClinicSlots";
+import Loading from "../components/Loading";
+ 
 
-registerLocale("ar", ar);
+const dayMap = {
+    Sunday: "الأحد",
+    Monday: "الإثنين",
+    Tuesday: "الثلاثاء",
+    Wednesday: "الأربعاء",
+    Thursday: "الخميس",
+    Friday: "الجمعة",
+    Saturday: "السبت",
+};
 
 function BookingPage() {
     const { clinicId } = useParams();
-    const [selectedDate, setSelectedDate] = useState(null);
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [showSlots, setShowSlots] = useState(false); // حالة للتحكم في الإظهار/الإخفاء
+
     const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
-    const {clinic,loading ,error}=useFetchClinicById(clinicId);
-
-    console.log("clinic:id", clinicId)
-    const [formData, setFormData] = useState({
-        name: "",
-        phone: "",
-        notes: "",
-    });
-    const [isModalOpen, setIsModalOpen] = useState(false);
-
-    const availableSlots = {
-        "2024-03-25": [
-            { time: "09:00", duration: 30 },
-            { time: "11:00", duration: 45 },
-        ],
-        "2024-03-26": [
-            { time: "10:00", duration: 30 },
-            { time: "14:00", duration: 30 },
-        ],
-    };
-
+    const { clinic, loading: getClinicLoading, error: getClinicError } = useFetchClinicById(clinicId);
+    const [formData, setFormData] = useState({ name: "", phone: "" });
+    const { bookedSlots, loading: slotsLoading, error: slotsError } = useFetchBookedClinicSlots(clinicId)
+     
+    if (getClinicLoading || slotsLoading) {
+        return <Loading />;
+    }
+    console.log("bookedSlots",bookedSlots);
     const handleDateChange = (date) => {
-        setSelectedDate(date);
+        console.log("التاريخ المستلم في handleDateChange قبل التعديل:", date);
+
+        // ضبط التاريخ ليكون في منتصف الليل في التوقيت المحلي
+        const adjustedDate = new Date(date);
+        adjustedDate.setHours(12, 0, 0, 0); // ضمان استخدام وقت وسط اليوم لتفادي الفروقات الزمنية
+
+        console.log("التاريخ المستلم في handleDateChange بعد التعديل:", adjustedDate);
+
+        setSelectedDate(adjustedDate);
         setSelectedTimeSlot(null);
     };
 
-    const handleTimeSlotSelection = (time) => {
-        setSelectedTimeSlot(time);
+
+    const handleTimeSlotSelection = (slot) => {
+        setSelectedTimeSlot(slot);
     };
 
     const handleSubmit = (e) => {
@@ -53,113 +56,176 @@ function BookingPage() {
             alert("يرجى اختيار تاريخ ووقت قبل تأكيد الحجز.");
             return;
         }
-        setIsModalOpen(true);
+        alert(`تم تأكيد الحجز بتاريخ ${selectedDate.toLocaleDateString("ar-EG")} في الساعة ${selectedTimeSlot}.`);
     };
 
-    const handleBookingConfirmation = () => {
-        alert(`تم تأكيد الحجز بتاريخ ${selectedDate.toLocaleDateString("ar-EG")} في الساعة ${selectedTimeSlot}.`);
-        setIsModalOpen(false);
+    const generateTimeSlots = (workingDay, interval, bookedTimes = []) => {
+        const slots = [];
+        const [startHour, startMinute] = workingDay.start_time.split(":").map(Number);
+        const [endHour, endMinute] = workingDay.end_time.split(":").map(Number);
+
+        let current = new Date();
+        current.setHours(startHour, startMinute, 0, 0);
+
+        const end = new Date();
+        end.setHours(endHour, endMinute, 0, 0);
+
+        const normalizedBookedTimes = bookedTimes.map(normalizeTime); // تطبيع الأوقات المحجوزة
+
+        while (current < end) {
+            const next = new Date(current.getTime() + interval * 60000);
+            const startTime = current.toTimeString().slice(0, 5); // وقت البداية
+            const endTime = next.toTimeString().slice(0, 5); // وقت النهاية
+
+            const isBooked = normalizedBookedTimes.includes(startTime); // التحقق من الحجز
+            slots.push({ start: startTime, end: endTime, isBooked });
+
+            current = next;
+        }
+        return slots;
+    };
+
+    const normalizeTime = (time) => {
+        const [timePart, period] = time.split(" "); // تقسيم الوقت إلى HH:MM و AM/PM
+        const [hours, minutes] = timePart.split(":").map(Number);
+        const isPM = period === "PM" || period === "مساءً"; // دعم الصيغتين الإنجليزية والعربية
+        const adjustedHours = isPM ? (hours % 12) + 12 : hours; // تحويل إلى صيغة 24 ساعة
+        return `${adjustedHours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
     };
 
     const getAvailableTimeSlots = () => {
-        if (!selectedDate) return [];
-        const formattedDate = selectedDate.toISOString().split("T")[0];
-        return availableSlots[formattedDate] || [];
+        if (!clinic || !clinic.workingHours) return [];
+        const dayOfWeek = dayMap[selectedDate.toLocaleDateString("en-US", { weekday: "long" })];
+        const workingDay = clinic.workingHours.find((wh) => wh.day === dayOfWeek);
+
+        if (!workingDay) return [];
+
+        const dateKey = selectedDate.toISOString().split("T")[0];
+        const bookedTimes = (bookedSlots[dateKey] || []).map(normalizeTime); // الأوقات المحجوزة
+
+        return generateTimeSlots(workingDay, clinic.appointment_time || 15, bookedTimes);
     };
 
+
+
+    const formatTime = (time) => {
+        const [hour, minute] = time.split(":").map(Number);
+        const isAM = hour < 12;
+        const formattedHour = hour % 12 || 12;
+        return `${formattedHour}:${minute.toString().padStart(2, "0")} ${isAM ? "صباحًا" : "مساءً"}`;
+    };
+
+    const tileClassName = ({ date }) => {
+        if (!clinic || !clinic.workingHours) return "";
+        const dayOfWeek = dayMap[date.toLocaleDateString("en-US", { weekday: "long" })];
+        const isAvailable = clinic.workingHours.some((wh) => wh.day === dayOfWeek);
+        return isAvailable ? "bg-green-100 text-green-900" : "text-gray-400";
+    };
+  
+    if (slotsError || getClinicError || !clinic) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <p className="text-xl text-red-500">
+                    عذرًا، حدث خطأ أثناء تحميل البيانات.
+                </p>
+            </div>
+        );
+    }
+    
+ 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 py-8 px-4" dir="rtl">
             <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
-                <h1 className="text-4xl font-bold text-center text-blue-900 mb-8">
-                    حجز موعد
-                </h1>
+                <h1 className="text-4xl font-bold text-center text-blue-900 mb-8">حجز موعد</h1>
 
-                {/* التقويم */}
-                <div className="mb-6">
-                    <h2 className="text-bold font-bold text-blue-900 flex items-center gap-2 mb-4">
-                        <CalendarIcon className="w-6 h-6 text-blue-300" />
+                <ul className="list-none text-right mb-6 space-y-4">
+                    <li className="text-lg">
+                        <span className="font-semibold text-gray-800">اسم العيادة:</span> {clinic.name}
+                    </li>
+                    <li className="text-lg">
+                        <span className="font-semibold text-gray-800">العنوان:</span> {clinic.address}
+                    </li>
+                    <li className="text-lg">
+                        <span className="font-semibold text-gray-800">رقم الهاتف:</span> {clinic.phone}
+                    </li>
+                </ul>
+
+                <div className="mb-8">
+                    <h2 className="text-2xl font-bold text-blue-900 mb-4 flex items-center gap-2">
+                        <CalendarIcon className="w-6 h-6 text-blue-500" />
                         اختر التاريخ
                     </h2>
-                    <DatePicker
-                        selected={selectedDate}
+                    <Calendar
+                        value={selectedDate}
                         onChange={handleDateChange}
-                        minDate={new Date()}
-                        inline
-                        locale="ar"
-                        highlightDates={[
-                            new Date("2024-03-25"),
-                            new Date("2024-03-26"),
-                        ]}
-                        dayClassName={(date) => {
-                            const formattedDate = date.toISOString().split("T")[0];
-                            return availableSlots[formattedDate]
-                                ? "bg-green-200 text-green-800"
-                                : "bg-gray-100 text-gray-500";
+                        tileDisabled={({ date }) => {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            return date < today;
                         }}
-                        calendarClassName="rounded-lg shadow-md border border-gray-300"
+                        tileClassName={tileClassName}
+                        locale="ar-EG"
+                        className="mb-4"
                     />
                 </div>
 
-                {/* الأوقات المتاحة */}
-                <div className="mb-6">
-                    <h2 className="text-xl font-semibold text-blue-900 flex items-center gap-2 mb-4">
-                        <Clock className="w-6 h-6 text-blue-300" />
+                <div className="mb-8">
+                    <h2 className="text-2xl font-bold text-blue-900 mb-4 flex items-center gap-2">
+                        <Clock className="w-6 h-6 text-blue-500" />
                         الأوقات المتاحة
                     </h2>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                        {getAvailableTimeSlots().length > 0 ? (
-                            getAvailableTimeSlots().map(({ time, duration }) => {
-                                const timeParts = time.split(":");
-                                const hour = parseInt(timeParts[0], 10);
-                                const isAM = hour < 12;
-                                const formattedTime = `${hour % 12 || 12}:${timeParts[1]} ${isAM ? "صباحًا" : "مساءً"}`;
-                                return (
+                    <button
+                        onClick={() => setShowSlots((prev) => !prev)} // تحديث حالة العرض
+                        className="mb-4 py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                    >
+                        {showSlots ? "إخفاء الأوقات" : "إظهار الأوقات"}
+                    </button>
+                    {showSlots && ( // عرض الأوقات فقط إذا كانت الحالة مفعّلة
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                            {getAvailableTimeSlots().length > 0 ? (
+                                getAvailableTimeSlots().map((slot, index) => (
                                     <button
-                                        key={time}
-                                        onClick={() => handleTimeSlotSelection(time)}
-                                        className={`py-2 px-3 rounded-lg font-medium border text-center transition ${selectedTimeSlot === time
+                                        key={index}
+                                        onClick={() => !slot.isBooked && handleTimeSlotSelection(`${slot.start}-${slot.end}`)}
+                                        className={`py-3 px-4 rounded-lg font-medium border text-center transition ${slot.isBooked
+                                            ? "bg-red-200 text-red-800 border-red-500 cursor-not-allowed"
+                                            : selectedTimeSlot === `${slot.start}-${slot.end}`
                                                 ? "bg-blue-500 text-white border-blue-500"
                                                 : "bg-gray-50 hover:bg-blue-100 hover:text-blue-900 border-gray-300"
                                             }`}
+                                        disabled={slot.isBooked}
                                     >
-                                        <span>{formattedTime}</span>
-                                        <br />
-                                        <span className="text-sm text-gray-500">{duration} دقيقة</span>
+                                        {formatTime(slot.start)} - {formatTime(slot.end)}
+                                        {slot.isBooked && <span className="block text-sm text-red-600">محجوز</span>}
                                     </button>
-                                );
-                            })
-                        ) : (
-                            <p className="text-gray-500 col-span-full text-center">
-                                لا توجد أوقات متاحة لهذا التاريخ.
-                            </p>
-                        )}
-                    </div>
+                                ))
+                            ) : (
+                                <p className="text-gray-500 col-span-full text-center">لا توجد أوقات متاحة لهذا التاريخ.</p>
+                            )}
+                        </div>
+                    )}
                 </div>
 
-                {/* نموذج الحجز */}
-                <form onSubmit={handleSubmit} className="space-y-4">
+
+                <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <label className="block text-gray-700 mb-2">الاسم الكامل</label>
+                        <label className="block text-lg font-medium text-gray-700 mb-2">الاسم الكامل</label>
                         <input
                             type="text"
                             name="name"
                             value={formData.name}
-                            onChange={(e) =>
-                                setFormData({ ...formData, name: e.target.value })
-                            }
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                             required
                         />
                     </div>
                     <div>
-                        <label className="block text-gray-700 mb-2">رقم الهاتف</label>
+                        <label className="block text-lg font-medium text-gray-700 mb-2">رقم الهاتف</label>
                         <input
                             type="tel"
                             name="phone"
                             value={formData.phone}
-                            onChange={(e) =>
-                                setFormData({ ...formData, phone: e.target.value })
-                            }
+                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                             required
                         />
@@ -171,39 +237,6 @@ function BookingPage() {
                         تأكيد الحجز
                     </button>
                 </form>
-
-                {/* موديل التأكيد */}
-                {isModalOpen && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                        <div className="bg-white rounded-lg shadow-lg p-6 w-96">
-                            <h3 className="text-xl font-semibold mb-4 text-blue-900">
-                                تأكيد الحجز
-                            </h3>
-                            <p className="text-gray-600 mb-4">
-                                هل أنت متأكد من حجز الموعد التالي؟
-                            </p>
-                            <p className="text-gray-800 font-semibold mb-4">
-                                التاريخ: {selectedDate.toLocaleDateString("ar-EG")}
-                                <br />
-                                الوقت: {selectedTimeSlot}
-                            </p>
-                            <div className="flex gap-4 justify-end">
-                                <button
-                                    className="bg-gray-300 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-400 transition"
-                                    onClick={() => setIsModalOpen(false)}
-                                >
-                                    إلغاء
-                                </button>
-                                <button
-                                    className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition"
-                                    onClick={handleBookingConfirmation}
-                                >
-                                    تأكيد
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
             </div>
         </div>
     );

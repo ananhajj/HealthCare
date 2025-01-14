@@ -48,7 +48,7 @@ const defaultSpecialties = [
     { ar_name: "طب عيون", icon: FaEye },
     { ar_name: "طب أطفال", icon: FaBaby },
     { ar_name: "طب نساء وولادة", icon: FaFirstAid },
-    { ar_name:  "باطنة", icon: FaUserMd },
+    { ar_name:  "طب الباطني", icon: FaUserMd },
     { ar_name: "جراحة عامة", icon: FaCut },
     { ar_name: "طب نفسي", icon: FaBrain },
     { ar_name: "أمراض القلب", icon: FaHeart },

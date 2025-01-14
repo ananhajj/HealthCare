@@ -11,10 +11,11 @@ export default function EmailVerification({ email, user_id, onNext }) {
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState(null);
-    const backendUrl = "";
+    const backendUrl = 'https://f98b-83-244-8-231.ngrok-free.app/';
+
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+       e.preventDefault();
         setLoading(true);
         try {
             const response = await axios.post(
@@ -33,6 +34,7 @@ export default function EmailVerification({ email, user_id, onNext }) {
         } finally {
             setLoading(false);
         }
+  
     };
 
     const handleResend = async () => {
@@ -88,13 +90,12 @@ export default function EmailVerification({ email, user_id, onNext }) {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4" dir="rtl">
-            <div className="w-full sm:max-w-md p-6 bg-white shadow-lg rounded-lg">
+             <div className="w-full max-w-lg p-8 bg-white shadow-xl rounded-lg">
                 {/* العنوان */}
-                <div className="text-center mb-8">
+                <div className="text-center mb-10">
                     <CheckCircle className="h-12 w-12 text-blue-500 mx-auto" />
-                    <h2 className="mt-4 text-2xl font-bold text-gray-900">تحقق من بريدك الإلكتروني</h2>
-                    <div className="flex justify-center items-center mt-2 space-x-2">
+                    <h2 className="mt-4 text-3xl font-extrabold text-gray-900">تحقق من بريدك الإلكتروني</h2>
+                    <div className="flex justify-center items-center mt-4 space-x-2">
                         {isEditing ? (
                             <input
                                 type="email"
@@ -124,6 +125,7 @@ export default function EmailVerification({ email, user_id, onNext }) {
                         <label className="block text-sm font-medium text-gray-700">رمز التحقق</label>
                         <input
                             type="text"
+                            placeholder="وصلك كود على الأيميل"
                             value={verificationData.otp}
                             onChange={(e) => setVerificationData({ ...verificationData, otp: e.target.value })}
                             className="w-3/4 px-4 py-2 mx-auto mt-2 text-center border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -134,7 +136,7 @@ export default function EmailVerification({ email, user_id, onNext }) {
                     <button
                         type="submit"
                         disabled={loading}
-                        className={`w-full py-2 rounded-md text-white ${loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
+                        className={`w-full py-3 rounded-md text-white ${loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
                             } transition-colors`}
                     >
                         {loading ? "جاري التحقق..." : "تحقق من البريد الإلكتروني"}
@@ -142,22 +144,23 @@ export default function EmailVerification({ email, user_id, onNext }) {
                 </form>
 
                 {/* رسائل الخطأ أو النجاح */}
-                {error && <p className="mt-4 text-sm text-red-500 text-center">{error}</p>}
+                {error && <p className="mt-6 text-sm text-red-500 text-center">{error}</p>}
                 {success && (
-                    <div className="mt-4 text-green-500 text-center">
+                    <div className="mt-6 text-green-500 text-center">
                         <CheckCircle className="mx-auto h-12 w-12" />
                         <p>تم التحقق من البريد الإلكتروني بنجاح!</p>
                     </div>
                 )}
 
                 {/* رابط إعادة الإرسال */}
-                <p className="mt-4 text-center text-sm text-gray-600">
+                <p className="mt-6 text-center text-sm text-gray-600">
                     لم يصلك الرمز؟{" "}
                     <button type="button" onClick={handleResend} className="text-blue-600 hover:underline">
                         أعد الإرسال
                     </button>
                 </p>
             </div>
-        </div>
+  
     );
+
 }

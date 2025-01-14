@@ -56,10 +56,8 @@ const CircularCapture = ({ onNext }) => {
     }, [isReady, captured]);
 
     return (
-        <div
-            className="flex flex-col items-center justify-center h-screen text-white bg-gray-900"
-            dir="rtl"
-        >
+        <div className="w-full max-w-lg p-8 bg-white shadow-xl rounded-lg">
+
             {!isReady ? (
                 <div className="text-center">
                     <p className="text-lg">{feedbackMessage}</p>

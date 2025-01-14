@@ -49,7 +49,7 @@ const VerificationDetails = ({ idPhoto, onBack, onComplete, setCurrentStep }) =>
     }, [idPhoto]);
 
 
-    const backendUrl = '';
+    const backendUrl = 'https://f98b-83-244-8-231.ngrok-free.app/';
 
     const handleSubmitDetails = async (formData) => {
         try {
@@ -145,7 +145,7 @@ const VerificationDetails = ({ idPhoto, onBack, onComplete, setCurrentStep }) =>
         } else {
             try {
                 if (userId) {
-                    await axios.delete(`${backendUrl}api/doctors/${userId}`);
+                    await axios.delete(`${backendUrl}api/users/${userId}`);
                     console.log(`تم حذف المستخدم ذو الرقم التعريفي ${userId} بنجاح.`);
                 }
             } catch (error) {

@@ -5,6 +5,7 @@ import PhoneNumberVerification from "./components/Patient/PhoneNumberVerificatio
 import UploadIdPhoto from "./components/Patient/UploadIdPhoto";
 import VerificationDetails from "./components/Patient/VerificationDetails";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 export default function PatientFlow({ onBackToRoleSelection }) {
     const [currentStep, setCurrentStep] = useState(1);
@@ -13,7 +14,7 @@ export default function PatientFlow({ onBackToRoleSelection }) {
     const [userId, setUserId] = useState(null);
     const [idPhoto, setIdPhoto] = useState(null);
     const [loading, setLoading] = useState(true);
-
+    const navigate = useNavigate();
     useEffect(() => {
         const savedStep = parseInt(localStorage.getItem("currentStep"), 10) || 1;
         const savedUserDetails = JSON.parse(localStorage.getItem("userDetails")) || {};
@@ -64,11 +65,21 @@ export default function PatientFlow({ onBackToRoleSelection }) {
 
         Swal.fire({
             icon: "success",
-            title: "Registration Complete!",
-            text: "Your account has been successfully verified.",
-            confirmButtonText: "OK",
+            title: "تم التسجيل بنجاح!",
+            text: "تم التحقق من حسابك بنجاح.",
+            confirmButtonText: "موافق",
+            // إضافة خصائص RTL
+            customClass: {
+                popup: 'rtl-popup',
+                confirmButton: 'rtl-confirm-btn'
+            },
+            // استخدام اتجاه الكتابة من اليمين لليسار
+            didOpen: () => {
+                const popup = Swal.getPopup();
+                popup.style.direction = 'rtl';
+            }
         }).then(() => {
-            onBackToRoleSelection();
+            navigate("/login");
         });
     };
 

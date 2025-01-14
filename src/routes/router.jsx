@@ -13,6 +13,8 @@ import CitySelection from "../user/components/CitySelection";
 import ClinicList from "../user/components/Clinics/ClinicList";
 import RegisterLayout from "../layouts/RegisterLayout";
 import PatientProfile from "../user/page/PatientProfile";
+import ProtectedRoute from "./ProtectedRoute";
+import AdminLayout from "../layouts/AdminLayout";
 
 const router = createBrowserRouter([
     {
@@ -33,7 +35,11 @@ const router = createBrowserRouter([
             },
             {
                 path: '/profile',
-                element: <PatientProfile />
+                element: (
+                    <ProtectedRoute requiredRole={2}>
+                        <PatientProfile />
+                    </ProtectedRoute>
+                ),
             },
             {
                 path: '/clinics',
@@ -70,18 +76,16 @@ const router = createBrowserRouter([
         path: '/register',
         element: <RegisterLayout />
 
+    },
+      {
+
+          path: '/dashboard',
+          element: (
+              <ProtectedRoute requiredRole={1}>
+                  <AdminLayout />
+              </ProtectedRoute>
+          ),
     }
 ])
 export default router
-{/*
-                      <button
-                                    className="mt-4 text-blue-600 hover:underline"
-                                    onClick={toggleDoctorDetails}
-                                >
-                                    عرض تفاصيل الطبيب
-                                </button>
-                         
-                        {showDoctorDetails && (
-                            <DoctorDetails doctor={doctor} open={showDoctorDetails} onClose={toggleDoctorDetails} />
-                        )}
-                            */}
+ 

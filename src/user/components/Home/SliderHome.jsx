@@ -8,12 +8,14 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { ClinicContext } from '../../context/ClinicContext';
 import { Link, useNavigate } from 'react-router-dom';
+import { UserContext } from '../../context/UserContextProvider';
 
 const backgroundImage = 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80'
 
 function SliderHome() {
     const {cities}=useContext(ClinicContext); 
     const navigate=useNavigate();
+    const { isLoggedIn }=useContext(UserContext);
     return (
         <div className="w-full bg-gradient-to-b from-blue-50 to-white " style={{
             backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0)))`,
@@ -40,6 +42,7 @@ function SliderHome() {
                         className="h-full"
                     >
                         {/* Slide 1 - Book from Home */}
+                        {!isLoggedIn&&(
                         <SwiperSlide className="flex-[0_0_100%] min-w-0 relative">
                             <div className="h-[600px] relative rounded-2xl overflow-hidden"
                                 style={{ background: "rgb(95 111 255 / var(--tw-border-opacity, 1))" }}>
@@ -51,13 +54,17 @@ function SliderHome() {
                                         <h1 className="text-4xl font-bold mb-6">كل المدن <span className='text-5xl'>الفلسطينية</span> في مكان واحد</h1>
                                         <p className="text-xl mb-8"> احجز موعدك من بيتك في أي مدينة تريد</p>
                                         <button className="bg-white text-green-800 hover:bg-customText group px-8 py-3 rounded-lg text-lg font-medium transition duration-300 gap-2 transform hover:scale-105">
-                                            <span>سجل الآن</span>
+                                          <Link to={'/register'}>
+                                                    <span>سجل الآن</span>   
+                                          </Link>
                                             <ArrowLeft className="mr-2 h-5 w-5 group-hover:rotate-90 group-hover:translate-x-2 transition-transform duration-300" />
                                         </button>
                                     </div>
                                 </div>
                             </div>
                         </SwiperSlide>
+                        )
+}
 
 
 

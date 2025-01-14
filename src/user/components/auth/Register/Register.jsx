@@ -161,16 +161,18 @@ export default function RegisterForm() {
                 <DoctorFlow onBackToRoleSelection={handleBackToRoleSelection} />
             )}
 
-            {/* رابط تسجيل الدخول */}
-            <p className="mt-4 text-sm text-gray-600">
-                هل لديك حساب؟{' '}
-                <Link
-                    to="/login"
-                    className="text-blue-600 underline hover:text-blue-800 transition-colors"
-                >
-                    سجل الدخول هنا
-                </Link>
-            </p>
+          <div>
+                {/* رابط تسجيل الدخول */}
+                <p className="mt-4 text-sm text-gray-600">
+                    هل لديك حساب؟{' '}
+                    <Link
+                        to="/login"
+                        className="text-blue-600 underline hover:text-blue-800 transition-colors"
+                    >
+                        سجل الدخول هنا
+                    </Link>
+                </p>
+          </div>
         </div>
     );
 

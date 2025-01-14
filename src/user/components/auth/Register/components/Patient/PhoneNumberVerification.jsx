@@ -12,10 +12,11 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState(null);
 
-    const backendUrl = '';
+    const backendUrl = 'https://f98b-83-244-8-231.ngrok-free.app/';
+
 
     const handleSubmit = async (e) => {
-       /* e.preventDefault();
+        e.preventDefault();
         setLoading(true);
 
         try {
@@ -34,8 +35,8 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
             setError('فشل التحقق. من فضلك حاول مجددًا.');
         } finally {
             setLoading(false);
-        }*/
-        onNext(user_id);
+        }
+     
     };
 
     const handleResend = async () => {
@@ -90,6 +91,7 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
             setLoading(false);
         }
     };
+  
 
     return (
         <div className="flex flex-col items-center min-h-[50vh] justify-center min-h-screen bg-gray-50 px-4 rtl">

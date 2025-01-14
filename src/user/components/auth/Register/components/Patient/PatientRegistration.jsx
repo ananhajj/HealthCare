@@ -12,7 +12,10 @@ const validationSchema = Yup.object({
     phone: Yup.string()
         .matches(/^059\d{7}$/, "رقم الهاتف غير صالح")
         .required("رقم الهاتف مطلوب"),
-    id_number: Yup.string().required("رقم الهوية مطلوب"),
+  
+    id_number: Yup.string()
+            .length(9, 'لا يقل عن 9 ارقام')
+        .required("رقم الهوية مطلوب"),
     dob: Yup.date().required("تاريخ الميلاد مطلوب"),
     gender: Yup.string().required("الجنس مطلوب"),
     blood_type: Yup.string().required("فصيلة الدم مطلوبة"),
@@ -61,11 +64,12 @@ export default function PatientRegistration({
 
     const [loading, setLoading] = useState(false);
     const [backendErrors, setBackendErrors] = useState('');
-    const backendUrl = '';
+ 
+    const backendUrl = 'https://f98b-83-244-8-231.ngrok-free.app/';
 
     const handleSubmit = async (values) => {
         console.log("form register",values);
-       /* setLoading(true);
+        setLoading(true);
         try {
             const response = await axios.post(
                 `${backendUrl}api/patient/register`,
@@ -74,7 +78,7 @@ export default function PatientRegistration({
             );
             if (response.status === 201) {
                 console.log(response.data)
-                const userDetails = { ...formData };
+                const userDetails = { ...values };
                 localStorage.setItem("userDetails", JSON.stringify(userDetails));
 
 
@@ -87,16 +91,32 @@ export default function PatientRegistration({
             if (error.response?.data) setBackendErrors(error.response.data.error);
         } finally {
             setLoading(false);
-        }*/
-        const userDetails = { ...values };
-        localStorage.setItem("userDetails", JSON.stringify(userDetails));
-        onNext(values.phone,1, userDetails);
-    };
+        }
 
+    };
+    const handleEnglishInputChange = (e) => {
+        const { name, value } = e.target;
+
+        // السماح فقط بالأحرف الإنجليزية والمسافات
+        const regex = /^[a-zA-Z\s]*$/;
+
+        if (regex.test(value) || value === "") {
+            formik.setFieldValue(name, value); // تحديث القيمة في formik
+        }
+    };
     const handleChange = (e) => {
         formik.handleChange(e);
     };
+    const handleArabicInputChange = (e) => {
+        const { name, value } = e.target;
 
+        // السماح فقط بالأحرف العربية
+        const regex = /^[\u0600-\u06FF\s]*$/;
+
+        if (regex.test(value) || value === "") {
+            formik.setFieldValue(name, value); // تحديث القيمة في formik
+        }
+    };
     return (
         <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6 overflow-auto md:overflow-visible  rtl" dir="rtl">
             {/* Header Section */}
@@ -120,7 +140,8 @@ export default function PatientRegistration({
                             type="text"
                             name="first_name"
                             value={formik.values.first_name}
-                            onChange={handleChange}
+                            placeholder='صالح'
+                            onChange={handleArabicInputChange}
                             className="block w-full pl-10 pr-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             required
                         />
@@ -139,7 +160,8 @@ export default function PatientRegistration({
                             type="text"
                             name="last_name"
                             value={formik.values.last_name}
-                            onChange={handleChange}
+                            onChange={handleArabicInputChange}
+                            placeholder='زيتاوي'
                             className="block w-full pl-10 pr-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             required
                         />
@@ -159,7 +181,8 @@ export default function PatientRegistration({
                                 type="text"
                                 name="username"
                                 value={formik.values.username}
-                                onChange={handleChange}
+                                onChange={handleEnglishInputChange}
+                                placeholder='salehzetawi'
                                 className="block w-full pl-10 pr-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
@@ -181,6 +204,7 @@ export default function PatientRegistration({
                             name="phone"
                             value={formik.values.phone}
                             onChange={handleChange}
+                            placeholder='0597376520'
                             className="block w-full pl-10 pr-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             pattern="\d{10}"
                             required
@@ -201,6 +225,7 @@ export default function PatientRegistration({
                                 name="id_number"
                                 value={formik.values.id_number}
                                 onChange={handleChange}
+                                placeholder='47048757'
                                 className="block w-full pl-10 pr-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
@@ -329,6 +354,7 @@ export default function PatientRegistration({
                     <input
                         type="password"
                         name="password"
+                        placeholder='خلي كلمة سر متقلش عن 6 خانات'
                         value={formik.values.password}
                         onChange={handleChange}
                         className="block w-full pl-10 pr-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"

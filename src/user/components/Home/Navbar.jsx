@@ -1,25 +1,40 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Stethoscope, Menu, X, User, LogIn, ChevronDown } from 'lucide-react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import logo from '../../../assets/logo.svg';
+import { UserContext } from '../../context/UserContextProvider';
 
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(true); // حالة تسجيل الدخول
+   
     const [isDropdownOpen, setIsDropdownOpen] = useState(false); // حالة القائمة المنسدلة
+    const dropdownRef = useRef(null);
     const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false); // حالة القائمة المنسدلة للموبايل
     const navigate = useNavigate();
+    const { isLoggedIn, setIsLoggedIn,logout } = useContext(UserContext);
 
     const handleLoginClick = () => {
         navigate('/login'); // يقوم بالتنقل إلى صفحة /login عند الضغط
     };
-
-    const handleLogout = () => {
-        setIsLoggedIn(false); // تفعيل تسجيل الخروج
-        setIsMobileDropdownOpen(false); // إغلاق القائمة المنسدلة
-        // هنا يمكن إضافة منطق تسجيل الخروج، مثل مسح الـ token من localStorage
+    const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            setIsDropdownOpen(false);
+        }
     };
-
+    const handleLogout = () => {
+        logout(); // استدعاء وظيفة تسجيل الخروج
+        navigate("/login"); // توجيه المستخدم إلى صفحة تسجيل الدخول
+    };
+    useEffect(() => {
+        if (isDropdownOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        } else {
+            document.removeEventListener("mousedown", handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isDropdownOpen]);
     return (
         <header className="text-sm py-4 mb-5 border-b border-b-[#ADADAD]" dir="rtl">
             <div className="container mx-auto px-6">
@@ -90,7 +105,7 @@ export default function Header() {
                     </nav>
 
                     {/* زر الدخول أو القائمة المنسدلة حسب حالة المستخدم */}
-                    <div className="hidden md:flex items-center">
+                    <div className="hidden md:flex items-center" ref={dropdownRef}>
                         {isLoggedIn ? (
                             <div className="relative z-10">
                                 <button
@@ -103,8 +118,12 @@ export default function Header() {
                                 </button>
                                 {isDropdownOpen && (
                                     <div className="absolute right-0 w-48 mt-2 bg-white shadow-lg rounded-lg border border-gray-200">
-                                        <Link to="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">الملف الشخصي</Link>
-                                        <Link to="/medical-record" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">السجل الطبي</Link>
+                                        <Link to="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            الملف الشخصي
+                                        </Link>
+                                        <Link to="/medical-record" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            السجل الطبي
+                                        </Link>
                                         <button
                                             onClick={handleLogout}
                                             className="w-full text-left block px-4 py-2 text-sm text-red-500 hover:bg-gray-100"

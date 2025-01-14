@@ -9,7 +9,7 @@ const ClinicList = () => {
     const { cityKey } = useParams();
     const navigate = useNavigate();
     const { specificClinics, loading, error } = useFetchClinics(cityKey);
-
+ 
     if (loading) {
         return <Loading />;
     }

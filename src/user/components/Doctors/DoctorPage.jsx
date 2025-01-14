@@ -4,7 +4,7 @@ import {
     MapPin,
     Phone,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { useNavigate, useParams } from "react-router-dom";
@@ -12,7 +12,17 @@ import useFetchBookedClinicSlots from "../../hooks/useFetchBookedClinicSlots";
 import useFetchDoctorById from "../../hooks/useFetchDoctorById";
 import { generateTimeSlots } from "../../utils/generateTimeSlots";
 import Loading from "../Loading";
-
+import { UserContext } from "../../context/UserContextProvider";
+import Swal from "sweetalert2";
+const dayMap = {
+    Sunday: "الأحد",
+    Monday: "الإثنين",
+    Tuesday: "الثلاثاء",
+    Wednesday: "الأربعاء",
+    Thursday: "الخميس",
+    Friday: "الجمعة",
+    Saturday: "السبت",
+};
 function DoctorPage() {
     useEffect(() => {
         window.scrollTo(0, 0); // إعادة التمرير إلى الأعلى عند تحميل الصفحة
@@ -20,6 +30,7 @@ function DoctorPage() {
     const { doctorId } = useParams();
     const navigate = useNavigate();
     const { doctor, loading: doctorLoading, error: doctorError } = useFetchDoctorById(doctorId);
+    const { isLoggedIn } = useContext(UserContext); // الحصول على حالة تسجيل الدخول
 
     const [viewOnlineBooking, setViewOnlineBooking] = useState(false);
     const [selectedClinic, setSelectedClinic] = useState(null);
@@ -30,10 +41,8 @@ function DoctorPage() {
         selectedClinic?.id
     );
 
-    console.log("bookedSlots كامل:", bookedSlots);
-    const dateKey = selectedDate.toISOString().split("T")[0];
-    console.log("تاريخ اليوم المختار:", dateKey);
-    console.log("الأوقات المحجوزة في هذا اليوم:", bookedSlots[dateKey] || []);
+     const dateKey = selectedDate.toISOString().split("T")[0];
+ 
 
 
 
@@ -95,16 +104,9 @@ function DoctorPage() {
 
         if (!selectedClinic) return [];
 
-        const dayMap = {
-            Sunday: "الأحد",
-            Monday: "الإثنين",
-            Tuesday: "الثلاثاء",
-            Wednesday: "الأربعاء",
-            Thursday: "الخميس",
-            Friday: "الجمعة",
-            Saturday: "السبت",
-        };
-        const dayOfWeekArabic = dayMap[selectedDate.toLocaleDateString("en-US", { weekday: "long" })];
+      
+        const dayOfWeekArabic = dayMap[selectedDate.toLocaleDateString("en-US", { weekday: "long" })]
+
 
         const workingDay = selectedClinic.workingHours.find((wh) => wh.day === dayOfWeekArabic);
 
@@ -118,16 +120,14 @@ function DoctorPage() {
         // تطبيع الأوقات المحجوزة
         const normalizedBookedTimes = bookedTimes.map((time) => normalizeTime(time));
 
-        console.log("Tile Date:", dateKey, "Normalized Booked Times:", normalizedBookedTimes);
-
+ 
         // استثناء الأوقات المحجوزة
         const filteredSlots = availableSlots.filter((slot) => {
-            const normalizedSlot = normalizeTime(extractStartTime(slot));
+            const normalizedSlot = normalizeTime(extractStartTime(slot)); // استخراج وقت البداية وتطبيعه
             const isBooked = normalizedBookedTimes.includes(normalizedSlot);
 
             // طباعة إضافية للمقارنة
-            console.log(`Comparing: Slot (${normalizedSlot}) with Booked Times (${normalizedBookedTimes}) -> Is Booked: ${isBooked}`);
-
+ 
             return !isBooked;
         });
 
@@ -205,72 +205,142 @@ function DoctorPage() {
             </div>
         );
     }
+ 
+    const handleBookingClick = () => {
+        if (!isLoggedIn) {
+            // عرض SweetAlert مع رسالة باللغة العربية و RTL
+            Swal.fire({
+                title: "👋 مرحباً بك!",
+                html: `
+                    <p style="font-size: 18px; line-height: 1.8; color: #444; text-align:  ;">
+                        لتتمكن من حجز موعدك بسهولة وراحة، نرجو منك تسجيل الدخول أولاً.
+                        <br />
+                        لا تقلق، العملية بسيطة وسريعة جدًا!
+                    </p>
+                `,
+                icon: "info",
+                showCancelButton: true,
+                confirmButtonText: "تسجيل الدخول الآن",
+                cancelButtonText: "لاحقًا",
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                customClass: {
+                    popup: "swal2-rtl", // جعل المحتوى من اليمين إلى اليسار
+                },
+                didOpen: () => {
+                    document.querySelector(".swal2-container").setAttribute("dir", "rtl");
+                },
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // إذا ضغط المستخدم على "تسجيل الدخول"، يمكن توجيهه إلى صفحة تسجيل الدخول
+                    window.location.href = "/login";
+                }
+            });
+        } else {
+            // فتح المودال إذا كان المستخدم مسجل الدخول
+            setIsModalOpen(true);
+        }
+    };
     return (
         <div
-            className="min-h-screen bg-gradient-to-r from-blue-100 to-white py-12 px-4 sm:px-6 lg:px-8"
+            className="min-h-screen bg-gradient-to-r from-blue-100 to-white py-6 px-4 sm:px-6 lg:px-8"
             dir="rtl"
         >
-            <div className="container mx-auto py-8">
+            <div className="container mx-auto py-4">
                 {/* زر العودة */}
                 <button
-                    className="mb-6 flex items-center text-white bg-mainColor hover:bg-blue-700 py-3 px-6 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105"
+                    className="mb-6 flex items-center text-white bg-mainColor hover:bg-blue-700 py-2 px-4 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105 text-sm md:text-base"
                     onClick={() => navigate(-1)}
                 >
-                    <ArrowLeft className="h-5 w-5 mr-3" />
+                    <ArrowLeft className="h-4 w-4 mr-2 md:h-5 md:w-5" />
                     العودة إلى قائمة الأطباء
                 </button>
 
-                <div className="grid md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* معلومات الطبيب */}
-                    <div className="bg-white rounded-lg shadow-lg p-6">
+                    <div className="bg-white rounded-lg shadow-md p-4 lg:p-6">
                         <img
                             src={doctor.avatar}
                             alt={doctor.name}
-                            className="w-32 h-32 rounded-full object-cover shadow-lg mx-auto mb-4"
+                            className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover shadow-md mx-auto mb-4"
                         />
-                        <h1 className="text-2xl font-semibold text-center mb-2">
+                        <h1 className="text-xl md:text-2xl font-semibold text-center mb-2">
                             {doctor.name}
                         </h1>
-                        <p className="text-lg text-muted-foreground text-center mb-2">
+                        <p className="text-sm md:text-lg text-muted-foreground text-center mb-2">
                             {doctor.speciality}
                         </p>
-                        <p className="text-center text-gray-600">
-                            <div className="text-center text-yellow-500 text-lg">
-                                {Array.from({ length: Math.floor(doctor.rating) }, (_, index) => (
-                                    <span key={index}>★</span> // نجمة ممتلئة
-                                ))}
-                                {doctor.rating % 1 >= 0.5 && <span>★</span>} {/* نصف نجمة إذا كان التقييم يحتوي على .5 */}
-                                {Array.from({ length: 5 - Math.ceil(doctor.rating) }, (_, index) => (
-                                    <span key={index} className="text-gray-300">★</span> // نجمة فارغة
-                                ))}
+                        <div className="text-center text-yellow-500 text-base md:text-lg">
+                            {Array.from({ length: Math.floor(doctor.rating) }, (_, index) => (
+                                <span key={index}>★</span>
+                            ))}
+                            {doctor.rating % 1 >= 0.5 && <span>★</span>}
+                            {Array.from(
+                                { length: 5 - Math.ceil(doctor.rating) },
+                                (_, index) => (
+                                    <span key={index} className="text-gray-300">
+                                        ★
+                                    </span>
+                                )
+                            )}
+                        </div>
+                        {/* عرض رقم الهاتف */}
+                        {doctor.phone && (
+                            <div className="mt-4">
+                                <h2 className="text-lg font-semibold text-mainColor mb-1 text-right">
+                                    رقم الهاتف
+                                </h2>
+                                <p className="text-sm md:text-base text-gray-700 text-right flex items-center">
+                                    <Phone className="inline-block w-5 h-5 text-gray-500 ml-2" />
+                                    {doctor.phone}
+                                </p>
                             </div>
+                        )}
 
-                        </p>
+
+                        {/* قسم المؤهلات */}
+                        {doctor.about && doctor.about.qualifies && (
+                            <div className="mt-4">
+                                <h2 className="text-xl font-semibold text-mainColor mb-3 text-start">
+                                    المؤهلات
+                                </h2>
+                                <ul className="bg-gray-100 p-3 rounded-lg text-sm md:text-base text-gray-700 list-disc list-inside">
+                                    {Object.entries(doctor.about.qualifies).map(([key, value]) => (
+                                        <li key={key}>
+                                            <span className="font-semibold">{value.name}</span> -{" "}
+                                            {value.position}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
 
                         {!viewOnlineBooking && (
-                            <div className="mt-6">
+                            <div className="mt-4">
                                 {doctor.clinics.length > 0 && (
-                                    <h2 className="text-2xl font-semibold mb-3 text-mainColor">
+                                    <h2 className="text-xl font-semibold mb-3 text-mainColor text-start">
                                         {doctor.clinics.length === 1 ? "عيادة" : "العيادات"}
                                     </h2>
                                 )}
 
-                                <div className="space-y-4">
+                                <div className="space-y-3">
                                     {doctor.clinics.map((clinic, index) => (
                                         <div
                                             key={index}
-                                            className={`p-4 cursor-pointer border-2 rounded-lg ${selectedClinic?.id === clinic.id
+                                            className={`p-3 cursor-pointer border-2 rounded-lg ${selectedClinic?.id === clinic.id
                                                 ? "border-blue-600"
                                                 : "border-gray-300 hover:border-gray-400"
                                                 }`}
                                             onClick={() => handleClinicSelection(clinic)}
                                         >
-                                            <h3 className="font-semibold mb-2">{clinic.name}</h3>
-                                            <p className="text-sm text-gray-500">
+                                            <h3 className="font-semibold text-sm md:text-base mb-1">
+                                                {clinic.name}
+                                            </h3>
+                                            <p className="text-xs md:text-sm text-gray-500 flex items-center">
                                                 <MapPin className="inline-block w-4 h-4 mr-1" />
                                                 {clinic.address}
                                             </p>
-                                            <p className="text-sm text-gray-500">
+                                            <p className="text-xs md:text-sm text-gray-500 flex items-center">
                                                 <Phone className="inline-block w-4 h-4 mr-1" />
                                                 {clinic.phone}
                                             </p>
@@ -282,8 +352,8 @@ function DoctorPage() {
                     </div>
 
                     {/* التقويم والمواعيد */}
-                    <div className="bg-white rounded-lg shadow-lg p-6">
-                        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-mainColor">
+                    <div className="bg-white rounded-lg shadow-md p-4 lg:p-6">
+                        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-mainColor">
                             <CalendarIcon className="h-5 w-5" />
                             {viewOnlineBooking
                                 ? "المواعيد الإلكترونية"
@@ -293,10 +363,10 @@ function DoctorPage() {
                         </h2>
 
                         {/* أزرار التبديل */}
-                        <div className="flex gap-4 mb-4">
-                            {doctor.clinics.length > 0 && ( // عرض زر مواعيد العيادة فقط إذا كانت هناك عيادات
+                        <div className="flex flex-col sm:flex-row gap-4 mb-4">
+                            {doctor.clinics.length > 0 && (
                                 <button
-                                    className={`py-2 px-4 rounded-lg ${!viewOnlineBooking
+                                    className={`py-2 px-3 text-sm md:text-base rounded-lg ${!viewOnlineBooking
                                         ? "bg-mainColor text-white"
                                         : "bg-gray-200 text-gray-800"
                                         }`}
@@ -306,7 +376,7 @@ function DoctorPage() {
                                 </button>
                             )}
                             <button
-                                className={`py-2 px-4 rounded-lg ${viewOnlineBooking
+                                className={`py-2 px-3 text-sm md:text-base rounded-lg ${viewOnlineBooking
                                     ? "bg-blue-600 text-white"
                                     : "bg-gray-200 text-gray-800"
                                     }`}
@@ -333,81 +403,125 @@ function DoctorPage() {
                             className="mb-4"
                         />
 
-
-
-
                         {/* عرض اليوم */}
-                        <div className="mb-4 text-center">
-                            <h3 className="text-lg font-semibold text-blue-900">
-                                {selectedDate.toLocaleDateString("ar-EG", {
-                                    weekday: "long",
-                                    day: "numeric",
-                                    month: "long",
-                                    year: "numeric",
-                                })}
-                            </h3>
+                        <div className="mb-4 text-center relative">
+                            {(() => {
+                                const availableTimeSlots = getAvailableTimeSlots();
+                                const isFullyBooked =
+                                    bookedSlots[dateKey]?.length > 0 && availableTimeSlots.length === 0;
+
+                                return (
+                                    <>
+                                        {isFullyBooked && (
+                                            <div className="absolute inset-0 bg-red-500 bg-opacity-70 flex items-center justify-center text-white font-semibold text-sm md:text-base rounded-lg">
+                                                محجوز
+                                            </div>
+                                        )}
+                                        <h3 className="text-sm md:text-lg font-semibold text-blue-900">
+                                            {selectedDate.toLocaleDateString("ar-EG", {
+                                                weekday: "long",
+                                                day: "numeric",
+                                                month: "long",
+                                                year: "numeric",
+                                            })}
+                                        </h3>
+                                    </>
+                                );
+                            })()}
                         </div>
 
+              
                         {/* الأوقات المتاحة */}
                         <div className="space-y-4">
-                            {getAvailableTimeSlots().length > 0 ? (
-                                <>
-                                    <h3 className="text-lg font-semibold text-blue-900">الأوقات المتاحة</h3>
-                                    <div className="max-h-60 overflow-y-auto space-y-3 px-2 border border-gray-300 rounded-md">
-                                        {getAvailableTimeSlots().map((slot, index) => {
-                                            const dateKey = selectedDate.toISOString().split("T")[0];
-                                            const bookedTimes = bookedSlots[dateKey]?.map((time) =>
-                                                normalizeTime(time)
-                                            ) || [];
+                            {(() => {
+                                const availableTimeSlots = generateTimeSlots(
+                                    selectedClinic?.workingHours.find(
+                                        (wh) =>
+                                            wh.day ===
+                                            dayMap[selectedDate.toLocaleDateString("en-US", {
+                                                weekday: "long",
+                                            })
+                                            ]
+                                    ),
+                                    selectedClinic?.appointment_time || 15
+                                );
 
-                                            const normalizedSlot = normalizeTime(extractStartTime(slot));
-                                            const isBooked = bookedTimes.includes(normalizedSlot);
+                                const bookedTimes =
+                                    bookedSlots[dateKey]?.map((time) => normalizeTime(time)) || [];
 
-                                            return (
-                                                <button
-                                                    key={index}
-                                                    className={`w-full py-3 px-6 text-center rounded-md border transition-all duration-200 ${isBooked
-                                                            ? "bg-red-200 text-red-800 cursor-not-allowed shadow-md" // تنسيق خاص للأوقات المحجوزة
-                                                            : selectedTimeSlot === slot
-                                                                ? "bg-blue-600 text-white shadow-lg"
-                                                                : "bg-gray-50 text-gray-800 hover:bg-blue-100 hover:text-blue-600"
-                                                        }`}
-                                                    onClick={() => !isBooked && handleTimeSlotSelection(slot)} // السماح بالتحديد فقط إذا لم يكن محجوزًا
-                                                    disabled={isBooked} // تعطيل الزر إذا كان الوقت محجوزًا
-                                                >
-                                                    {formatTimeRangeToArabic(slot)}{" "}
-                                                    {isBooked && <span className="ml-2 text-sm">(محجوز)</span>}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </>
-                            ) : (
-                                <p className="text-center text-gray-500">لا توجد أوقات متاحة لهذا اليوم.</p>
-                            )}
+                                // عرض جميع الأوقات مع تحديد المحجوزة
+                                if (availableTimeSlots.length > 0) {
+                                    return (
+                                        <>
+                                            <h3 className="text-lg font-semibold text-blue-900">
+                                                الأوقات المتاحة
+                                            </h3>
+                                            <div className="max-h-60 overflow-y-auto space-y-3 px-2 border border-gray-300 rounded-md">
+                                                {availableTimeSlots.map((slot, index) => {
+                                                    const normalizedSlot = normalizeTime(
+                                                        extractStartTime(slot)
+                                                    );
+                                                    const isBooked = bookedTimes.includes(
+                                                        normalizedSlot
+                                                    );
+
+                                                    return (
+                                                        <button
+                                                            key={index}
+                                                            className={`w-full py-3 px-6 text-center rounded-md border transition-all duration-200 ${isBooked
+                                                                    ? "bg-red-200 text-red-800 cursor-not-allowed shadow-md" // تنسيق خاص للمحجوز
+                                                                    : selectedTimeSlot === slot
+                                                                        ? "bg-blue-600 text-white shadow-lg"
+                                                                        : "bg-gray-50 text-gray-800 hover:bg-blue-100 hover:text-blue-600"
+                                                                }`}
+                                                            onClick={() =>
+                                                                !isBooked &&
+                                                                handleTimeSlotSelection(slot)
+                                                            }
+                                                            disabled={isBooked} // تعطيل الزر إذا كان الوقت محجوزًا
+                                                        >
+                                                            {formatTimeRangeToArabic(slot)}{" "}
+                                                            {isBooked && (
+                                                                <span className="ml-2 text-sm">
+                                                                    (محجوز)
+                                                                </span>
+                                                            )}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </>
+                                    );
+                                } else {
+                                    return (
+                                        <p className="text-center text-gray-500">
+                                            لا توجد أوقات متاحة لهذا اليوم.
+                                        </p>
+                                    );
+                                }
+                            })()}
                         </div>
-
-
-
-
-
 
                         {/* زر الحجز الآن */}
                         {selectedTimeSlot && (
                             <div className="mt-4 text-center">
                                 <button
                                     className="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition"
-                                    onClick={() => setIsModalOpen(true)}
+                                    onClick={handleBookingClick}
                                 >
                                     احجز الآن
                                 </button>
                             </div>
                         )}
+
+
+
+
+
                     </div>
-
                 </div>
+                
             </div>
-
             {/* موديل التأكيد */}
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -441,6 +555,6 @@ function DoctorPage() {
         </div>
     );
 }
-
+ 
 export default DoctorPage;
 

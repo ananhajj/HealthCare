@@ -12,7 +12,7 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState(null);
 
-    const backendUrl = "";
+    const backendUrl = 'https://f98b-83-244-8-231.ngrok-free.app/';
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -35,6 +35,7 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
         } finally {
             setLoading(false);
         }
+     
     };
 
     const handleResend = async () => {
@@ -91,15 +92,16 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4" dir="rtl">
-            <div className="w-full max-w-md p-6 bg-white shadow-md rounded-lg">
-                <div className="text-center mb-8">
+       
+            <div className="flex flex-col justify-between w-full max-w-lg lg:max-w-2xl xl:max-w-3xl p-10 bg-white shadow-xl rounded-lg">
+                {/* العنوان */}
+                <div className="text-center mb-12">
                     <CheckCircle className="mx-auto h-12 w-12 text-blue-500" />
-                    <h2 className="mt-4 text-2xl font-bold text-gray-900">
+                    <h2 className="mt-4 text-3xl font-extrabold text-gray-900">
                         تحقق من رقم هاتفك
                     </h2>
 
-                    <div className="flex justify-center items-center mt-2 space-x-2">
+                    <div className="flex justify-center items-center mt-6 space-x-3">
                         {isEditing ? (
                             <input
                                 type="tel"
@@ -123,6 +125,7 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
                     {phoneError && <p className="mt-2 text-sm text-red-500">{phoneError}</p>}
                 </div>
 
+                {/* نموذج التحقق */}
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                         <label className="block text-sm font-medium text-gray-700">
@@ -134,7 +137,7 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
                             onChange={(e) =>
                                 setVerificationData({ ...verificationData, otp: e.target.value })
                             }
-                            className="w-full px-4 py-2 mt-1 text-center border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-3 mt-2 text-center border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="أدخل الرمز المكون من 6 أرقام"
                             maxLength={6}
                             required
@@ -144,21 +147,23 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
                     <button
                         type="submit"
                         disabled={loading}
-                        className={`w-full py-2 text-white font-medium rounded-md shadow ${loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
+                        className={`w-full py-3 text-white font-medium rounded-md shadow ${loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
                             } transition-colors`}
                     >
                         {loading ? "جاري التحقق..." : "تحقق من الهاتف"}
                     </button>
                 </form>
 
-                {error && <p className="mt-4 text-center text-sm text-red-500">{error}</p>}
+                {/* رسائل الخطأ أو النجاح */}
+                {error && <p className="mt-6 text-center text-sm text-red-500">{error}</p>}
                 {success && (
-                    <p className="mt-4 text-center text-sm text-green-500">
+                    <p className="mt-6 text-center text-sm text-green-500">
                         تم التحقق من رقم الهاتف بنجاح!
                     </p>
                 )}
 
-                <p className="mt-4 text-center text-sm text-gray-600">
+                {/* رابط إعادة الإرسال */}
+                <p className="mt-6 text-center text-sm text-gray-600">
                     لم يصلك الرمز؟{" "}
                     <button
                         type="button"
@@ -169,6 +174,8 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
                     </button>
                 </p>
             </div>
-        </div>
+     
     );
+
+
 }

@@ -1,10 +1,52 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Calendar, Clock, MapPin, User } from "lucide-react";
 import { formatScheduleArabic } from "../../utils/scheduleFormatter";
+import Swal from "sweetalert2";
+import { UserContext } from "../../context/UserContextProvider";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export const ClinicCard = ({ clinic, onBooking }) => {
+    const { isLoggedIn } = useContext(UserContext); // الحصول على حالة تسجيل الدخول
+    const navigate = useNavigate();
     console.log("clinic in city",clinic);
     const formattedSchedule = clinic.schedule ? clinic.schedule : ["غير محدد"];
+    const handleBookingClick = () => {
+        if (!isLoggedIn) {
+            // عرض SweetAlert إذا لم يكن المستخدم مسجلًا
+            Swal.fire({
+                           title: "👋 مرحباً بك!",
+                           html: `
+                               <p style="font-size: 18px; line-height: 1.8; color: #444; text-align:  ;">
+                                   لتتمكن من حجز موعدك بسهولة وراحة، نرجو منك تسجيل الدخول أولاً.
+                                   <br />
+                                   لا تقلق، العملية بسيطة وسريعة جدًا!
+                               </p>
+                           `,
+                           icon: "info",
+                           showCancelButton: true,
+                           confirmButtonText: "تسجيل الدخول الآن",
+                           cancelButtonText: "لاحقًا",
+                           confirmButtonColor: "#3085d6",
+                           cancelButtonColor: "#d33",
+                           customClass: {
+                               popup: "swal2-rtl", // جعل المحتوى من اليمين إلى اليسار
+                           },
+                           didOpen: () => {
+                               document.querySelector(".swal2-container").setAttribute("dir", "rtl");
+                           },
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // توجيه المستخدم إلى صفحة تسجيل الدخول
+                    window.location.href = "/login";
+                }
+            });
+        } else {
+            // استدعاء دالة الحجز إذا كان المستخدم مسجل الدخول
+           
+            navigate(`/clinic/booking/${clinic.id}`);
+            
+        }
+    };
     return (
         <div className="relative bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
             {/* الصورة */}
@@ -75,7 +117,7 @@ export const ClinicCard = ({ clinic, onBooking }) => {
             {/* زر الحجز */}
             <div className="mt-6">
                 <button
-                    onClick={() => onBooking(clinic.id)}
+                    onClick={handleBookingClick}
                     className="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors duration-300 flex items-center justify-center"
                 >
                     <Calendar className="w-5 h-5 ml-2" />

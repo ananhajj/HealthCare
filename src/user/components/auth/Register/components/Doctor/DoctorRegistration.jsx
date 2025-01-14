@@ -3,7 +3,43 @@ import { Mail, Lock, User, Phone, Stethoscope, Building, Award, Calendar } from 
 import axios from 'axios';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
-
+import {
+    FaStethoscope,
+    FaTooth,
+    FaEye,
+    FaBaby,
+    FaFirstAid,
+    FaUserMd,
+    FaCut,
+    FaBrain,
+    FaHeart,
+    FaBandAid,
+    FaHospital,
+    FaSyringe,
+    FaMicroscope,
+    FaFlask,
+    FaShieldAlt,
+    FaPills,
+} from "react-icons/fa";
+const defaultSpecialties = [
+    { ar_name: "طب عام", icon: FaStethoscope },
+    { ar_name: "طب أسنان", icon: FaTooth },
+    { ar_name: "طب العيون", icon: FaEye },
+    { ar_name: "طب أطفال", icon: FaBaby },
+    { ar_name: "طب نساء وولادة", icon: FaFirstAid },
+    { ar_name: "طب الباطني ", icon: FaUserMd },
+    { ar_name: "جراحة عامة", icon: FaCut },
+    { ar_name: "الطب النفسي", icon: FaBrain },
+    { ar_name: "طب جراحة القلب، والأوعية الدموية", icon: FaHeart },
+    { ar_name: "الأمراض الجلدية", icon: FaBandAid },
+    { ar_name: "طب العظام", icon: FaHospital },
+    { ar_name: "أنف وأذن وحنجرة", icon: FaHospital },
+    { ar_name: "التخدير", icon: FaSyringe },
+    { ar_name: "الأشعة", icon: FaMicroscope },
+    { ar_name: "المسالك البولية", icon: FaFlask },
+    { ar_name: "المناعة", icon: FaShieldAlt },
+    { ar_name: "الأمراض المعدية", icon: FaPills },
+];
 const validationSchema = Yup.object({
     first_name: Yup.string().required('First name is required'),
     last_name: Yup.string().required('Last name is required'),
@@ -17,7 +53,7 @@ const validationSchema = Yup.object({
     dob: Yup.date().required('Date of birth is required'),
     speciality: Yup.string().required('Specialty is required'),
     id_number: Yup.string()
-        .length(10, 'ID number must be 10 digits')
+        .length(9, 'ID number must be 10 digits')
         .required('ID number is required'),
     password: Yup.string()
         .min(6, 'Password must be at least 6 characters')
@@ -55,6 +91,8 @@ export default function DoctorRegistration({
             phone: phone || '',
             first_name: firstName || '',
             last_name: lastName || '',
+            en_first_name:  '',
+            en_last_name:   '',
             dob: dob || '',
             username: username || '',
             speciality: speciality || '',
@@ -70,18 +108,17 @@ export default function DoctorRegistration({
 
     const [loading, setLoading] = useState(false);
     const [backendErrors, setBackendErrors] = useState('');
-    const backendUrl = '';
+    const backendUrl = 'https://f98b-83-244-8-231.ngrok-free.app/';
 
     const handleSubmit = async (values) => {
 
-        /*setLoading(true);
+        setLoading(true);
         try {
             const response = await axios.post(
                 `${backendUrl}api/doctor/register`,
                 values,
                 { headers: { "ngrok-skip-browser-warning": "s" } }
             );
-
             if (response.status === 201) {
                 const userDetails = { ...values };
                 localStorage.setItem("userDetails", JSON.stringify(userDetails));
@@ -91,11 +128,7 @@ export default function DoctorRegistration({
             if (error.response?.data) setBackendErrors(error.response.data.error);
         } finally {
             setLoading(false);
-        }*/
-        const userDetails = { ...values };
-        localStorage.setItem("userDetails", JSON.stringify(userDetails));
-        console.log("values:", values);
-        onNext(values.email, values.phone,  1, userDetails);
+        }
     };
 
 
@@ -106,6 +139,50 @@ export default function DoctorRegistration({
 
         // تخزين تاريخ الميلاد في localStorage
         localStorage.setItem("birthday", newDate);
+    };
+    const [filteredSpecialties, setFilteredSpecialties] = useState([]);
+    const [showDropdown, setShowDropdown] = useState(false);
+
+    const handleInputChange = (e) => {
+        const value = e.target.value;
+        formik.setFieldValue("speciality", value);
+
+        if (value.trim() === "") {
+            setFilteredSpecialties([]);
+            setShowDropdown(false);
+            return;
+        }
+
+        const filtered = defaultSpecialties.filter((specialty) =>
+            specialty.ar_name.includes(value)
+        );
+        setFilteredSpecialties(filtered);
+        setShowDropdown(true);
+    };
+
+    const handleSelectSpeciality = (speciality) => {
+        formik.setFieldValue("speciality", speciality.ar_name);
+        setShowDropdown(false);
+    };
+    const handleArabicInputChange = (e) => {
+        const { name, value } = e.target;
+
+        // السماح فقط بالأحرف العربية
+        const regex = /^[\u0600-\u06FF\s]*$/;
+
+        if (regex.test(value) || value === "") {
+            formik.setFieldValue(name, value); // تحديث القيمة في formik
+        }
+    };
+    const handleEnglishInputChange = (e) => {
+        const { name, value } = e.target;
+
+        // السماح فقط بالأحرف الإنجليزية والمسافات
+        const regex = /^[a-zA-Z\s]*$/;
+
+        if (regex.test(value) || value === "") {
+            formik.setFieldValue(name, value); // تحديث القيمة في formik
+        }
     };
 
     return (
@@ -130,7 +207,8 @@ export default function DoctorRegistration({
                                 name="first_name"
                                 type="text"
                                 value={formik.values.first_name}
-                                onChange={formik.handleChange}
+                                placeholder='عنان'
+                                onChange={handleArabicInputChange}
                                 className="block w-full pr-10 pl-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
@@ -153,8 +231,9 @@ export default function DoctorRegistration({
                             <input
                                 name="last_name"
                                 type="text"
+                                placeholder='قرارية'
                                 value={formik.values.last_name}
-                                onChange={formik.handleChange}
+                                onChange={handleArabicInputChange}
                                 className="block w-full pr-10 pl-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
@@ -168,6 +247,59 @@ export default function DoctorRegistration({
                         )}
                     </div>
 
+                    {/* الاسم الأول في الانجليزي */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            الاًسم الأول  (بالانجليزي)
+                        </label>
+                        <div className="relative">
+                            <input
+                                name="en_first_name"
+                                type="text"
+                                value={formik.values.en_first_name}
+                                placeholder='Anan'
+                                onChange={handleEnglishInputChange}
+                                className="block w-full pr-10 pl-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                dir="ltr"
+                                required
+                            />
+                            <User className="absolute right-3 top-3 h-5 w-5 text-gray-400" />
+                        </div>
+                        {formik.errors.last_name && formik.touched.en_first_name && (
+                            <p className="text-red-500 text-sm mt-1">{formik.errors.en_first_name}</p>
+                        )}
+                        {backendErrors.last_name && (
+                            <p className="text-red-500 text-sm mt-1">{backendErrors.en_first_name[0]}</p>
+                        )}
+                    </div>
+
+                    {/* الاسم الاخير في الانجليزي */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            الاًسم الأخير (بالانجليزي)
+                        </label>
+                        <div className="relative">
+                            <input
+                                name="en_last_name"
+                                type="text"
+                                value={formik.values.en_last_name}
+                                placeholder='Qrareya'
+                                onChange={handleEnglishInputChange}
+                                className="block w-full pr-10 pl-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                dir="ltr"
+                                required
+                            />
+                            <User className="absolute right-3 top-3 h-5 w-5 text-gray-400" />
+                        </div>
+                        {formik.errors.last_name && formik.touched.en_last_name && (
+                            <p className="text-red-500 text-sm mt-1">{formik.errors.en_last_name}</p>
+                        )}
+                        {backendErrors.last_name && (
+                            <p className="text-red-500 text-sm mt-1">{backendErrors.en_last_name[0]}</p>
+                        )}
+                    </div>
+
+
                     {/* البريد الإلكتروني */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -177,6 +309,7 @@ export default function DoctorRegistration({
                             <input
                                 name="email"
                                 type="email"
+                                placeholder='ananqrareya@gmail.com'
                                 value={formik.values.email}
                                 onChange={formik.handleChange}
                                 className="block w-full pr-10 pl-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -201,6 +334,7 @@ export default function DoctorRegistration({
                             <input
                                 type="tel"
                                 name="phone"
+                                placeholder='0597376520'
                                 value={formik.values.phone}
                                 onChange={formik.handleChange}
                                 className="block w-full pr-10 pl-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -225,10 +359,12 @@ export default function DoctorRegistration({
                             <input
                                 type="text"
                                 name="username"
+                                placeholder='ananqrarey'
                                 value={formik.values.username}
                                 onChange={formik.handleChange}
                                 className="block w-full pr-10 pl-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
+                                dir="ltr"
                             />
                             <User className="absolute right-3 top-3 h-5 w-5 text-gray-400" />
                         </div>
@@ -273,12 +409,28 @@ export default function DoctorRegistration({
                             <input
                                 type="text"
                                 name="speciality"
+                                placeholder='طب عام'
                                 value={formik.values.speciality}
-                                onChange={formik.handleChange}
+                                onChange={handleInputChange}
                                 className="block w-full pr-10 pl-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
-                            <Stethoscope className="absolute right-3 top-3 h-5 w-5 text-gray-400" />
+                            <FaStethoscope className="absolute right-3 top-3 h-5 w-5 text-gray-400" />
+
+                            {showDropdown && (
+                                <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1 max-h-40 overflow-auto shadow-lg">
+                                    {filteredSpecialties.map((specialty, index) => (
+                                        <li
+                                            key={index}
+                                            className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                            onClick={() => handleSelectSpeciality(specialty)}
+                                        >
+                                            <specialty.icon className="h-5 w-5 text-gray-500 mr-2" />
+                                            <span>{specialty.ar_name}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
                         </div>
                         {formik.errors.speciality && formik.touched.speciality && (
                             <p className="text-red-500 text-sm mt-1">{formik.errors.speciality}</p>
@@ -297,6 +449,7 @@ export default function DoctorRegistration({
                             <input
                                 type="text"
                                 name="id_number"
+                                placeholder='4708420119'
                                 value={formik.values.id_number}
                                 onChange={formik.handleChange}
                                 className="block w-full pr-10 pl-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -319,6 +472,7 @@ export default function DoctorRegistration({
                             <input
                                 type="password"
                                 name="password"
+                                placeholder='at least 6 characters'
                                 value={formik.values.password}
                                 onChange={formik.handleChange}
                                 className="block w-full pr-10 pl-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"

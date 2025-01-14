@@ -1,8 +1,15 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { User, Lock, Search } from "lucide-react"; // استيراد الأيقونات من lucide-react
 import { useFormik } from "formik"; // إدارة النماذج باستخدام Formik
-import { Link } from "react-router-dom"; // للتوجيه بين الصفحات
+import { Link, useNavigate } from "react-router-dom"; // للتوجيه بين الصفحات
 import * as Yup from "yup"; // لإضافة التحقق من صحة البيانات
+import { UserContext } from "../../context/UserContextProvider";
+import { Bounce, Slide, toast } from "react-toastify";
+
+import axios from "axios";
+import { encryptData } from "../../../routes/encryption";
+import useFetchPatientByIdData from "../../hooks/useFetchPatientByIdData";
+import Swal from "sweetalert2";
 
 // التحقق من صحة البيانات باستخدام Yup
 const validationSchema = Yup.object({
@@ -11,18 +18,78 @@ const validationSchema = Yup.object({
 });
 
 export default function Login() {
+    const { setUserData, setIsLoggedIn, setLoading } = useContext(UserContext);  // الوصول إلى الدوال من السياق
+    const apiUrl = "https://f98b-83-244-8-231.ngrok-free.app";
     const [errorMessage, setErrorMessage] = useState(""); // تخزين الأخطاء عند الحاجة
+    const navigate=useNavigate();
     const formik = useFormik({
         initialValues: {
             username: "",
             password: "",
         },
         validationSchema,
-        onSubmit: (values) => {
-            // هنا يمكنك التعامل مع البيانات المدخلة
-            console.log(values);
-        },
+        onSubmit: LoginUser,
     });
+    async function LoginUser() {
+        setLoading(true);
+        const loginPayload = {
+            username: formik.values.username,
+            password: formik.values.password,
+        };
+
+        try {
+            const response = await axios.post(`${apiUrl}/api/login`, loginPayload, {
+                headers: { "ngrok-skip-browser-warning": "s" },
+            });
+
+            if (response.status === 200) {
+                const { token, user } = response.data;
+
+                // تخزين التوكن مباشرةً بدون تشفير
+                localStorage.setItem("userToken", token);
+
+                // تشفير بيانات المستخدم وتخزينها
+                const encryptedUser = encryptData(user);
+                localStorage.setItem("userData", encryptedUser);
+
+                // تحديث السياق
+                setUserData(user);
+                setIsLoggedIn(true);
+
+                // التنقل بناءً على الدور
+                if (user.role_id === 2) {
+                    localStorage.setItem("currentUserId", user.id);
+                    navigate("/");
+                } else if (user.role_id === 1) {
+                    navigate("/doctor");
+                } else if (user.role_id === 3) {
+                    navigate("/admin");
+                }
+
+                Swal.fire({
+                    title: "تم تسجيل الدخول بنجاح!",
+                    text: "مرحبًا بك مرة أخرى 👋",
+                    icon: "success",
+                    confirmButtonText: "حسنًا",
+                    confirmButtonColor: "#3085d6",
+                    timer: 3000,
+                    timerProgressBar: true,
+                });
+            }
+        } catch (error) {
+            console.error("Login error:", error);
+            Swal.fire({
+                title: "فشل تسجيل الدخول",
+                text: "حدث خطأ أثناء محاولة تسجيل الدخول. يرجى المحاولة مرة أخرى.",
+                icon: "error",
+                confirmButtonText: "إعادة المحاولة",
+                confirmButtonColor: "#d33",
+            });
+        } finally {
+            setLoading(false);
+        }
+    }
+
 
     return (
         <div className="container mx-auto px-6 py-12" dir="rtl">
