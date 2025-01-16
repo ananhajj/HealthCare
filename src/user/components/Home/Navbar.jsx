@@ -121,6 +121,9 @@ export default function Header() {
                                         <Link to="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                             الملف الشخصي
                                         </Link>
+                                         <Link to="/booking-history-online" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                حجزك الأونلاين
+                                         </Link>
                                         <Link to="/medical-record" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                             السجل الطبي
                                         </Link>

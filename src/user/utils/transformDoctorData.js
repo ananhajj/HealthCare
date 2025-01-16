@@ -10,9 +10,12 @@ export const transformDoctorData = (doctorData) => {
   return {
     id: String(doctorData.id),
     name: doctorData.ar_full_name || "اسم غير متوفر",
+    enName:doctorData.en_full_name ||"اسم غير متوفر",
     speciality: doctorData.speciality || "تخصص غير محدد",
     avatar: doctorData.avatar || "صورة غير متوفرة",
-    about: JSON.parse(doctorData.about || "{}"),
+     about: typeof doctorData.about === "string"
+      ? JSON.parse(doctorData.about || "{}")
+      : doctorData.about || {},
     phone: doctorData.phone || "غير متوفر",
     rating: doctorData.rating || 0,
     fee: doctorData.fee || 0,

@@ -3,18 +3,18 @@ import { UserContext } from "../context/UserContextProvider";
 import axios from "axios";
 import { convertTo12HourFormat } from "../utils/scheduleFormatter";
 
-const useFetchBookedClinicSlots=(clinicId)=>{
-    const [bookedSlots, setBookedSlots] = useState({});
+const useFetchBookedOnlineSlots=(doctorId)=>{
+    const [bookedOnlineSlots, setBookedSlots] = useState({});
     const { loading, setLoading } = useContext(UserContext);
     const [error, setError] = useState(null);
     useEffect(() => {
-        if (!clinicId) return;
+        if (!doctorId) return;
         const fetchBookedSlots = async () => {
             setLoading(true);
             setError(null);
             try{
                 const response = await axios.get(
-                    `https://d7ef-212-14-228-238.ngrok-free.app/api/clinics/${clinicId}/ReservedAppointments`,
+                    `https://d7ef-212-14-228-238.ngrok-free.app/api/doctors/${doctorId}/ReservedAppointments`,
                     { headers: { "ngrok-skip-browser-warning": "s" } }
                 );
                 const rawData = response.data;
@@ -48,7 +48,7 @@ const useFetchBookedClinicSlots=(clinicId)=>{
             }
         };
         fetchBookedSlots();
-    }, [clinicId, setLoading]);
-    return { bookedSlots, loading, error };
+    }, [doctorId, setLoading]);
+    return { bookedOnlineSlots, loading, error };
 };
-export default useFetchBookedClinicSlots;
+export default useFetchBookedOnlineSlots;

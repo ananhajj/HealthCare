@@ -20,7 +20,7 @@ const useFetchClinicById = (clinicId) => {
 
             try {
                 const response = await axios.get(
-                    `https://f98b-83-244-8-231.ngrok-free.app/api/clinics/${clinicId}`,
+                    `https://d7ef-212-14-228-238.ngrok-free.app/api/clinics/${clinicId}`,
                     { headers: { "ngrok-skip-browser-warning": "s" } }
                 );
 
@@ -32,6 +32,7 @@ const useFetchClinicById = (clinicId) => {
                         id: clinicF.id || "غير متوفر",
                         name: clinicF.ar_name || "اسم غير متوفر",
                         city: clinicF.city?.ar_name || "مدينة غير محددة",
+                        doctorId: clinicF.doctor.id,
                         address: clinicF.address
                             ? Object.values(clinicF.address)
                                 .filter(Boolean)

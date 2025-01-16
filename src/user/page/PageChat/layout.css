@@ -1,0 +1,24 @@
+.maincomponent {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 80vh;
+    direction: rtl;
+}
+
+.str-chatchannel-list {
+    width: 30%;
+    height: 80vh;
+    font-size: 18px;
+
+}
+
+.str-chatchannel {
+    width: 70%;
+    height: 80vh;
+}
+
+.str-chat__thread {
+    width: 100%;
+    height: 80vh;
+}

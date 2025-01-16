@@ -18,7 +18,7 @@ const useFetchAllClinics=()=>{
             setError(false);
             try{
                 const response = await axios.get(
-                    `https://f98b-83-244-8-231.ngrok-free.app/api/clinics`,
+                    `https://d7ef-212-14-228-238.ngrok-free.app/api/clinics`,
                     { headers: { "ngrok-skip-browser-warning": "s" } }
                 );
                 console.log("all clinics",response.data);

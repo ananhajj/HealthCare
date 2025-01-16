@@ -6,7 +6,7 @@ const useFetchPatientByIdData = (userId) => {
     const [patientData, setPatientData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const apiUrl = "https://f98b-83-244-8-231.ngrok-free.app";
+    const apiUrl = "https://d7ef-212-14-228-238.ngrok-free.app";
 
     useEffect(() => {
         if (!userId ) return;
