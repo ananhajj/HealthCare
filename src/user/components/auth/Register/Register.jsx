@@ -4,7 +4,10 @@ import PatientFlow from './PatientFlow';
 import DoctorFlow from './DoctorFlow';
 import axios from 'axios';
 import { motion } from 'framer-motion';
+import registerAi from '../../../../assets/animations/register.json'
+
 import { Link, NavLink, useNavigate } from 'react-router-dom';
+import Lottie from 'lottie-react';
 export default function RegisterForm() {
     const navigate = useNavigate();
     const [role, setRole] = useState(null);
@@ -162,6 +165,10 @@ export default function RegisterForm() {
             )}
 
           <div>
+            <div className='w-full flex items-center justify-center '>
+                <Lottie animationData={registerAi} loop  className="w-20"/>
+            </div>
+               
                 {/* رابط تسجيل الدخول */}
                 <p className="mt-4 text-sm text-gray-600">
                     هل لديك حساب؟{' '}

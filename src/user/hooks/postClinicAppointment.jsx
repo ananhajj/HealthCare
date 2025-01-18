@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const apiUrl = "https://d7ef-212-14-228-238.ngrok-free.app";
+const apiUrl = "https://c15b-139-190-147-200.ngrok-free.app";
 export const postClinicAppointment = async (clinicId, appointmentData) => {
   try {
     const response = await axios.post(

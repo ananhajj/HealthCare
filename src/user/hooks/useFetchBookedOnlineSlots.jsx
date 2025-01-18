@@ -14,7 +14,7 @@ const useFetchBookedOnlineSlots=(doctorId)=>{
             setError(null);
             try{
                 const response = await axios.get(
-                    `https://d7ef-212-14-228-238.ngrok-free.app/api/doctors/${doctorId}/ReservedAppointments`,
+                    `https://c15b-139-190-147-200.ngrok-free.app/api/doctors/${doctorId}/ReservedAppointments`,
                     { headers: { "ngrok-skip-browser-warning": "s" } }
                 );
                 const rawData = response.data;

@@ -5,7 +5,7 @@ const useFetchStreamToken=(doctorId)=>{
     const [streamToken,setStreamToken]=useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const apiUrl = "https://d7ef-212-14-228-238.ngrok-free.app";
+    const apiUrl = "https://c15b-139-190-147-200.ngrok-free.app";
     useEffect(()=>{
 
         const fetchStreamToken=async()=>{

@@ -5,11 +5,12 @@ import { Link, useNavigate } from "react-router-dom"; // للتوجيه بين �
 import * as Yup from "yup"; // لإضافة التحقق من صحة البيانات
 import { UserContext } from "../../context/UserContextProvider";
 import { Bounce, Slide, toast } from "react-toastify";
-
+import logoanimationData from '../../../assets/animations/loginAni.json'
 import axios from "axios";
 import { encryptData } from "../../../routes/encryption";
 import useFetchPatientByIdData from "../../hooks/useFetchPatientByIdData";
 import Swal from "sweetalert2";
+import Lottie from "lottie-react";
 
 // التحقق من صحة البيانات باستخدام Yup
 const validationSchema = Yup.object({
@@ -19,7 +20,7 @@ const validationSchema = Yup.object({
 
 export default function Login() {
     const { setUserData, setIsLoggedIn, setLoading } = useContext(UserContext);  // الوصول إلى الدوال من السياق
-    const apiUrl = "https://d7ef-212-14-228-238.ngrok-free.app";
+    const apiUrl = "https://c15b-139-190-147-200.ngrok-free.app/";
     const [errorMessage, setErrorMessage] = useState(""); // تخزين الأخطاء عند الحاجة
     const navigate=useNavigate();
     const formik = useFormik({
@@ -95,9 +96,12 @@ export default function Login() {
         <div className="container mx-auto px-6 py-12" dir="rtl">
             <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6">
                 <div className="flex items-center justify-center mb-6">
-                    <User className="h-8 w-8 text-indigo-600" />
+                  
                     <h1 className="text-2xl font-bold text-gray-900 ml-3">تسجيل الدخول</h1>
                 </div>
+                  <div className="absolute left-0 top-0 w-32 h-32">
+            
+            </div>
                 <form onSubmit={formik.handleSubmit}>
                     <div className="mb-4">
                         <div className="relative">
@@ -141,9 +145,8 @@ export default function Login() {
 
                     {errorMessage && <div className="text-red-500 text-sm mb-4">{errorMessage}</div>}
 
-                    <button type="submit" className="w-full py-3 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors flex items-center justify-center space-x-2">
-                        <User className="h-5 w-5" /> {/* أيقونة المستخدم */}
-                        <span>تسجيل الدخول</span>
+                    <button type="submit" className="w-full flex items-center justify-center  ">
+                       <Lottie animationData={logoanimationData} loop  className="w-20"/>
                     </button>
 
                     <div className="mt-4 text-center">

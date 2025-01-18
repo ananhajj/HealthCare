@@ -1,64 +1,26 @@
-import { useState } from 'react';
-import { Calendar, Clock, CheckCircle } from "lucide-react";
-import { BookingCard } from '../components/BookingHistoryCard';
-
-const mockBookings = [
-  {
-    id: '1',
-    doctorName: 'د. أحمد محمد',
-    specialization: 'استشاري طب عام',
-    bookingTime: new Date(new Date().getTime() + 2 * 60 * 60 * 1000).toISOString(), // بعد ساعتين
-    status: 'confirmed',
-    image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=400&fit=crop',
-  },
-  {
-    id: '2',
-    doctorName: 'د. سارة خالد',
-    specialization: 'استشاري طب أسنان',
-    bookingTime: new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString(), // بعد يوم
-    status: 'pending',
-    image: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=400&h=400&fit=crop',
-  },
-  {
-    id: '3',
-    doctorName: 'د. عمر يوسف',
-    specialization: 'استشاري طب عيون',
-    bookingTime: new Date(new Date().getTime() - 2 * 60 * 60 * 1000).toISOString(), // قبل ساعتين (مكتمل)
-    status: 'completed',
-    image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=400&h=400&fit=crop',
-  },
-  {
-    id: '4',
-    doctorName: 'د. خالد علي',
-    specialization: 'استشاري قلب',
-    bookingTime: new Date(new Date().getTime() + 10 * 60 * 1000).toISOString(), // بعد 10 دقائق
-    status: 'confirmed',
-    image: 'https://images.unsplash.com/photo-1593032457868-0cde40686691?w=400&h=400&fit=crop',
-  },
-  {
-    id: '5',
-    doctorName: 'د. ليلى حسين',
-    specialization: 'استشاري أعصاب',
-    bookingTime: new Date(new Date().getTime() + 48 * 60 * 60 * 1000).toISOString(), // بعد يومين
-    status: 'pending',
-    image: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=400&fit=crop',
-  },
-];
+import { Calendar, CheckCircle, Clock } from "lucide-react";
+import { useContext, useState } from 'react';
+import   { BookingCard } from '../components/BookingHistoryCard';
+import { BookingContext } from '../context/BookingContext';
 
 export default function OnlineBookingHistory() {
+  const { onlineBooking: filteredBookings } = useContext(BookingContext); // استخدام البيانات من السياق
   const [activeTab, setActiveTab] = useState('upcoming');
   const [showAll, setShowAll] = useState(false);
+console.log("before upcomingBookings",filteredBookings)
 
-  const upcomingBookings = mockBookings.filter(
-    booking => ['confirmed', 'pending'].includes(booking.status)
-  );
-  const completedBookings = mockBookings.filter(
+  // تصنيف الحجوزات
+const upcomingBookings = filteredBookings.filter(
+  booking => ['confirmed', 'pending'].includes(booking.status.trim().toLowerCase())
+);
+console.log(" after upcomingBookings",upcomingBookings)
+
+  const completedBookings = filteredBookings.filter(
     booking => booking.status === 'completed'
   );
 
   const displayedBookings = (bookings) => showAll ? bookings : bookings.slice(0, 3);
-
-  return (
+   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50" dir="rtl">
       <div className="max-w-6xl mx-auto p-6">
         <div className="flex items-center justify-between mb-8 bg-white/70 backdrop-blur-lg rounded-2xl p-8 shadow-lg border border-blue-200">
@@ -105,7 +67,7 @@ export default function OnlineBookingHistory() {
           </div>
 
           <div className="space-y-6 animate-in fade-in-50 duration-500">
-            {activeTab === 'upcoming' && (
+            { (
               upcomingBookings.length > 0 ? (
                 displayedBookings(upcomingBookings).map(booking => (
                   <BookingCard key={booking.id} booking={booking} />

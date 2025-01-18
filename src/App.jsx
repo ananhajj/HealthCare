@@ -5,6 +5,7 @@ import router from "./routes/router";
 import UserContextProvider from "./user/context/UserContextProvider";
 import ClinicContextProvider from "./user/context/ClinicContext";
 import DoctorContextProvider from "./user/context/DoctorContext";
+import BookingContextProvider from "./user/context/BookingContext";
 
 
 function App() {
@@ -12,8 +13,10 @@ function App() {
     <UserContextProvider>
       <DoctorContextProvider>
         <ClinicContextProvider>
+          <BookingContextProvider> 
           <RouterProvider router={router}>
           </RouterProvider>
+          </BookingContextProvider>
         </ClinicContextProvider>
       </DoctorContextProvider>
     </UserContextProvider>

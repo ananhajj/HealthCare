@@ -8,7 +8,7 @@ function Home() {
     return (
         <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50 relative bg-gray-100" dir="rtl">
             {/* خلفية مائلة مع الشفافية */}
-            <div className="absolute inset-0 bg-mainColor bg-opacity-50 skew-y-3 transform -z-10 h-[120%] -mt-10"></div>
+<div className="absolute inset-0 bg-mainColor bg-opacity-50 skew-y-3 transform -z-10 h-[99%] -mt-10"></div>
 
             {/* المكونات الفرعية */}
             <SliderHome />

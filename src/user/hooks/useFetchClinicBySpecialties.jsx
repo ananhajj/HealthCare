@@ -17,7 +17,7 @@ const useFetchSpecialties = (specialId) => {
 
             try {
                 const response = await axios.get(
-                    `https://d7ef-212-14-228-238.ngrok-free.app/api/categories/${specialId}`,
+                    `https://c15b-139-190-147-200.ngrok-free.app/api/categories/${specialId}`,
                     { headers: { "ngrok-skip-browser-warning": "s" } }
                 );
                  const cleanedClinics = response.data.clinics.data.map((clinic) => ({

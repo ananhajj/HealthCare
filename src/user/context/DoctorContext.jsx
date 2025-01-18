@@ -47,7 +47,7 @@ const SPECIALITY_MAP = {
 const DoctorContextProvider = ({ children }) => {
     const [doctors, setDoctors] = useState([]);
     const { loading, setLoading } = useContext(UserContext);
-    const apiUrl = "https://d7ef-212-14-228-238.ngrok-free.app";
+    const apiUrl = "https://c15b-139-190-147-200.ngrok-free.app";
 
     useEffect(() => {
         const fetchDoctors = async () => {

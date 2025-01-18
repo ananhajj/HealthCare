@@ -69,7 +69,7 @@ const ClinicContextProvider = ({ children }) => {
     const [specialties, setSpecialties] = useState(defaultSpecialties);
     const [cities, setCities] = useState([]);
     const {loading, setLoading}=useContext(UserContext);
-    const apiUrl = "https://d7ef-212-14-228-238.ngrok-free.app";
+    const apiUrl = "https://c15b-139-190-147-200.ngrok-free.app";
 
     useEffect(() => {
         const fetchSpecialties = async () => {

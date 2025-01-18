@@ -9,4 +9,14 @@
     --tw-space-x-reverse: 0;
     margin-left: calc(3rem * calc(1 - var(--tw-space-x-reverse)));
 }
- 
+.custome-space{
+    right: -60px;
+}
+ol {
+    direction: rtl;
+    text-align: right;
+}
+ul{
+        direction: rtl;
+            text-align: right;
+}

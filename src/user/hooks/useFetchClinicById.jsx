@@ -20,7 +20,7 @@ const useFetchClinicById = (clinicId) => {
 
             try {
                 const response = await axios.get(
-                    `https://d7ef-212-14-228-238.ngrok-free.app/api/clinics/${clinicId}`,
+                    `https://c15b-139-190-147-200.ngrok-free.app/api/clinics/${clinicId}`,
                     { headers: { "ngrok-skip-browser-warning": "s" } }
                 );
 

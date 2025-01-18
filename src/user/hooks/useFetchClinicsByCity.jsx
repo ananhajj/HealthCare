@@ -17,7 +17,7 @@ const useFetchClinicsByCity = (cityKey) => {
 
             try {
                 const response = await axios.get(
-                    `https://d7ef-212-14-228-238.ngrok-free.app/api/cities/${cityKey}`,
+                    `https://c15b-139-190-147-200.ngrok-free.app/api/cities/${cityKey}`,
                     { headers: { "ngrok-skip-browser-warning": "s" } }
                 );
 

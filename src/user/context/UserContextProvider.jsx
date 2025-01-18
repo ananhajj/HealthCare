@@ -4,8 +4,13 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 export const UserContext = createContext();
-
+import { StreamChat } from "stream-chat";
 const UserContextProvider = ({ children }) => {
+
+
+  const apiKey = "8ghmxrx2v98h";
+const client = StreamChat.getInstance(apiKey);
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState(null);
@@ -13,16 +18,113 @@ const UserContextProvider = ({ children }) => {
   const [streamToken, setStreamToken] = useState(null);
   const [userId, setUserId] = useState(null);
 
+
+
+//الاتصال في التشات ليصبح اليوزر اونلاين
+const connectToChat = async (userId, streamToken, userData) => {
+  try {
+    const userIdS = userId.toString(); // تحويل userId إلى سلسلة نصية
+
+    await client.connectUser(
+      {
+        id: userIdS, // تأكد من تمرير userId كسلسلة
+        name: `User_${userData.first_name}`, // اسم المستخدم
+      },
+      streamToken
+    );
+
+    console.log("User connected to Stream Chat successfully.");
+
+    // مراقبة تغييرات Presence
+    client.on('user.presence.changed', (event) => {
+      console.log(
+        `Presence changed for user ${event.user.id}:`,
+        event.user.online ? 'Online' : 'Offline'
+      );
+    });
+
+    // مراقبة حالة الاتصال
+    client.on('connection.changed', (event) => {
+      console.log('Connection status:', event.online ? 'Connected' : 'Disconnected');
+    });
+
+  } catch (error) {
+    console.error("Error connecting user to Stream Chat:", error.message || error);
+    toast.error("Failed to connect to the chat system. Please try again later.");
+  }
+};
+
+
+// جلب Stream Token والاتصال بالدردشة
+
+useEffect(() => {
+  const initializeChat = async () => {
+  try {
+    const streamToken = await getStreamToken(userId.toString());
+    setStreamToken(streamToken);
+
+    // الاتصال بـ Stream Chat
+    await connectToChat(userId, streamToken, userData);
+
+    // استخدام معرف ثابت للقناة
+    const channelId = `user-${userId}`;
+
+    // التحقق مما إذا كانت القناة موجودة بالفعل
+    const channels = await client.queryChannels({ id: channelId });
+
+    let userChannel;
+    if (channels.length > 0) {
+      // القناة موجودة بالفعل
+      userChannel = channels[0];
+      console.log(`Channel ${channelId} already exists.`);
+    } else {
+      // إنشاء القناة إذا لم تكن موجودة
+      userChannel = client.channel('messaging', channelId, {
+        name: `Chat for User ${userId}`,
+        members: [userId.toString()],
+      });
+      await userChannel.create();
+      console.log(`Channel ${channelId} created.`);
+    }
+
+    // مشاهدة القناة
+    await userChannel.watch({ presence: true });
+    console.log(`Channel ${channelId} is being watched with presence enabled.`);
+  } catch (error) {
+    console.error("Error initializing chat connection:", error.message);
+    toast.error("Failed to connect to the chat system. Please try again.");
+  }
+};
+
+
+  if (isLoggedIn && !client.user) {
+    initializeChat();
+  }
+}, [isLoggedIn, userId, userData, streamToken]);
+
+
+
+
+
+
+
+
+
+
   // تسجيل الخروج وتنظيف البيانات
-  const logout = () => {
-    localStorage.removeItem("userToken");
-    localStorage.removeItem("userData");
-    setIsLoggedIn(false);
-    setUserData(null);
-    setToken(null);
-    setStreamToken(null);
-    setUserId(null);
-  };
+const logout = () => {
+  localStorage.removeItem("userToken");
+  localStorage.removeItem("userData");
+  setIsLoggedIn(false);
+  setUserData(null);
+  setStreamToken(null);
+  setUserId(null);
+
+  // فصل الاتصال عند تسجيل الخروج فقط
+  if (client) {
+    client.disconnectUser().then(() => console.log("User disconnected from Stream Chat."));
+  }
+};
 
   // جلب بيانات المستخدم عبر ID
 const getUser1 = async (id) => {
@@ -34,7 +136,7 @@ const getUser1 = async (id) => {
   try {
     console.log(`Fetching user data for ID: ${id}`);
     const response = await axios.get(
-      `https://d7ef-212-14-228-238.ngrok-free.app/api/get-user/${id}`,
+      `https://c15b-139-190-147-200.ngrok-free.app/api/get-user/${id}`,
       {
         headers: {
              "ngrok-skip-browser-warning": "s",
@@ -43,7 +145,6 @@ const getUser1 = async (id) => {
       }
     );
 
-    console.log("User data fetched successfully:", response.data);
     return response.data;
   } catch (error) {
     if (error.response) {
@@ -77,9 +178,8 @@ const getStreamToken = async (userId) => {
   }
 
   try {
-    console.log(`Requesting stream token for userId: ${userId}`);
     const response = await fetch(
-      `https://d7ef-212-14-228-238.ngrok-free.app/api/generate-token`,
+      `https://c15b-139-190-147-200.ngrok-free.app/api/generate-token`,
       {
         method: "POST",
         headers: {
@@ -110,37 +210,30 @@ const getStreamToken = async (userId) => {
 
 
 
-useEffect(() => {
-  const storedToken = localStorage.getItem("userToken");
-  const encryptedUserData = localStorage.getItem("userData");
+  useEffect(() => {
+    const storedToken = localStorage.getItem("userToken");
+    const encryptedUserData = localStorage.getItem("userData");
 
-  if (storedToken && encryptedUserData) {
-    try {
-      const decryptedUserData = decryptData(encryptedUserData);
-      setToken(storedToken);
-      setUserData(decryptedUserData);
+    if (storedToken && encryptedUserData) {
+      try {
+        const decryptedUserData = decryptData(encryptedUserData);
+        const userId = decryptedUserData?.id;
 
-      if (decryptedUserData?.id) {
-        setUserId(decryptedUserData.id);
-        console.log("User ID set from localStorage:", decryptedUserData.id);
-      } else {
-        console.error("User ID is missing in decrypted data.");
-        toast.error("User data is incomplete. Please log in again.");
+        if (userId) {
+          setUserId(userId);
+          setUserData(decryptedUserData);
+          setIsLoggedIn(true);
+
+ 
+        } else {
+          console.error("User ID is missing in decrypted data.");
+        }
+      } catch (error) {
+        console.error("Error decrypting user data:", error);
         logout();
       }
-
-      setIsLoggedIn(true);
-    } catch (error) {
-      console.error("Error decrypting user data:", error);
-      logout(); // تنظيف البيانات في حالة حدوث خطأ
     }
-  } else {
-    console.warn("No userToken or userData found in localStorage.");
-    toas.error("Please log in to continue.");
-    logout();
-  }
-}, []);
-
+  }, []);
 
   const contextValue = useMemo(
     () => ({
@@ -157,6 +250,7 @@ useEffect(() => {
       streamToken,
       userId,
       setUserId,
+      connectToChat
     }),
     [isLoggedIn, userData, loading, token, streamToken, userId]
   );

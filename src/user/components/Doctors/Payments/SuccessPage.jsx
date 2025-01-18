@@ -7,7 +7,7 @@ const SuccessPage = () => {
   const navigate = useNavigate();
   const sessionId = searchParams.get("session_id");
   const appointmentId = localStorage.getItem("appointment_id");
-  const apiUrl = "https://d7ef-212-14-228-238.ngrok-free.app";
+    const apiUrl = "https://c15b-139-190-147-200.ngrok-free.app";
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
