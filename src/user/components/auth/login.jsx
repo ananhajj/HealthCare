@@ -19,10 +19,10 @@ const validationSchema = Yup.object({
 });
 
 export default function Login() {
-    const { setUserData, setIsLoggedIn, setLoading } = useContext(UserContext);  // الوصول إلى الدوال من السياق
-    const apiUrl = "https://c15b-139-190-147-200.ngrok-free.app/";
-    const [errorMessage, setErrorMessage] = useState(""); // تخزين الأخطاء عند الحاجة
-    const navigate=useNavigate();
+    const { setUserData, setIsLoggedIn, setLoading, setUserId } = useContext(UserContext);  // الوصول إلى الدوال من السياق
+    const apiUrl = import.meta.env.VITE_APP_KEY;
+    const [errorMessage, setErrorMessage] = useState(""); 
+    const navigate = useNavigate();
     const formik = useFormik({
         initialValues: {
             username: "",
@@ -42,8 +42,9 @@ export default function Login() {
             const response = await axios.post(`${apiUrl}/api/login`, loginPayload, {
                 headers: { "ngrok-skip-browser-warning": "s" },
             });
-
+            console.log("response", response.data)
             if (response.status === 200) {
+
                 const { token, user } = response.data;
 
                 // تخزين التوكن مباشرةً بدون تشفير
@@ -60,10 +61,17 @@ export default function Login() {
                 // التنقل بناءً على الدور
                 if (user.role_id === 2) {
                     localStorage.setItem("currentUserId", user.id);
+                    setUserId(user.id);
                     navigate("/");
-                } else if (user.role_id === 1) {
-                    navigate("/doctor");
                 } else if (user.role_id === 3) {
+                    localStorage.setItem("currentUserId", user.id);
+                      localStorage.setItem("created_At",user.created_at);
+                      localStorage.setItem("update_at",user.updated_at);
+                    setUserId(user.id);
+                    navigate("/dashboard-doctor");
+                } else if (user.role_id === 1) {
+                    localStorage.setItem("currentUserId", user.id);
+                    setUserId(user.id);
                     navigate("/admin");
                 }
 
@@ -96,12 +104,12 @@ export default function Login() {
         <div className="container mx-auto px-6 py-12" dir="rtl">
             <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6">
                 <div className="flex items-center justify-center mb-6">
-                  
+
                     <h1 className="text-2xl font-bold text-gray-900 ml-3">تسجيل الدخول</h1>
                 </div>
-                  <div className="absolute left-0 top-0 w-32 h-32">
-            
-            </div>
+                <div className="absolute left-0 top-0 w-32 h-32">
+
+                </div>
                 <form onSubmit={formik.handleSubmit}>
                     <div className="mb-4">
                         <div className="relative">
@@ -146,7 +154,7 @@ export default function Login() {
                     {errorMessage && <div className="text-red-500 text-sm mb-4">{errorMessage}</div>}
 
                     <button type="submit" className="w-full flex items-center justify-center  ">
-                       <Lottie animationData={logoanimationData} loop  className="w-20"/>
+                        <Lottie animationData={logoanimationData} loop className="w-20" />
                     </button>
 
                     <div className="mt-4 text-center">

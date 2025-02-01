@@ -7,6 +7,7 @@ const useFetchSpecialties = (specialId) => {
     const [specificClinicsByCateg, setSpecificClinicsByCateg] = useState([]);
     const { loading, setLoading } = useContext(UserContext);
     const [error, setError] = useState(null);
+          const apiUrl =import.meta.env.VITE_APP_KEY;
 
     useEffect(() => {
         const fetchClinics = async () => {
@@ -17,12 +18,12 @@ const useFetchSpecialties = (specialId) => {
 
             try {
                 const response = await axios.get(
-                    `https://c15b-139-190-147-200.ngrok-free.app/api/categories/${specialId}`,
+                    `${apiUrl}/api/categories/${specialId}`,
                     { headers: { "ngrok-skip-browser-warning": "s" } }
                 );
                  const cleanedClinics = response.data.clinics.data.map((clinic) => ({
                     ...clinic,
-                    schedule: cleanSchedule(clinic.schedule || []),
+                    schedule: cleanSchedule(clinic.schedule.data || []),
                 }));
 
                 setSpecificClinicsByCateg(cleanedClinics);

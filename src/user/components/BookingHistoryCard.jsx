@@ -1,29 +1,47 @@
 import { useState, useEffect } from 'react';
 import { Calendar, Clock, CheckCircle, AlertCircle, Video } from "lucide-react";
 
+// دمج التاريخ والوقت
 const combineDateAndTime = (date, time) => {
-  const [day, month, year] = date.split('-'); // تقسيم التاريخ
-  const [hours, minutes] = time.split(':'); // تقسيم الوقت
-  return new Date(year, month - 1, day, hours, minutes); // إنشاء كائن تاريخ صحيح
+  const [day, month, year] = date.split('-');
+  const [hours, minutes] = time.split(':');
+  return new Date(year, month - 1, day, hours, minutes);
 };
 
+// تحويل التاريخ إلى يوم الأسبوع
+const getDayName = (date) => {
+  const [day, month, year] = date.split('-');
+  const formattedDate = new Date(year, month - 1, day);
+  return new Intl.DateTimeFormat('ar-EG', { weekday: 'long' }).format(formattedDate);
+};
 
-export function  BookingCard({ booking }) {
+export function BookingCard({ booking }) {
   const [canStartCall, setCanStartCall] = useState(false);
   const [timeLeft, setTimeLeft] = useState('');
+  const [status, setStatus] = useState(booking.status); // متابعة حالة الحجز
 
   useEffect(() => {
     const updateTime = () => {
       const bookingDateTime = combineDateAndTime(booking.bookingDate, booking.bookingTime);
       const now = new Date();
-      const difference = bookingDateTime - now;
+      const difference = bookingDateTime.getTime() - now.getTime();
 
-      setCanStartCall(now >= bookingDateTime && booking.status === 'confirmed');
+      if (difference <= 0) {
+        if (status === 'confirmed' || status === 'pending') {
+          setStatus('missed'); // تغيير الحالة إلى "missed"
+        }
+      } else if (difference > 0 && status === 'confirmed') {
+        setCanStartCall(now >= bookingDateTime && status === 'confirmed');
+      }
 
       if (difference > 0) {
-        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+        const totalSeconds = Math.floor(difference / 1000);
+        const totalMinutes = Math.floor(totalSeconds / 60);
+        const totalHours = Math.floor(totalMinutes / 60);
+
+        const hours = totalHours;
+        const minutes = totalMinutes % 60;
+        const seconds = totalSeconds % 60;
 
         setTimeLeft(`${hours} ساعة ${minutes} دقيقة ${seconds} ثانية`);
       } else {
@@ -34,7 +52,7 @@ export function  BookingCard({ booking }) {
     updateTime();
     const timer = setInterval(updateTime, 1000);
     return () => clearInterval(timer);
-  }, [booking]);
+  }, [booking, status]);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -44,6 +62,8 @@ export function  BookingCard({ booking }) {
         return 'bg-yellow-50 text-yellow-700';
       case 'completed':
         return 'bg-blue-50 text-blue-700';
+      case 'missed':
+        return 'bg-red-50 text-red-700';
       default:
         return 'bg-gray-50 text-gray-700';
     }
@@ -68,43 +88,60 @@ export function  BookingCard({ booking }) {
               className="object-cover w-full h-full"
             />
           </div>
-          <span className={`absolute -top-3 -right-3 px-3 py-1 rounded-full text-sm flex items-center gap-2 shadow-md ${getStatusColor(booking.status)}`}>
-            {booking.status === 'confirmed' ? <CheckCircle className="w-4 h-4" /> : booking.status === 'pending' ? <Clock className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
-            <span>{booking.status === 'confirmed' ? 'مؤكد' : booking.status === 'pending' ? 'قيد الانتظار' : 'مكتمل'}</span>
+          <span className={`absolute -top-3 -right-3 px-3 py-1 rounded-full text-sm flex items-center gap-2 shadow-md ${getStatusColor(status)}`}>
+            {status === 'confirmed' && <CheckCircle className="w-4 h-4" />}
+            {status === 'pending' && <Clock className="w-4 h-4" />}
+            {status === 'missed' && <AlertCircle className="w-4 h-4" />}
+            {status === 'completed' && <CheckCircle className="w-4 h-4" />}
+            <span>
+              {status === 'confirmed'
+                ? 'مؤكد'
+                : status === 'pending'
+                ? 'قيد الانتظار'
+                : status === 'missed'
+                ? 'فائت'
+                : 'مكتمل'}
+            </span>
           </span>
         </div>
         <div className="flex-1 flex flex-col justify-between">
           <div className="space-y-4">
-            <h3 className="text-2xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-300">{booking.doctorName}</h3>
+            <h3 className="text-2xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
+              {booking.doctorName}
+            </h3>
             <p className="text-blue-600 font-medium">{booking.specialization}</p>
             <div className="flex items-center gap-3 text-gray-600">
               <Calendar className="w-5 h-5 text-blue-600" />
-              <span>{`${booking.bookingDate} ${booking.bookingTime}`}</span>
+              <span>
+                {`${booking.bookingDate} (${getDayName(booking.bookingDate)}) ${booking.bookingTime}`}
+              </span>
             </div>
-            {booking.status !== 'completed' && (
+            {status !== 'completed' && status !== 'missed' && (
               <p className="text-blue-600 font-medium flex items-center gap-2">
                 <Clock className="w-5 h-5" />
                 {timeLeft}
               </p>
             )}
           </div>
-          {booking.status !== 'completed' && (
+     {status === 'confirmed' && canStartCall && (
             <div className="mt-4 flex justify-end">
               <button
                 onClick={handleStartCall}
-                className={`flex items-center gap-2 px-6 py-3 rounded-lg text-lg font-medium transition-all ${
-                  canStartCall ? 'bg-green-600 text-white hover:bg-green-700 shadow-lg hover:shadow-xl' : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                }`}
-                disabled={!canStartCall}
+                className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white hover:bg-green-700 shadow-lg hover:shadow-xl rounded-lg text-lg font-medium transition-all"
               >
                 <Video className="w-5 h-5" />
-                {canStartCall ? 'بدء المكالمة' : 'غير متاح الآن'}
+                بدء المكالمة
               </button>
             </div>
+          )}
+          {status === 'missed' && (
+            <p className="text-red-600 font-medium flex items-center gap-2">
+              <AlertCircle className="w-5 h-5" />
+              تم تجاوز موعد الحجز دون الحضور
+            </p>
           )}
         </div>
       </div>
     </div>
   );
 }
- 

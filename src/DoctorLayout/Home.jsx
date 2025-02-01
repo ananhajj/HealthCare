@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { 
   Users, 
   Calendar, 
@@ -18,7 +18,8 @@ import {
   Menu,
   X,
   Moon,
-  Sun
+  Sun,
+  Link
 } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import Appointments from './components/Appointments';
@@ -26,9 +27,14 @@ import OnlineAppointments from './components/OnlineAppointments';
 import ClinicManagement from './components/ClinicManagement';
 import Profile from './components/Profile';
 import logo from '../assets/logo.svg'
+import { UserContext } from '../user/context/UserContextProvider';
+import { useNavigate } from 'react-router-dom';
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // حالة القائمة المنسدلة
+      const { isLoggedIn, setIsLoggedIn, logout,notifications, setNotifications } = useContext(UserContext);
+  const navigate=useNavigate();
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('darkMode') === 'true';
@@ -48,7 +54,13 @@ function App() {
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
   };
+ const handleLogout = () => {
+         
 
+        logout(); // استدعاء وظيفة تسجيل الخروج
+
+        navigate("/login"); // توجيه المستخدم إلى صفحة تسجيل الدخول
+    };
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
@@ -204,9 +216,36 @@ function App() {
                 <Bell size={20} />
                 <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
               </button>
-              <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
-                <User size={20} className="text-indigo-600 dark:text-indigo-400" />
-              </div>
+                <div className="relative z-10">
+
+                                <button
+                                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                >
+                                    <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
+                                        <User size={20} className="text-indigo-600 dark:text-indigo-400" />
+                                    </div>
+
+                                </button>
+                                {isDropdownOpen && (
+                                    <div className="absolute custome-space w-35 mt-2 bg-white shadow-lg rounded-lg border border-gray-200">
+                                        <Link to="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            الملف الشخصي
+                                        </Link>
+                                        <Link to="/booking-history-online" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            حجزك الأونلاين
+                                        </Link>
+                                        <Link to="/medical-record" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            السجل الطبي
+                                        </Link>
+                                        <button
+                                            onClick={handleLogout}
+                                            className="w-full text-left block px-4 py-2 text-sm text-red-500 hover:bg-gray-100"
+                                        >
+                                            تسجيل الخروج
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
             </div>
           </div>
         </header>

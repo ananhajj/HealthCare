@@ -24,7 +24,7 @@ function Guide() {
         {/* خيارات الحجز */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           {/* الاستشارة عبر الفيديو */}
-          <div className="bg-white rounded-xl shadow-lg p-8 transform transition-all hover:scale-105 hover:shadow-2xl text-right relative">
+          <div className="bg-white rounded-xl list-booking  shadow-lg p-8 transform transition-all hover:scale-105 hover:shadow-2xl text-right relative">
             <div className="absolute left-0 top-0 w-32 h-32">
               <Lottie animationData={videoConsultationAnimation} loop />
             </div>
@@ -51,7 +51,7 @@ function Guide() {
           </div>
 
           {/* الحجز في العيادة */}
-          <div className="bg-white rounded-xl shadow-lg p-8 transform transition-all hover:scale-105 hover:shadow-2xl text-right relative">
+          <div className="bg-white rounded-xl shadow-lg list-booking  p-8 transform transition-all hover:scale-105 hover:shadow-2xl text-right relative">
             <div className="absolute left-0 top-0 w-32 h-32">
               <Lottie animationData={clinicBookingAnimation} loop />
             </div>
@@ -61,7 +61,7 @@ function Guide() {
             <p className="text-gray-600 mb-6 ">
               قم بحجز موعد لزيارة الطبيب في عيادته بسهولة من خلال منصتنا
             </p>
-            <ol className="list-decimal list-inside space-y-3 text-gray-700">
+            <ol className="list-decimal list-inside space-y-3 text-gray-700   ">
               <li>سجّل دخولك إلى حسابك أو قم بإنشاء حساب جديد.</li>
               <li>اختر الطبيب أو التخصص المناسب.</li>
               <li>حدد العيادة والموعد الذي يناسبك.</li>
@@ -84,15 +84,15 @@ function Guide() {
           <h2 className="text-4xl font-bold text-gray-800 mb-12 text-center">
             مقارنة بين الخيارات
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-right">
-            <div className="bg-indigo-50 rounded-lg p-6 shadow-md transform transition-all hover:scale-105 hover:shadow-lg">
+          <div className="grid grid-cols-1 list-booking  md:grid-cols-2 gap-8 text-right">
+            <div className="bg-indigo-50 rounded-lg p-6 shadow-md transform list-booking  transition-all hover:scale-105 hover:shadow-lg">
               <div className="flex items-center justify-end  space-x-3   mb-4 text-right">
                 <Video className="text-indigo-600 w-6 h-6" />
                 <h3 className="text-2xl font-semibold text-indigo-600 text-right">
                   استشارة عبر الفيديو
                 </h3>
               </div>
-              <ul className="list-disc list-inside space-y-2 text-gray-700">
+              <ul className="list-disc list-inside space-y-2 text-gray-700 ">
                 <li>استشارة طبية من أي مكان.</li>
                 <li>توفير الوقت والجهد.</li>
                 <li>مناسب للحالات غير الطارئة.</li>

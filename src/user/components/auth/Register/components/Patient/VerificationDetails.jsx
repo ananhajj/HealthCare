@@ -49,7 +49,7 @@ const VerificationDetails = ({ idPhoto, onBack, onComplete, setCurrentStep }) =>
     }, [idPhoto]);
 
 
-    const backendUrl = 'https://f98b-83-244-8-231.ngrok-free.app/';
+    const backendUrl = 'https://c15b-139-190-147-200.ngrok-free.app/';
 
     const handleSubmitDetails = async (formData) => {
         try {

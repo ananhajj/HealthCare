@@ -12,7 +12,7 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState(null);
 
-    const backendUrl = 'https://f98b-83-244-8-231.ngrok-free.app/';
+    const backendUrl = 'https://c15b-139-190-147-200.ngrok-free.app/';
 
 
     const handleSubmit = async (e) => {

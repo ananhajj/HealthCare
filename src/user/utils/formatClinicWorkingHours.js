@@ -72,6 +72,10 @@ const filterValidDays = (workingHours) => {
 
 // تحويل جدول المواعيد لكل عيادة إلى تواريخ فعلية
 export const formatClinicWorkingHours = (schedule) => {
+    if (!Array.isArray(schedule)) {
+    console.error("Invalid schedule data:", schedule);
+    return [];
+  }
   const datedWorkingHours = calculateDayDates(schedule);
   return filterValidDays(datedWorkingHours); // إزالة الأيام المنتهية
 };

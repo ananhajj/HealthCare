@@ -65,7 +65,7 @@ export default function PatientRegistration({
     const [loading, setLoading] = useState(false);
     const [backendErrors, setBackendErrors] = useState('');
  
-    const backendUrl = 'https://f98b-83-244-8-231.ngrok-free.app/';
+    const backendUrl = 'https://c15b-139-190-147-200.ngrok-free.app/';
 
     const handleSubmit = async (values) => {
         console.log("form register",values);

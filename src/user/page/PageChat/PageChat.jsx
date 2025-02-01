@@ -79,20 +79,20 @@ useEffect(() => {
     <div className="maincomponent">
       <Chat client={client}>
  
-        <ChannelList
-          filters={filters}
-           sort={{ last_message_at: -1 }}
-           options={{ limit: 10 }}
-
-        />
-       <Channel>
-          <Window>
-            <ChannelHeader />
-            <MessageList />
-            <MessageInput />
-          </Window>
-          <Thread />
-        </Channel>
+<ChannelList
+  filters={filters}
+  sort={{ last_message_at: -1 }}
+  options={{ limit: 10 }}
+  style={{ maxHeight: 'calc(100vh - 100px)' }} // تخصيص الحجم مع إضافة مسافة
+/>
+<Channel>
+  <Window>
+    <ChannelHeader />
+    <MessageList style={{ maxHeight: 'calc(100vh - 200px)' }} />  {/* تخصيص العرض */}
+    <MessageInput />
+  </Window>
+  <Thread />
+</Channel>
       </Chat>
     </div>
   );

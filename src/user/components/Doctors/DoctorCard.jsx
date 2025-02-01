@@ -84,7 +84,7 @@ function DoctorCard({ doctor }) {
                 {/* أزرار */}
                 <div className="flex items-center justify-between">
                     <button
-                        onClick={() => window.location.href = `https://wa.me/${doctor.phone}`} // رابط واتساب كأداة للتشات
+                          onClick={() => navigate(`/chat${doctor.id ? `?doctorId=${doctor.id}` : ""}`)} // رابط واتساب كأداة للتشات
                         className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition"
                     >
                         <MessageCircle className="w-5 h-5" />

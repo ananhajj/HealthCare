@@ -7,6 +7,7 @@ const useFetchClinicById = (clinicId) => {
     const [clinic, setClinic] = useState(null);
     const { loading, setLoading } = useContext(UserContext);
     const [error, setError] = useState(null);
+          const apiUrl =import.meta.env.VITE_APP_KEY;
 
  
 
@@ -20,7 +21,7 @@ const useFetchClinicById = (clinicId) => {
 
             try {
                 const response = await axios.get(
-                    `https://c15b-139-190-147-200.ngrok-free.app/api/clinics/${clinicId}`,
+                    `${apiUrl}/api/clinics/${clinicId}`,
                     { headers: { "ngrok-skip-browser-warning": "s" } }
                 );
 

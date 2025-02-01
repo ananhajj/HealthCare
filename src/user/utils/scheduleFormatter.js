@@ -27,19 +27,14 @@ export const convertTo12HourFormat = (time) => {
  * @returns {Array} جدول زمني باللغة العربية
  */
 export const formatScheduleArabic = (schedule) => {
-  const groupedSchedule = {};
 
-  schedule.forEach(({ day, start_time, end_time }) => {
-    const timeRange = `${convertTo12HourFormat(
-      start_time
-    )} - ${convertTo12HourFormat(end_time)}`;
-    if (!groupedSchedule[timeRange]) {
-      groupedSchedule[timeRange] = [];
-    }
-    groupedSchedule[timeRange].push(dayMap[day]); // ترجمة اليوم إلى العربية
+
+ 
+
+  // تنسيق الجدول الزمني بحيث يعرض كل يوم مع توقيته
+  return schedule.map(({ day, start_time, end_time }) => {
+    const startFormatted = convertTo12HourFormat(start_time);
+    const endFormatted = convertTo12HourFormat(end_time);
+    return `${dayMap[day]}: ${startFormatted} - ${endFormatted}`; // عرض اليوم مع توقيت البداية والنهاية
   });
-
-  return Object.entries(groupedSchedule).map(
-    ([timeRange, days]) => `${days.join("، ")}: ${timeRange}`
-  );
 };

@@ -21,6 +21,7 @@ export const transformDoctorData = (doctorData) => {
     fee: doctorData.fee || 0,
     onlineFee: doctorData.online_fee || 0,
     onlineActive: doctorData.online_active === 1,
+    online_appointment_time:doctorData.online_appointment_time,
     onlineSchedule: formatClinicWorkingHours(doctorData.online_schedule || []), // الحجز الإلكتروني
     clinics: Array.isArray(doctorData.clinics?.data)
       ? doctorData.clinics.data.map((clinic) => ({

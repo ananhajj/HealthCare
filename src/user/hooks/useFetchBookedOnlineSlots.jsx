@@ -7,6 +7,8 @@ const useFetchBookedOnlineSlots=(doctorId)=>{
     const [bookedOnlineSlots, setBookedSlots] = useState({});
     const { loading, setLoading } = useContext(UserContext);
     const [error, setError] = useState(null);
+          const apiUrl =import.meta.env.VITE_APP_KEY;
+
     useEffect(() => {
         if (!doctorId) return;
         const fetchBookedSlots = async () => {
@@ -14,7 +16,7 @@ const useFetchBookedOnlineSlots=(doctorId)=>{
             setError(null);
             try{
                 const response = await axios.get(
-                    `https://c15b-139-190-147-200.ngrok-free.app/api/doctors/${doctorId}/ReservedAppointments`,
+                    `${apiUrl}/api/doctors/${doctorId}/ReservedAppointments`,
                     { headers: { "ngrok-skip-browser-warning": "s" } }
                 );
                 const rawData = response.data;

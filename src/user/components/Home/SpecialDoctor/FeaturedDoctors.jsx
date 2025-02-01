@@ -35,24 +35,27 @@ export function FeaturedDoctors() {
         );
     };
 
-    // تحديد الأطباء الثلاثة المرئيين
+    // تحديد الأطباء الثلاثة المرئيين في حالة وجود أكثر من 3
     const visibleDoctors = () => {
-        const startIndex = currentIndex;
-        const endIndex = (currentIndex + 2) % sortedDoctors.length; // عرض 3 أطباء
-        if (startIndex <= endIndex) {
-            return sortedDoctors.slice(startIndex, endIndex + 1);
+        if (sortedDoctors.length >= 3) {
+            const startIndex = currentIndex;
+            const endIndex = (currentIndex + 2) % sortedDoctors.length; // عرض 3 أطباء
+            if (startIndex <= endIndex) {
+                return sortedDoctors.slice(startIndex, endIndex + 1);
+            } else {
+                return [
+                    ...sortedDoctors.slice(startIndex),
+                    ...sortedDoctors.slice(0, endIndex + 1),
+                ];
+            }
         } else {
-            return [
-                ...sortedDoctors.slice(startIndex),
-                ...sortedDoctors.slice(0, endIndex + 1),
-            ];
+            return sortedDoctors; // عرض الأطباء بشكل عادي إذا كان العدد أقل من 3
         }
     };
 
     const handleShowMore = () => {
         navigate("/doctor");
         window.scrollTo(0, 0); // يعيد التمرير إلى أعلى الصفحة
-
     };
 
     return (
@@ -61,37 +64,46 @@ export function FeaturedDoctors() {
                 أطباء مميزون
             </h2>
 
-            {/* كاروسيل الأطباء */}
-            <div className="relative flex items-center justify-between gap-8 max-w-5xl mx-auto">
-                {/* زر السابق (يمين - التحرك لليمين) */}
-                <button
-                    onClick={prevDoctor}
-                    className="p-3 rounded-full bg-white shadow-lg hover:bg-gray-50 transition-colors absolute right-0 z-10"
-                    aria-label="Previous doctor"
-                >
-                    <ChevronRight className="w-6 h-6 text-gray-600" />
-                </button>
-
-                {/* عرض 3 دكاترة */}
-                <div className="flex gap-4 items-center justify-center overflow-hidden">
-                    {visibleDoctors().map((doctor, index) => (
-                        <DoctorCard
-                            key={doctor.id}
-                            doctor={doctor}
-                            isActive={index === 1} // الطبيب الأوسط نشط
-                        />
+            {/* إذا كان عدد الأطباء أقل من 3، اعرضهم بشكل عادي */}
+            {sortedDoctors.length < 3 ? (
+            <div className="flex gap-4 items-center justify-center overflow-hidden">
+                    {visibleDoctors().map((doctor) => (
+                        <DoctorCard key={doctor.id} doctor={doctor}    isActive={1} />
                     ))}
                 </div>
+            ) : (
+                // عرض الكاروسيل إذا كان عدد الأطباء 3 أو أكثر
+                <div className="relative flex items-center justify-center gap-8 max-w-5xl mx-auto">
+                    {/* زر السابق (يمين - التحرك لليمين) */}
+                    <button
+                        onClick={prevDoctor}
+                        className="p-3 rounded-full bg-white shadow-lg hover:bg-gray-50 transition-colors absolute left-0 z-10"
+                        aria-label="Previous doctor"
+                    >
+                        <ChevronRight className="w-6 h-6 text-gray-600" />
+                    </button>
 
-                {/* زر التالي (يسار - التحرك لليسار) */}
-                <button
-                    onClick={nextDoctor}
-                    className="p-3 rounded-full bg-white shadow-lg hover:bg-gray-50 transition-colors absolute left-0 z-10"
-                    aria-label="Next doctor"
-                >
-                    <ChevronLeft className="w-6 h-6 text-gray-600" />
-                </button>
-            </div>
+                    {/* عرض الأطباء */}
+                    <div className="flex gap-4 items-center justify-center overflow-hidden">
+                        {visibleDoctors().map((doctor, index) => (
+                            <DoctorCard
+                                key={doctor.id}
+                                doctor={doctor}
+                                isActive={index === 1} // الطبيب الأوسط نشط
+                            />
+                        ))}
+                    </div>
+
+                    {/* زر التالي (يسار - التحرك لليسار) */}
+                    <button
+                        onClick={nextDoctor}
+                        className="p-3 rounded-full bg-white shadow-lg hover:bg-gray-50 transition-colors absolute right-0 z-10"
+                        aria-label="Next doctor"
+                    >
+                        <ChevronLeft className="w-6 h-6 text-gray-600" />
+                    </button>
+                </div>
+            )}
 
             {/* زر عرض المزيد */}
             <button

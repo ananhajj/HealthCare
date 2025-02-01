@@ -99,18 +99,19 @@ export const ClinicCard = ({ clinic, onBooking }) => {
                 {/* الجدول */}
                 <div className="flex items-start gap-2">
                     <Calendar className="h-5 w-5 text-gray-500 mt-1" />
-                    <div>
-                        <span className="font-semibold">الجدول:</span>
-                        <ol className="list-disc pl-5 text-sm mt-1">
-                            {clinic.schedule?.length > 0
-                                ? formatScheduleArabic(clinic.schedule).map((entry, index) => (
-                                    <li key={index} className="font-semibold text-blue-900">
-                                        {entry}
-                                    </li>
-                                ))
-                                : "غير متوفر"}
-                        </ol>
-                    </div>
+<div>
+  <span className="font-semibold">الجدول الزمني:</span>
+  <ol className="list-disc pl-5 text-sm mt-1">
+    {clinic.schedule && clinic.schedule.length > 0
+      ? formatScheduleArabic(clinic.schedule).map((entry, index) => (
+          <li key={index} className="font-semibold text-blue-900">
+            {entry}
+          </li>
+        ))
+      : "غير متوفر"}
+  </ol>
+</div>
+
                 </div>
             </div>
 

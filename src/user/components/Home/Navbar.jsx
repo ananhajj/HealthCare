@@ -4,24 +4,105 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import logo from '../../../assets/logo.svg';
 import { UserContext } from '../../context/UserContextProvider';
 import { useChatContext } from 'stream-chat-react';
+import { initializePusher, subscribeToChannel, unsubscribeFromChannel } from '../../utils/pusherService';
+import axios from 'axios';
 
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { client } = useChatContext(); // الوصول إلى Stream Chat Client
-
+    const apiUrl = import.meta.env.VITE_APP_KEY;
     const [unreadCount, setUnreadCount] = useState(0);
-    const [notifications, setNotifications] = useState([]);
 
-   
+
+    const [isRatingModalOpen, setIsRatingModalOpen] = useState(false); // حالة فتح/إغلاق المودال
+    const [selectedNotification, setSelectedNotification] = useState(null); // الإشعار المحدد
+
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false); // حالة القائمة المنسدلة
     const dropdownRef = useRef(null);
     const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false); // حالة القائمة المنسدلة للموبايل
     const navigate = useNavigate();
-    const { isLoggedIn, setIsLoggedIn, logout } = useContext(UserContext);
+    const { isLoggedIn, setIsLoggedIn, logout, notifications, setNotifications, userId } = useContext(UserContext);
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
-      useEffect(() => {
+
+    // تخزين الإشعارات في localStorage عند تحديثها
+    useEffect(() => {
+        const storedNotifications = JSON.parse(localStorage.getItem('notifications')) || [];
+        setNotifications(storedNotifications);
+        setUnreadCount(storedNotifications.filter(notification => !notification.read).length); // حساب الإشعارات غير المقروءة
+    }, []);
+
+/*
+    useEffect(() => {
+
+        if (!userId) {
+            return;
+        }
+
+        // تهيئة Pusher مرة واحدة
+        initializePusher();
+
+        // قائمة القنوات
+        const channels = [
+            {
+                name: `appointment.reminder.${userId}`,
+                handler: (data) => {
+                    console.log('تم استلام إشعار تذكير من Pusher:', data);
+                    const newNotification = {
+                        id: data.id,
+                        message: data.message,
+                        sender: data.sender,
+                        source: 'pusher',
+                        type: 'reminder',
+                        read: false,
+                    };
+                    setNotifications((prev) => [...prev, newNotification]);
+                    setUnreadCount((prev) => prev + 1);
+                },
+            },
+            {
+                name: `appointment.rating.${userId}`,
+                handler: (data) => {
+                    console.log('تم استلام إشعار تقييم من Pusher:', data);
+                    const newNotification = {
+                        id: data.id,
+                        message: data.message,
+                        patient_id: data.patient_id,
+                        doctor_name: data.doctor_name,
+                        doctor_id: data.doctor_id,
+                        source: 'pusher',
+                        created_at: new Date().toISOString(),
+                        read: false,
+                        type: 'rating',
+                    };
+                    setNotifications((prev) => [...prev, newNotification]);
+                    setUnreadCount((prev) => prev + 1);
+                },
+            },
+        ];
+
+        // الاشتراك في القنوات
+        channels.forEach(({ name, handler }) => {
+            subscribeToChannel(name, handler);
+        });
+
+        // تنظيف الاشتراك عند إلغاء المكون
+        return () => {
+            channels.forEach(({ name }) => {
+                unsubscribeFromChannel(name);
+            });
+        };
+    }, []);
+
+*/
+
+
+
+
+
+    // استماع لإشعارات Stream (الرسائل الجديدة)
+    useEffect(() => {
         if (!client) {
             console.error("Stream Chat client is not initialized.");
             return;
@@ -29,15 +110,17 @@ export default function Header() {
 
         const handleNewMessage = (event) => {
             if (event.channel_type === "messaging" && event.user.id !== client.userID) {
-                setNotifications((prev) => [
-                    ...prev,
-                    {
-                        id: event.message.id, // معرف الرسالة
-                        senderId: event.user.id, // معرف المرسل
-                        senderName: event.user.name, // اسم المرسل
-                        channelId: event.channel_id, // معرف القناة
-                    },
-                ]);
+                const newNotification = {
+                    id: event.message.id,
+                    senderId: event.user.id,
+                    senderName: event.user.name,
+                    message: event.message.text,
+                    channelId: event.channel_id,
+                    source: 'stream',
+                    read: false, // تعيين الإشعار كغير مقروء
+                };
+
+                setNotifications((prev) => [...prev, newNotification]);
                 setUnreadCount((prev) => prev + 1);
             }
         };
@@ -50,6 +133,10 @@ export default function Header() {
     }, [client]);
 
 
+
+
+
+
     const handleLoginClick = () => {
         navigate('/login'); // يقوم بالتنقل إلى صفحة /login عند الضغط
     };
@@ -59,10 +146,13 @@ export default function Header() {
         }
     };
     const handleLogout = () => {
+        localStorage.removeItem('notifications');
+
         logout(); // استدعاء وظيفة تسجيل الخروج
+
         navigate("/login"); // توجيه المستخدم إلى صفحة تسجيل الدخول
     };
-     useEffect(() => {
+    useEffect(() => {
         if (isDropdownOpen) {
             document.addEventListener("mousedown", handleClickOutside);
 
@@ -82,8 +172,36 @@ export default function Header() {
     const toggleNotifications = () => {
         setIsNotificationOpen(!isNotificationOpen);
     };
+    const markNotificationsAsRead = () => {
+        const updatedNotifications = notifications.map(notification => ({
+            ...notification,
+            read: true,
+        }));
 
-
+        setNotifications(updatedNotifications);
+        setUnreadCount(0);
+        localStorage.setItem('notifications', JSON.stringify(updatedNotifications));
+    };
+    const sendRating = async (ratingData) => {
+        try {
+            const response = await axios.post(
+                `${apiUrl}/api/ratings`,
+                ratingData,
+                {
+                    headers: {
+                        "ngrok-skip-browser-warning": "s",
+                        Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+            console.log('تم إرسال التقييم بنجاح:', ratingData);
+            alert('تم إرسال التقييم بنجاح! شكرًا لتقييمك 😊');
+        } catch (error) {
+            console.error('خطأ أثناء إرسال التقييم:', error);
+            alert('حدث خطأ أثناء إرسال التقييم. حاول مرة أخرى.');
+        }
+    };
     return (
         <header className="text-sm py-4 mb-5 border-b border-b-[#ADADAD]" dir="rtl">
             <div className="container mx-auto px-6">
@@ -166,13 +284,13 @@ export default function Header() {
                         {isLoggedIn &&
                             <div className="relative z-10 ml-2">
                                 <button
-                                  className="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300 relative"
+                                    className="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300 relative"
                                     onClick={toggleNotifications}
                                 >
-                                                                           <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
+                                    <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
 
-                <Bell size={20} className="text-indigo-600 dark:text-indigo-400"/>
-                </div>
+                                        <Bell size={20} className="text-indigo-600 dark:text-indigo-400" />
+                                    </div>
                                     {unreadCount > 0 && (
                                         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                                             {unreadCount}
@@ -183,38 +301,215 @@ export default function Header() {
                                 {isNotificationOpen && (
                                     <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-72 bg-white border border-gray-300 rounded-lg shadow-lg">
                                         <div className="p-4">
-                                            {notifications.length > 0 ? (
-                                                <ul className="text-gray-700 text-sm space-y-2">
-                                                    {notifications.map((notification) => (
-                                                        <li
-                                                            key={notification.id}
-                                                            className="border-b border-gray-200 py-2 hover:bg-gray-100 cursor-pointer"
-                                                            onClick={() => navigate(`/chat?doctorId=${notification.senderId}`)}
-                                                        >
-                                                            رسالة جديدة من {notification.senderName}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            ) : (
-                                                <p className="text-sm text-gray-500">لا توجد إشعارات جديدة.</p>
+                                            {notifications.filter((n) => !n.read).length > 0 && (
+                                                <div>
+                                                    <h3 className="text-gray-600 font-semibold mb-2">الإشعارات الجديدة</h3>
+                                                    <div className="max-h-48 overflow-y-auto">
+                                                        <ul className="text-gray-700 text-sm space-y-2">
+                                                            {notifications
+                                                                .filter((n) => !n.read)
+                                                                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                                                                .map((notification) => (
+                                                                    <li
+                                                                        key={notification.id}
+                                                                        className="border-b border-gray-200 py-2 hover:bg-gray-100 cursor-pointer"
+                                                                        onClick={() => {
+                                                                            if (notification.type === 'rating') {
+                                                                                // تحديث الإشعار ليصبح مقروء
+                                                                                setNotifications((prev) =>
+                                                                                    prev.map((n) =>
+                                                                                        n.id === notification.id
+                                                                                            ? { ...n, read: true }
+                                                                                            : n
+                                                                                    )
+                                                                                );
+                                                                                // حفظ جميع بيانات الإشعار
+                                                                                setSelectedNotification({
+                                                                                    id: notification.id,
+                                                                                    patient_id: notification.patient_id,
+                                                                                    appointmentId: notification.appointment_id,
+                                                                                    doctor_name: notification.doctor_name,
+                                                                                    doctor_id: notification.doctor_id,
+                                                                                    message: notification.message,
+                                                                                    type: notification.type,
+                                                                                    created_at: notification.created_at,
+                                                                                    rating: 0, // التقييم الافتراضي
+                                                                                    comment: '', // التعليق الافتراضي
+                                                                                });
+                                                                                setIsRatingModalOpen(true); // فتح المودال
+                                                                            } else {
+                                                                                // باقي العمليات للإشعارات الأخرى
+                                                                                setNotifications((prev) =>
+                                                                                    prev.map((n) =>
+                                                                                        n.id === notification.id
+                                                                                            ? { ...n, read: true }
+                                                                                            : n
+                                                                                    )
+                                                                                );
+                                                                                if (notification.source === 'pusher') {
+                                                                                    navigate(`/appointment-details/${notification.id}`);
+                                                                                } else if (notification.source === 'stream') {
+                                                                                    navigate(`/chat?doctorId=${notification.senderId}`);
+                                                                                }
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        {notification.message}
+                                                                    </li>
+                                                                ))}
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {notifications.filter((n) => n.read).length > 0 && (
+                                                <div>
+                                                    <h3 className="text-gray-600 font-semibold mt-4 mb-2">الإشعارات المقروءة</h3>
+                                                    <div className="max-h-48 overflow-y-auto">
+                                                        <ul className="text-gray-700 text-sm space-y-2">
+                                                            {notifications
+                                                                .filter((n) => n.read)
+                                                                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                                                                .map((notification) => (
+                                                                    <li
+                                                                        key={notification.id}
+                                                                        className="border-b border-gray-200 py-2 hover:bg-gray-100 cursor-pointer bg-gray-100"
+                                                                        onClick={() => {
+                                                                            if (notification.source === 'pusher') {
+                                                                                navigate(`/appointment-details/${notification.id}`);
+                                                                            } else if (notification.source === 'stream') {
+                                                                                navigate(`/chat?doctorId=${notification.senderId}`);
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        {notification.source === 'pusher' ? (
+                                                                            <>
+                                                                                <strong>إشعار من Pusher:</strong> {notification.message}
+                                                                            </>
+                                                                        ) : (
+                                                                            <>
+                                                                                <strong>رسالة جديدة من {notification.senderName}</strong>: {notification.message}
+                                                                            </>
+                                                                        )}
+                                                                    </li>
+                                                                ))}
+                                                        </ul>
+                                                    </div>
+                                                </div>
                                             )}
                                         </div>
+                                        <button onClick={markNotificationsAsRead} className="block w-full py-2 text-center text-sm text-blue-500">
+                                            علامة كـ "مقروء"
+                                        </button>
                                     </div>
                                 )}
+
+
+
+
                             </div>
 
                         }
+                        {isRatingModalOpen && (
+                            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                                <div className="bg-white rounded-lg shadow-lg p-6 w-96 animate-fade-in">
+                                    <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">
+                                        تقييم الخدمة
+                                    </h3>
+                                    <p className="text-sm text-gray-600 mb-4 text-center">
+                                        الدكتور: {selectedNotification?.doctor_name}
+                                    </p>
+                                    <p className="text-sm text-gray-600 mb-4 text-center">
+                                        {selectedNotification?.message}
+                                    </p>
+                                    {/* اختيار النجوم */}
+                                    <div className="flex items-center justify-center mb-4 space-x-2">
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <svg
+                                                key={star}
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 24 24"
+                                                fill={star <= (selectedNotification?.rating || 0) ? '#FFD700' : '#E5E7EB'}
+                                                className={`w-10 h-10 cursor-pointer transition-transform duration-200 ${star <= (selectedNotification?.rating || 0) ? 'scale-110' : 'hover:scale-110'
+                                                    }`}
+                                                onClick={() =>
+                                                    setSelectedNotification((prev) => ({
+                                                        ...prev,
+                                                        rating: star,
+                                                    }))
+                                                }
+                                                aria-label={`تقييم ${star} نجوم`}
+                                            >
+                                                <path
+                                                    fillRule="evenodd"
+                                                    d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+                                                    clipRule="evenodd"
+                                                />
+                                            </svg>
+                                        ))}
+                                    </div>
+
+                                    {/* إدخال التعليق */}
+                                    <textarea
+                                        className="w-full border rounded-lg p-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        placeholder="اكتب تعليقك هنا..."
+                                        value={selectedNotification?.comment || ''}
+                                        onChange={(e) =>
+                                            setSelectedNotification((prev) => ({
+                                                ...prev,
+                                                comment: e.target.value,
+                                            }))
+                                        }
+                                    />
+                                    {/* أزرار الإرسال والإغلاق */}
+                                    <div className="flex justify-end space-x-2">
+                                        <button
+                                            className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-all"
+                                            onClick={() => setIsRatingModalOpen(false)}
+                                        >
+                                            إلغاء
+                                        </button>
+                                        <button
+                                            className={`px-4 py-2 rounded-lg transition-all text-white ${selectedNotification?.rating
+                                                ? 'bg-blue-500 hover:bg-blue-600'
+                                                : 'bg-blue-300 cursor-not-allowed'
+                                                }`}
+                                            onClick={() => {
+                                                if (selectedNotification?.rating) {
+                                                    // إعداد بيانات التقييم
+                                                    const ratingData = {
+                                                        patient_id: selectedNotification.patient_id,
+                                                        doctor_id: selectedNotification.doctor_id,
+                                                        rating: selectedNotification.rating,
+                                                        review: selectedNotification.comment || '',
+                                                    };
+
+                                                    // استدعاء الدالة لإرسال التقييم
+                                                    sendRating(ratingData);
+
+                                                    // إغلاق المودال
+                                                    setIsRatingModalOpen(false);
+                                                }
+                                            }}
+                                            disabled={!selectedNotification?.rating}
+                                        >
+                                            إرسال التقييم
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {isLoggedIn ? (
 
                             <div className="relative z-10">
 
                                 <button
-                                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                                 >
-                                       <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
-                                                  <User size={20} className="text-indigo-600 dark:text-indigo-400" />
-                                                </div>
-                                   
+                                    <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
+                                        <User size={20} className="text-indigo-600 dark:text-indigo-400" />
+                                    </div>
+
                                 </button>
                                 {isDropdownOpen && (
                                     <div className="absolute custome-space w-40 mt-2 bg-white shadow-lg rounded-lg border border-gray-200">
@@ -317,92 +612,165 @@ export default function Header() {
                                     : 'text-[rgb(95,111,255)] hover:text-black transition-colors duration-200 font-medium text-2xl'
                             }
                         >
-                          دليلك
+                            دليلك
                         </NavLink>
                     </nav>
 
                     {/* زر التسجيل أو الدخول - للموبايل */}
                     <div className="flex flex-col md:flex items-center space-y-2 mt-4 pb-2">
                         <div className='flex items-center'>
-                               {isLoggedIn &&
-                            <div className="relative z-10 ml-2">
-                                <button
-                                  className="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300 relative"
-                                    onClick={toggleNotifications}
-                                >
-                                                                           <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
+                            {isLoggedIn &&
+                                <div className="relative z-10 ml-2">
+                                    <button
+                                        className="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300 relative"
+                                        onClick={toggleNotifications}
+                                    >
+                                        <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
 
-                <Bell size={20} className="text-indigo-600 dark:text-indigo-400"/>
-                </div>
-                                    {unreadCount > 0 && (
-                                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                                            {unreadCount}
-                                        </span>
-                                    )}
-                                </button>
-
-                                {isNotificationOpen && (
-                                    <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-72 bg-white border border-gray-300 rounded-lg shadow-lg">
-                                        <div className="p-4">
-                                            {notifications.length > 0 ? (
-                                                <ul className="text-gray-700 text-sm space-y-2">
-                                                    {notifications.map((notification) => (
-                                                        <li
-                                                            key={notification.id}
-                                                            className="border-b border-gray-200 py-2 hover:bg-gray-100 cursor-pointer"
-                                                            onClick={() => navigate(`/chat?doctorId=${notification.senderId}`)}
-                                                        >
-                                                            رسالة جديدة من {notification.senderName}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            ) : (
-                                                <p className="text-sm text-gray-500">لا توجد إشعارات جديدة.</p>
-                                            )}
+                                            <Bell size={20} className="text-indigo-600 dark:text-indigo-400" />
                                         </div>
-                                    </div>
-                                )}
-                            </div>
+                                        {unreadCount > 0 && (
+                                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                                                {unreadCount}
+                                            </span>
+                                        )}
+                                    </button>
 
-                        }
-                        {isLoggedIn ? (
-                            <div className="relative z-10">
+                                    {isNotificationOpen && (
+                                        <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-72 bg-white border border-gray-300 rounded-lg shadow-lg">
+                                            <div className="p-4">
+                                                {notifications.filter((n) => !n.read).length > 0 && (
+                                                    <div>
+                                                        <h3 className="text-gray-600 font-semibold mb-2">الإشعارات الجديدة</h3>
+                                                        <div className="max-h-48 overflow-y-auto">
+                                                            <ul className="text-gray-700 text-sm space-y-2">
+                                                                {notifications
+                                                                    .filter((n) => !n.read)
+                                                                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                                                                    .map((notification) => (
+                                                                        <li
+                                                                            key={notification.id}
+                                                                            className="border-b border-gray-200 py-2 hover:bg-gray-100 cursor-pointer"
+                                                                            onClick={() => {
+                                                                                if (notification.type === 'rating') {
+                                                                                    // تحديث الإشعار ليصبح مقروء
+                                                                                    setNotifications((prev) =>
+                                                                                        prev.map((n) =>
+                                                                                            n.id === notification.id
+                                                                                                ? { ...n, read: true }
+                                                                                                : n
+                                                                                        )
+                                                                                    );
+                                                                                    setSelectedNotification(notification); // حفظ بيانات الإشعار
+                                                                                    setIsRatingModalOpen(true); // فتح المودال
+                                                                                } else {
+                                                                                    // باقي العمليات للإشعارات الأخرى
+                                                                                    setNotifications((prev) =>
+                                                                                        prev.map((n) =>
+                                                                                            n.id === notification.id
+                                                                                                ? { ...n, read: true }
+                                                                                                : n
+                                                                                        )
+                                                                                    );
+                                                                                    if (notification.source === 'pusher') {
+                                                                                        navigate(`/appointment-details/${notification.id}`);
+                                                                                    } else if (notification.source === 'stream') {
+                                                                                        navigate(`/chat?doctorId=${notification.senderId}`);
+                                                                                    }
+                                                                                }
+                                                                            }}
+                                                                        >
+                                                                            {notification.message}
+                                                                        </li>
+                                                                    ))}
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                {notifications.filter((n) => n.read).length > 0 && (
+                                                    <div>
+                                                        <h3 className="text-gray-600 font-semibold mt-4 mb-2">الإشعارات المقروءة</h3>
+                                                        <div className="max-h-48 overflow-y-auto">
+                                                            <ul className="text-gray-700 text-sm space-y-2">
+                                                                {notifications
+                                                                    .filter((n) => n.read)
+                                                                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                                                                    .map((notification) => (
+                                                                        <li
+                                                                            key={notification.id}
+                                                                            className="border-b border-gray-200 py-2 hover:bg-gray-100 cursor-pointer bg-gray-100"
+                                                                            onClick={() => {
+                                                                                if (notification.source === 'pusher') {
+                                                                                    navigate(`/appointment-details/${notification.id}`);
+                                                                                } else if (notification.source === 'stream') {
+                                                                                    navigate(`/chat?doctorId=${notification.senderId}`);
+                                                                                }
+                                                                            }}
+                                                                        >
+                                                                            {notification.source === 'pusher' ? (
+                                                                                <>
+                                                                                    <strong>إشعار من Pusher:</strong> {notification.message}
+                                                                                </>
+                                                                            ) : (
+                                                                                <>
+                                                                                    <strong>رسالة جديدة من {notification.senderName}</strong>: {notification.message}
+                                                                                </>
+                                                                            )}
+                                                                        </li>
+                                                                    ))}
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <button onClick={markNotificationsAsRead} className="block w-full py-2 text-center text-sm text-blue-500">
+                                                علامة كـ "مقروء"
+                                            </button>
+                                        </div>
+                                    )}
+
+                                </div>
+
+                            }
+                            {isLoggedIn ? (
+                                <div className="relative z-10">
+                                    <button
+                                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                    >
+                                        <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
+                                            <User size={20} className="text-indigo-600 dark:text-indigo-400" />
+                                        </div>
+                                    </button>
+                                    {isDropdownOpen && (
+                                        <div className="absolute right-0 w-48 mt-2 bg-white shadow-lg rounded-lg border border-gray-200">
+                                            <Link to="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                الملف الشخصي
+                                            </Link>
+                                            <Link to="/booking-history-online" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                حجزك الأونلاين
+                                            </Link>
+                                            <Link to="/medical-record" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                السجل الطبي
+                                            </Link>
+                                            <button
+                                                onClick={handleLogout}
+                                                className="w-full text-left block px-4 py-2 text-sm text-red-500 hover:bg-gray-100"
+                                            >
+                                                تسجيل الخروج
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
                                 <button
-                                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                    onClick={handleLoginClick}
+                                    className="flex items-center space-x-3 px-6 py-3 rounded-full bg-transparent text-[rgb(95,111,255)] border-2 border-[rgb(95,111,255)] hover:bg-[rgb(95,111,255)] hover:text-white hover:shadow-xl hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[rgb(95,111,255)]"
                                 >
-                                       <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
-                                                  <User size={20} className="text-indigo-600 dark:text-indigo-400" />
-                                                </div>
+                                    <LogIn size={20} className="transition-transform duration-300 transform hover:rotate-180" />
+                                    <span className="font-medium">تسجيل الدخول</span>
                                 </button>
-                               {isDropdownOpen && (
-                                    <div className="absolute right-0 w-48 mt-2 bg-white shadow-lg rounded-lg border border-gray-200">
-                                        <Link to="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                            الملف الشخصي
-                                        </Link>
-                                        <Link to="/booking-history-online" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                            حجزك الأونلاين
-                                        </Link>
-                                        <Link to="/medical-record" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                            السجل الطبي
-                                        </Link>
-                                        <button
-                                            onClick={handleLogout}
-                                            className="w-full text-left block px-4 py-2 text-sm text-red-500 hover:bg-gray-100"
-                                        >
-                                            تسجيل الخروج
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        ) : (
-                            <button
-                                onClick={handleLoginClick}
-                                className="flex items-center space-x-3 px-6 py-3 rounded-full bg-transparent text-[rgb(95,111,255)] border-2 border-[rgb(95,111,255)] hover:bg-[rgb(95,111,255)] hover:text-white hover:shadow-xl hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-[rgb(95,111,255)]"
-                            >
-                                <LogIn size={20} className="transition-transform duration-300 transform hover:rotate-180" />
-                                <span className="font-medium">تسجيل الدخول</span>
-                            </button>
-                        )}
+                            )}
                         </div>
                     </div>
                 </div>

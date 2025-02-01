@@ -38,7 +38,7 @@ function DoctorPage() {
     error: doctorError,
   } = useFetchDoctorById(doctorId);
   const { isLoggedIn } = useContext(UserContext); // الحصول على حالة تسجيل الدخول
-
+console.log("test",doctor);
   const [viewOnlineBooking, setViewOnlineBooking] = useState(false);
   const [selectedClinic, setSelectedClinic] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -95,15 +95,30 @@ const handleClinicBookingConfirmation = async () => {
     return;
   }
 
-  const startTime = selectedTimeSlot.split("-")[0].replace(/AM|PM/g, "").trim();
+const startTime = selectedTimeSlot.split("-")[0].trim(); // استخراج الوقت بدون AM/PM
+const isPM = startTime.includes("PM");
+const isAM = startTime.includes("AM");
+
+// إزالة AM/PM وتحويله إلى رقم
+let [hours, minutes] = startTime.replace(/AM|PM/g, "").trim().split(":").map(Number);
+
+if (isPM && hours !== 12) {
+  hours += 12; // تحويل PM إلى توقيت 24 ساعة
+} else if (isAM && hours === 12) {
+  hours = 0; // تحويل 12 AM إلى 00
+}
+
+// تنسيق الوقت بصيغة 24 ساعة
+const startTime24h = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
 
   const appointmentData = {
     date: selectedDate.toISOString().split("T")[0], // YYYY-MM-DD
-    time: startTime, // وقت البداية فقط
+    time: startTime24h, // وقت البداية فقط
     doctor_id: doctorId, // معرّف العيادة
   };
 
 try {
+ 
   const response = await postClinicAppointment(selectedClinic.id, appointmentData);
 
   // Format date and time
@@ -130,7 +145,7 @@ try {
   // Extract error message
   const errorMessage = error.response?.data?.message || error.message;
 
-  if (errorMessage === "blocked") {
+  if (errorMessage === "exist") {
   Swal.fire({
       icon: "warning",
       title: "عزيزي، لا يمكنك الحجز!",
@@ -166,7 +181,29 @@ try {
       document.querySelector(".swal2-container").setAttribute("dir", "rtl");
     },
     }).then(() => setIsModalOpen(false));
-  } else {
+  } else if (errorMessage === "blocked") {
+    Swal.fire({
+      icon: "error",
+      title: "عذرًا، لا يمكنك الحجز",
+      html: `
+        <p>
+          😞 لقد تم حظرك لمدة شهر بسبب عدم الالتزام بمواعيدك السابقة.
+        </p>
+        <p>
+          يُرجى التواصل مع الدعم الفني أو انتظار انتهاء فترة الحظر لإعادة الحجز.
+        </p>
+      `,
+      confirmButtonText: "تمام، فهمت!",
+      customClass: {
+        popup: "swal2-rtl", // تضيف اتجاه النصوص إلى RTL
+      },
+      didOpen: () => {
+        document.querySelector(".swal2-container").setAttribute("dir", "rtl");
+      },
+    }).then(() => setIsModalOpen(false));
+}
+
+  else {
     console.log("Unexpected error message:", errorMessage);
     Swal.fire({
       icon: "error",
@@ -192,13 +229,28 @@ const handleOnlineBookingConfirmation=async()=>{
     });
     return;
   }
-    const startTime = selectedTimeSlot.split("-")[0].replace(/AM|PM/g, "").trim();
+const startTime = selectedTimeSlot.split("-")[0].trim(); // استخراج الوقت بدون AM/PM
+const isPM = startTime.includes("PM");
+const isAM = startTime.includes("AM");
+
+// إزالة AM/PM وتحويله إلى رقم
+let [hours, minutes] = startTime.replace(/AM|PM/g, "").trim().split(":").map(Number);
+
+if (isPM && hours !== 12) {
+  hours += 12; // تحويل PM إلى توقيت 24 ساعة
+} else if (isAM && hours === 12) {
+  hours = 0; // تحويل 12 AM إلى 00
+}
+
+// تنسيق الوقت بصيغة 24 ساعة
+const startTime24h = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
   const appointmentData = {
     date: selectedDate.toISOString().split("T")[0], // YYYY-MM-DD
-    time: startTime, // وقت البداية فقط
+    time: startTime24h, // وقت البداية فقط
     doctor_id: doctorId, // معرّف العيادة
     _token:"F7BlCl7UiMXkxPllKKwKfdd0c0wN36T442tIlM79"
   };
+  console.log("app",appointmentData);
   try {
   const response = await postOnlineAppointment(doctor.id, appointmentData);
    const stripeUrl = response.url;  
@@ -225,7 +277,7 @@ const handleOnlineBookingConfirmation=async()=>{
   // Extract error message
   const errorMessage = error.response?.data?.message || error.message;
 
-  if (errorMessage === "blocked") {
+  if (errorMessage === "exist") {
   Swal.fire({
       icon: "warning",
       title: "عزيزي، لا يمكنك الحجز!",
@@ -261,7 +313,29 @@ const handleOnlineBookingConfirmation=async()=>{
       document.querySelector(".swal2-container").setAttribute("dir", "rtl");
     },
     }).then(() => setIsModalOpen(false));
-  } else {
+  }
+  else if (errorMessage === "blocked") {
+    Swal.fire({
+      icon: "error",
+      title: "عذرًا، لا يمكنك الحجز",
+      html: `
+        <p>
+          😞 لقد تم حظرك لمدة شهر بسبب عدم الالتزام بمواعيدك السابقة.
+        </p>
+        <p>
+          يُرجى التواصل مع الدعم الفني أو انتظار انتهاء فترة الحظر لإعادة الحجز.
+        </p>
+      `,
+      confirmButtonText: "تمام، فهمت!",
+      customClass: {
+        popup: "swal2-rtl", // تضيف اتجاه النصوص إلى RTL
+      },
+      didOpen: () => {
+        document.querySelector(".swal2-container").setAttribute("dir", "rtl");
+      },
+    }).then(() => setIsModalOpen(false));
+}
+  else {
     console.log("Unexpected error message:", errorMessage);
     Swal.fire({
       icon: "error",
@@ -319,7 +393,7 @@ const getOnlineTimeSlots = () => {
 
   const availableSlots = generateTimeSlots(
     workingHour,
-    doctor.appointment_time || 15
+    doctor.online_appointment_time || 15
   );
   const bookedOnlineTimes = (bookedOnlineSlots[dateKey] || []).map(normalizeTime);
   // لا حاجة للتحقق من الحجز للمواعيد الإلكترونية هنا إذا لم يكن هناك حجز
@@ -542,6 +616,17 @@ const getOnlineTimeSlots = () => {
                   <Phone className="inline-block w-5 h-5 text-gray-500 ml-2" />
                   {doctor.phone}
                 </p>
+                  {/* عرض النبذة */}
+    {doctor.about && doctor.about.overview && (
+      <div className="mt-4">
+        <h2 className="text-lg font-semibold text-mainColor mb-1 text-right">
+          نبذة عن الطبيب
+        </h2>
+        <p className="text-sm md:text-base text-gray-700 text-right">
+          {doctor.about.overview}
+        </p>
+      </div>
+    )}
                 <div className="fixed bottom-8 right-8 z-50">
                   <button
                     className="flex items-center gap-2 bg-green-500 text-white py-3 px-4 rounded-full shadow-lg hover:bg-green-600 transition-all duration-300 transform hover:scale-105"
@@ -759,10 +844,9 @@ const getOnlineTimeSlots = () => {
                       </h3>
                       {!viewOnlineBooking && (
                         <p className="text-sm">
-                          فريقنا يعمل دائمًا على تحسين خدماتنا وتوفير المزيد من
-                          المواعيد.
-                          <br />
-                          إذا كنت بحاجة للمساعدة، يرجى الاتصال بنا.
+                          اختر عيادة من القائمة تحت 
+                           <br />
+                           "المواعيد باللون الاخضر عزيزي" لإظهار المواعيد
                         </p>
                       )}
                     </div>

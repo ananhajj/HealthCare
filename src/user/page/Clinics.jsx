@@ -29,6 +29,8 @@ function Clinics() {
     const cityFromURL = queryParams.get("city") || "الكل";
     const specialtyFromURL = queryParams.get("specialty") || "الكل";
 
+
+    
     useEffect(() => {
         setSelectedCity(cityFromURL);
         setSelectedSpecialty(specialtyFromURL);
@@ -68,7 +70,7 @@ function Clinics() {
 
     // جلب جميع العيادات
     const { allClinics, loading: allClinicsLoading, error: allClinicsError } = useFetchAllClinics();
-
+ 
     // جلب العيادات بناءً على المدينة
     const { specificClinics, loading: clinicsLoading, error: clinicsError } = useFetchClinicsByCity(
         selectedCityId || null

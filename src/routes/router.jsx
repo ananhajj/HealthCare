@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import UserLayout from "../layouts/UserLayout";
-import Home from "../user/Home";
+import Home from  "../user/page/Home"
 import { AboutUs } from "../user/page/AboutUs";
 import Clinics from "../user/page/Clinics";
 import Login from "../user/components/auth/login";
@@ -125,7 +125,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/dashboard-doctor",
-    element: <DoctorLayout />,
+    element: (
+      <ProtectedRoute requiredRole={3}>
+        <DoctorLayout />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/dashboard",

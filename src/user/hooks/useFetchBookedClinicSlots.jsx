@@ -7,6 +7,7 @@ const useFetchBookedClinicSlots=(clinicId)=>{
     const [bookedSlots, setBookedSlots] = useState({});
     const { loading, setLoading } = useContext(UserContext);
     const [error, setError] = useState(null);
+      const apiUrl =import.meta.env.VITE_APP_KEY;
     useEffect(() => {
         if (!clinicId) return;
         const fetchBookedSlots = async () => {
@@ -14,7 +15,7 @@ const useFetchBookedClinicSlots=(clinicId)=>{
             setError(null);
             try{
                 const response = await axios.get(
-                    `https://c15b-139-190-147-200.ngrok-free.app/api/clinics/${clinicId}/ReservedAppointments`,
+                    `${apiUrl}/api/clinics/${clinicId}/ReservedAppointments`,
                     { headers: { "ngrok-skip-browser-warning": "s" } }
                 );
                 const rawData = response.data;

@@ -12,13 +12,14 @@ const useFetchAllClinics=()=>{
         }
         return schedule.filter((entry) => entry.available !== 0);
     };
+    const apiUrl =import.meta.env.VITE_APP_KEY;
     useEffect(()=>{
         const fetchClinics=async()=>{
             setLoading(true);
             setError(false);
             try{
                 const response = await axios.get(
-                    `https://c15b-139-190-147-200.ngrok-free.app/`,
+                    `${apiUrl}/api/clinics`,
                     { headers: { "ngrok-skip-browser-warning": "s" } }
                 );
                 console.log("all clinics",response.data);

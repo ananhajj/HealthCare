@@ -5,7 +5,8 @@ const useFetchStreamToken=(doctorId)=>{
     const [streamToken,setStreamToken]=useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const apiUrl = "https://c15b-139-190-147-200.ngrok-free.app";
+           const apiUrl =import.meta.env.VITE_APP_KEY;
+
     useEffect(()=>{
 
         const fetchStreamToken=async()=>{

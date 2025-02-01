@@ -7,6 +7,7 @@ const useFetchClinicsByCity = (cityKey) => {
     const [specificClinics, setSpecificClinics] = useState([]);
     const { loading, setLoading } = useContext(UserContext);
     const [error, setError] = useState(null);
+          const apiUrl =import.meta.env.VITE_APP_KEY;
 
     useEffect(() => {
         const fetchClinics = async () => {
@@ -17,7 +18,7 @@ const useFetchClinicsByCity = (cityKey) => {
 
             try {
                 const response = await axios.get(
-                    `https://c15b-139-190-147-200.ngrok-free.app/api/cities/${cityKey}`,
+                    `${apiUrl}/api/cities/${cityKey}`,
                     { headers: { "ngrok-skip-browser-warning": "s" } }
                 );
 

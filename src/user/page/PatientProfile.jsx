@@ -14,20 +14,17 @@ export default function PatientProfile() {
     const [uploading, setUploading] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false); // إضافة حالة القائمة
 
-    const apiUrl = "https://f98b-83-244-8-231.ngrok-free.app";
+     const apiUrl =import.meta.env.VITE_APP_KEY;
 
-    if (loading) {
-        <Loading/>
+    if (loading ||!patientData) {
+       return <Loading/>
     }
 
     if (error) {
         return <div className="min-h-screen flex items-center justify-center text-red-500">حدث خطأ أثناء تحميل البيانات.</div>;
     }
 
-    if (!patientData) {
-        return <div className="min-h-screen flex items-center justify-center">لا توجد بيانات لعرضها.</div>;
-    }
-
+ 
     const fullName = `${patientData.user?.first_name || "غير متوفر"} ${patientData.user?.last_name || ""}`.trim();
     const age = new Date().getFullYear() - new Date(patientData.user?.dob || "").getFullYear();
     const accountCreationDate = new Date(patientData.created_at).toLocaleDateString("ar-EG", {
@@ -238,7 +235,7 @@ export default function PatientProfile() {
                                 تاريخ إنشاء الحساب: {accountCreationDate || "غير متوفر"}
                             </div>
                             <div className="flex items-center text-lg">
-                                {patientData.user?.["is active"] ? (
+                                {patientData.user?.["is_active"] ? (
                                     <div className="flex items-center gap-2 text-green-600">
                                         <CheckCircle className="h-5 w-5" />
                                         <span>الحساب مفعل</span>

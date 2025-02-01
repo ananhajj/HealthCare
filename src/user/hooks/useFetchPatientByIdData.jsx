@@ -6,7 +6,7 @@ const useFetchPatientByIdData = (userId) => {
     const [patientData, setPatientData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const apiUrl = "https://c15b-139-190-147-200.ngrok-free.app";
+          const apiUrl =import.meta.env.VITE_APP_KEY;
 
     useEffect(() => {
         if (!userId ) return;
@@ -15,11 +15,13 @@ const useFetchPatientByIdData = (userId) => {
             setLoading(true);
             try {
                 const response = await axios.get(`${apiUrl}/api/patients/${userId}`, {
-                    headers: {
-                        "ngrok-skip-browser-warning": "s",
-                    },
+                   headers: {
+          "ngrok-skip-browser-warning": "s",
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+          "Content-Type": "application/json",
+        },
                 });
-
+                console.log("paitent",response.data)
                 if (response.status === 200) {
                     const data = response.data.data;
                   

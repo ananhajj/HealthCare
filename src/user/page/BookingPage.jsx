@@ -112,55 +112,77 @@ function BookingPage() {
           // Extract error message
           const errorMessage = error.response?.data?.message || error.message;
         
-          if (errorMessage === "blocked") {
-          Swal.fire({
-              icon: "warning",
-              title: "عزيزي، لا يمكنك الحجز!",
-              html: `
-                <p>😅 لقد حجزت بالفعل موعدًا في هذا اليوم مع هذه العيادة.</p>
-                <p>دع غيرك يستفيد من الأوقات المتبقية، واختر يومًا آخر للحجز.</p>
-              `,
-               confirmButtonText: "تمام، فهمت!",
-            customClass: {
-              popup: "swal2-rtl", // تضيف اتجاه النصوص إلى RTL
-            },
-            didOpen: () => {
-              document.querySelector(".swal2-container").setAttribute("dir", "rtl");
-            },
-            });
+      if (errorMessage === "exist") {
+      Swal.fire({
+          icon: "warning",
+          title: "عزيزي، لا يمكنك الحجز!",
+          html: `
+            <p>😅 لقد حجزت بالفعل موعدًا في هذا اليوم مع هذه العيادة.</p>
+            <p>دع غيرك يستفيد من الأوقات المتبقية، واختر يومًا آخر للحجز.</p>
+          `,
+           confirmButtonText: "تمام، فهمت!",
+        customClass: {
+          popup: "swal2-rtl", // تضيف اتجاه النصوص إلى RTL
+        },
+        didOpen: () => {
+          document.querySelector(".swal2-container").setAttribute("dir", "rtl");
+        },
+        });
           } else if (errorMessage === "You have appointment in another clinic") {
-            Swal.fire({
-              icon: "error",
-              title: "عذرًا، لديك حجز آخر",
-              html: `
-                <p>
-                  😞 يبدو أنك قمت بحجز موعد في عيادة أخرى.
-                </p>
-                <p>
-                  يُرجى التحقق من مواعيدك أو اختيار عيادة أخرى للحجز.
-                </p>
-              `,
-               confirmButtonText: "تمام، فهمت!",
-            customClass: {
-              popup: "swal2-rtl", // تضيف اتجاه النصوص إلى RTL
-            },
-            didOpen: () => {
-              document.querySelector(".swal2-container").setAttribute("dir", "rtl");
-            },
-            });
-          } else {
-            console.log("Unexpected error message:", errorMessage);
-            Swal.fire({
-              icon: "error",
-              title: "حدث خطأ",
-              html: `
-                <p style="text-align: right; font-size: 16px; line-height: 1.8;">
-                  ⚠️ حدث خطأ غير متوقع. يُرجى المحاولة مرة أخرى لاحقًا.
-                </p>
-              `,
-              confirmButtonText: "حسنًا",
-            });
+              Swal.fire({
+                icon: "error",
+                title: "عذرًا، لديك حجز آخر",
+                html: `
+                  <p>
+                    😞 يبدو أنك قمت بحجز موعد في عيادة أخرى.
+                  </p>
+                  <p>
+                    يُرجى التحقق من مواعيدك أو اختيار عيادة أخرى للحجز.
+                  </p>
+                `,
+                 confirmButtonText: "تمام، فهمت!",
+              customClass: {
+                popup: "swal2-rtl", // تضيف اتجاه النصوص إلى RTL
+              },
+              didOpen: () => {
+                document.querySelector(".swal2-container").setAttribute("dir", "rtl");
+              },
+              });
+          } else if (errorMessage === "blocked") {
+              Swal.fire({
+                icon: "error",
+                title: "عذرًا، لا يمكنك الحجز",
+                html: `
+                  <p>
+                    😞 لقد تم حظرك لمدة شهر بسبب عدم الالتزام بمواعيدك السابقة.
+                  </p>
+                  <p>
+                    يُرجى التواصل مع الدعم الفني أو انتظار انتهاء فترة الحظر لإعادة الحجز.
+                  </p>
+                `,
+                confirmButtonText: "تمام، فهمت!",
+                customClass: {
+                  popup: "swal2-rtl", // تضيف اتجاه النصوص إلى RTL
+                },
+                didOpen: () => {
+                  document.querySelector(".swal2-container").setAttribute("dir", "rtl");
+                },
+              });
+
           }
+           else {
+              console.log("Unexpected error message:", errorMessage);
+              Swal.fire({
+                icon: "error",
+                title: "حدث خطأ",
+                html: `
+                  <p style="text-align: right; font-size: 16px; line-height: 1.8;">
+                    ⚠️ حدث خطأ غير متوقع. يُرجى المحاولة مرة أخرى لاحقًا.
+                  </p>
+                `,
+                confirmButtonText: "حسنًا",
+              });
+            } 
         }
     };
 

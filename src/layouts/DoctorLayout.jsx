@@ -1,9 +1,15 @@
-import { Home } from "lucide-react";
+import DoctorLayoutContextProvider from "../DoctorLayout/context/DoctorLayoutContext";
 import HomeDoctor from "../DoctorLayout/Home";
-
+ 
 const DoctorLayout=()=>{
     return(
-        <HomeDoctor/>
+        <>
+            <DoctorLayoutContextProvider> 
+             <HomeDoctor/>
+             </DoctorLayoutContextProvider>
+        </>
+    
+      
     )
 };
 export default DoctorLayout ;
