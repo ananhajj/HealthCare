@@ -25,18 +25,23 @@ export default function FinancialRecords() {
                                 headers: { "ngrok-skip-browser-warning": "s" },
                             }
                         );
-                         const totalRevenue = response.data.reduce((total, invoice) => {
-                            // التأكد من أن amount و length هما أرقام
+                        const totalRevenue = response.data.reduce((total, invoice) => {
+                            // تحويل `amount` إلى رقم عشري
                             const amount = parseFloat(invoice.amount);
-                            const length = parseInt(onlineAppointmentComplete.length); // أو إذا كانت length عدد عشري استخدم parseFloat
 
-                            
-                                return total + (amount * length);
-                          
-                             // في حال كانت البيانات غير صالحة
+                            if (isNaN(amount)) {
+                                console.error("قيمة amount غير صالحة:", invoice.amount);
+                                return total; // تجاهل الفاتورة إذا كانت القيمة غير صالحة
+                            }
+
+                            // إضافة `amount` إلى الإجمالي
+                            return total + amount;
                         }, 0);
-                        setTotalRevenue(totalRevenue);
-                        console.log("totalRevenue", totalRevenue);
+
+                        // تحديث الحالة مع الاحتفاظ بالقيمة السابقة
+                        setTotalRevenue((prevTotal) => prevTotal + totalRevenue);
+
+                     
                          const patientInvoices = response.data.map(invoice => ({
                             ...invoice,
                             patientName: appointment.patientName,   

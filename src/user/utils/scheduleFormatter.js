@@ -20,7 +20,10 @@ export const convertTo12HourFormat = (time) => {
   const adjustedHours = hours % 12 || 12; // تحويل 0 إلى 12
   return `${adjustedHours}:${minutes.toString().padStart(2, "0")} ${period}`;
 };
-
+export function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString();  
+}
 /**
  * دالة لتحويل جدول المواعيد إلى صيغة مجمعة باللغة العربية
  * @param {Array} schedule - بيانات الجدول من API

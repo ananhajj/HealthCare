@@ -20,16 +20,9 @@ import {
   Legend
 } from 'recharts';
 import { DoctorLayoutContext } from '../context/DoctorLayoutContext';
+import { formatMonthToArabic } from '../utils/formatDateAndTime';
 
-const visitData = [
-  { name: 'يناير', visits: 400 },
-  { name: 'فبراير', visits: 300 },
-  { name: 'مارس', visits: 600 },
-  { name: 'أبريل', visits: 800 },
-  { name: 'مايو', visits: 500 },
-  { name: 'يونيو', visits: 700 },
-];
-
+ 
  
 const COLORS = ["#4CAF50", "#F44336", "#FF9800"]; // أخضر، أحمر، برتقالي
 const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name }) => {
@@ -47,6 +40,15 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
 };
 export default function Dashboard() {
   const { preferences, infoDashboard }=useContext(DoctorLayoutContext);
+  console.log("infoDashboard", infoDashboard);
+  const visitData = infoDashboard?.appointments_per_month?.map(item => ({
+    name: formatMonthToArabic(item.month),
+    visits: item.total_appointments
+  })) || [];  // إذا كان undefined، استخدم مصفوفة فارغة
+
+  console.log(visitData);
+ 
+
   const appointmentStats = [
     { name: "المواعيد المكتملة", value: infoDashboard?.completed_appointment_count || 0 },
     { name: "المواعيد الملغاة", value: infoDashboard?.canceled_appointment_count || 0 },
@@ -119,20 +121,20 @@ export default function Dashboard() {
 
   {/* Charts */}
   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
-      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">عدد الزيارات الشهرية</h3>
-      <div className="h-80">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={visitData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
-            <XAxis dataKey="name" stroke="#ddd" />
-            <YAxis stroke="#ddd" />
-            <Tooltip />
-            <Line type="monotone" dataKey="visits" stroke="#4F46E5" strokeWidth={2} />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">عدد الزيارات الشهرية</h3>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={visitData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
+                <XAxis dataKey="name" stroke="#ddd" />
+                <YAxis stroke="#ddd" />
+                <Tooltip />
+                <Line type="monotone" dataKey="visits" stroke="#4F46E5" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div> 
 
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
           {/* العنوان والتنسيق */}

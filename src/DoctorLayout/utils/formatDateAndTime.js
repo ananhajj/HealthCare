@@ -6,6 +6,16 @@
     const formattedHour = hourInt % 12 || 12; // إذا كانت الساعة 0 أو 12، تُعرض كـ 12
     return `${formattedHour}:${minute} ${period}`;
   }
+
+  const monthNamesArabic = [
+  "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
+  "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
+];
+
+export function formatMonthToArabic(dateString) {
+  const monthNumber = parseInt(dateString.split('-')[1], 10); // استخراج رقم الشهر
+  return monthNamesArabic[monthNumber - 1]; // جلب اسم الشهر بناءً على الرقم
+}
   export function formatDateWithDay(date) {
     const daysOfWeek = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
     const months = [

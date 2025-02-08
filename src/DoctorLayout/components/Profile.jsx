@@ -803,18 +803,8 @@ if (error) {
           )}
 
       
-    <button className="w-full text-right p-4 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-indigo-200 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-800 transition">
-      <h3 className="font-semibold text-gray-800 dark:text-gray-100">التحقق بخطوتين</h3>
-      <p className="text-sm text-gray-500 dark:text-gray-400">
-        قم بتفعيل طبقة حماية إضافية لحسابك
-      </p>
-    </button>
-    <button className="w-full text-right p-4 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-indigo-200 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-800 transition">
-      <h3 className="font-semibold text-gray-800 dark:text-gray-100">إعدادات الخصوصية</h3>
-      <p className="text-sm text-gray-500 dark:text-gray-400">
-        تحكم في من يمكنه رؤية معلوماتك
-      </p>
-    </button>
+ 
+ 
   </div>
 </div>
 

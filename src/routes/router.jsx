@@ -21,6 +21,7 @@ import DoctorLayout from "../layouts/DoctorLayout";
 import Guide from "../user/page/Guide";
 import Login from "../auth/login";
 import RestPassword from "../auth/RestPassword";
+import PatientMedicalRecord from "../user/page/PatientMedicalRecord";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -55,6 +56,15 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
         
+      },
+      {
+        path: "/medical-record",
+        element: (
+          <ProtectedRoute requiredRole={2}>
+            <PatientMedicalRecord />
+          </ProtectedRoute>
+        ),
+
       },
            {
         path: "/booking-history-online",
