@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { UserContext } from "./UserContextProvider";
+
 import axios from "axios";
 import {
     FaStethoscope,
@@ -20,6 +20,7 @@ import {
     FaPills,
     FaLungs,
 } from "react-icons/fa";
+import { UserContext } from "../../context/UserContextProvider";
 
 export const DoctorContext = createContext();
 
@@ -47,7 +48,7 @@ const SPECIALITY_MAP = {
 const DoctorContextProvider = ({ children }) => {
     const [doctors, setDoctors] = useState([]);
     const { loading, setLoading } = useContext(UserContext);
-      const apiUrl =import.meta.env.VITE_APP_KEY;
+    const apiUrl = import.meta.env.VITE_APP_KEY;
 
     useEffect(() => {
         const fetchDoctors = async () => {

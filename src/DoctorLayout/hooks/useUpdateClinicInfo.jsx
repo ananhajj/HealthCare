@@ -12,7 +12,7 @@ const useUpdateClinicInfo = () => {
   const updateClinicInfo = async (data,clinicId) => {
     setLoading(true);
     setError(null);
- 
+ console.log("clinc id",clinicId)
     try {
       const response = await axios.put(`${apiUrl}/api/clinics/${clinicId}`, data, {
         headers: {

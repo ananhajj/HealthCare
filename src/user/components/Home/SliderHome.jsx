@@ -8,7 +8,7 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { ClinicContext } from '../../context/ClinicContext';
 import { Link, useNavigate } from 'react-router-dom';
-import { UserContext } from '../../context/UserContextProvider';
+import { UserContext } from '../../../context/UserContextProvider';
 
 const backgroundImage = 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80'
 

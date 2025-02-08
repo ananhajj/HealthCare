@@ -1,8 +1,9 @@
 import { Star, Video, MessageCircle, Phone } from "lucide-react";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { UserContext } from "../../../context/UserContextProvider";
+
 import Swal from "sweetalert2";
+import { UserContext } from "../../../../context/UserContextProvider";
 
 export const DoctorCard = ({ doctor, isActive }) => {
     const navigate=useNavigate();

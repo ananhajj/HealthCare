@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { UserContext } from "../context/UserContextProvider";
+import { UserContext } from "../../context/UserContextProvider";
 import { cleanSchedule } from "../utils/cleanSchedule"; // استخراج الدالة إلى ملف منفصل
 
 const useFetchClinicsByCity = (cityKey) => {

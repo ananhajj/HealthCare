@@ -3,7 +3,6 @@ import UserLayout from "../layouts/UserLayout";
 import Home from  "../user/page/Home"
 import { AboutUs } from "../user/page/AboutUs";
 import Clinics from "../user/page/Clinics";
-import Login from "../user/components/auth/login";
 import PageNotFound from "../PageNotFound";
 import Doctor from "../user/page/Doctor";
 import DoctorPage from "../user/components/Doctors/DoctorPage";
@@ -20,7 +19,8 @@ import SuccessPage from "../user/components/Doctors/Payments/SuccessPage";
 import CancelPage from "../user/components/Doctors/Payments/CancelPage";
 import DoctorLayout from "../layouts/DoctorLayout";
 import Guide from "../user/page/Guide";
-
+import Login from "../auth/login";
+import RestPassword from "../auth/RestPassword";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -42,6 +42,11 @@ const router = createBrowserRouter([
         path: "/login",
         element: <Login />,
       },
+      {
+        path: "/reset-password",
+        element: <RestPassword/>,
+      },
+     
       {
         path: "/profile",
         element: (

@@ -78,19 +78,27 @@ function CompleteBooking({ appointment, clinic, personalInfo, onClose }) {
 
     try {
       // **إرسال تقرير الموعد**
+      console.log("data",completeData)
+      console.log("prescriptionFiles",prescriptionFiles)
 if (reportFile) {
   const reportSuccess = await completeAppointmentReport(reportsData, appointment.id);
-  if (reportSuccess) {
+  console.log("return this",reportSuccess);
+  if (reportSuccess === "200") {
+    // في حال تم إضافة التقرير بنجاح، يمكن إضافة الوصفة الطبية فقط إذا كانت موجودة
     if (prescriptionFiles) {
       console.log(prescriptionData);
       const prescriptionSuccess = await completeAppointmentPrescriptions(prescriptionData, appointment.id);
-      if (prescriptionSuccess) {
-        // **إرسال ملاحظات الموعد**
+      if (prescriptionSuccess === "200") {
+        // إرسال ملاحظات الموعد إذا تمت إضافة الوصفة بنجاح
         await completeAppointmentNote(completeData, appointment.id);
       }
+    } else {
+      // إرسال ملاحظات الموعد إذا لم تكن هناك وصفة طبية
+      await completeAppointmentNote(completeData, appointment.id);
     }
   }
 }
+
       // **إظهار إشعار عند النجاح**
       Swal.fire({
         icon: "success",
@@ -261,14 +269,9 @@ if (reportFile) {
               onClick={completeBooking}
               className="bg-gradient-to-r from-green-500 to-green-700 text-white py-2 px-4 rounded-lg shadow-lg hover:scale-105 transition-transform"
             >
-              إنهاء الحجز
+              إكمال الحجز
             </button>
-            <button
-              onClick={() => setStatus("cancelled")}
-              className="bg-gradient-to-r from-red-500 to-red-700 text-white py-2 px-4 rounded-lg shadow-lg hover:scale-105 transition-transform"
-            >
-              إلغاء الحجز
-            </button>
+          
           </div>
         </div>
       </div>

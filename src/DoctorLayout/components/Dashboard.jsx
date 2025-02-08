@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { 
   Users, 
   Calendar, 
   Clock,
-  Activity
+  Activity,
+  DollarSign
 } from 'lucide-react';
 import {
   LineChart,
@@ -15,8 +16,10 @@ import {
   ResponsiveContainer,
   PieChart,
   Pie,
-  Cell
+  Cell,
+  Legend
 } from 'recharts';
+import { DoctorLayoutContext } from '../context/DoctorLayoutContext';
 
 const visitData = [
   { name: 'يناير', visits: 400 },
@@ -27,60 +30,92 @@ const visitData = [
   { name: 'يونيو', visits: 700 },
 ];
 
-const diagnosisData = [
-  { name: 'ضغط الدم', value: 30 },
-  { name: 'السكري', value: 25 },
-  { name: 'الربو', value: 20 },
-  { name: 'القلب', value: 15 },
-  { name: 'أخرى', value: 10 },
-];
+ 
+const COLORS = ["#4CAF50", "#F44336", "#FF9800"]; // أخضر، أحمر، برتقالي
+const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name }) => {
+  const RADIAN = Math.PI / 180;
+  const radius = outerRadius + 20;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
-
+  return (
+    <text x={x} y={y} fill={"#E2E8F0"}  // تغيير اللون حسب الوضع
+ textAnchor={x > cx ? "start" : "end"} dominantBaseline="central">
+      {`${name} (${(percent * 100).toFixed(0)}%)`}
+    </text>
+  );
+};
 export default function Dashboard() {
+  const { preferences, infoDashboard }=useContext(DoctorLayoutContext);
+  const appointmentStats = [
+    { name: "المواعيد المكتملة", value: infoDashboard?.completed_appointment_count || 0 },
+    { name: "المواعيد الملغاة", value: infoDashboard?.canceled_appointment_count || 0 },
+    { name: "المواعيد في الانتظار", value: infoDashboard?.pending_appointment_count || 0 }
+  ];
+ 
+   
+
   return (
 <div className="space-y-6 bg-gray-50 dark:bg-gray-900">
   {/* Stats Cards */}
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">المرضى اليوم</p>
-          <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200">24</h3>
-          <p className="text-sm text-green-600 dark:text-green-400 mt-1">+12.5% من الأمس</p>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {/* إجمالي المرضى */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">إجمالي المرضى</p>
+              <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200">{infoDashboard.patients_count}</h3>
+              <p className="text-sm text-green-600 dark:text-green-400 mt-1">جميع المرضى</p>
+            </div>
+            <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900 rounded-lg flex items-center justify-center">
+              <Users className="text-indigo-600 dark:text-indigo-400" size={24} />
+            </div>
+          </div>
         </div>
-        <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900 rounded-lg flex items-center justify-center">
-          <Users className="text-indigo-600 dark:text-indigo-400" size={24} />
-        </div>
-      </div>
-    </div>
 
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">المواعيد القادمة</p>
-          <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200">8</h3>
-          <p className="text-sm text-yellow-600 dark:text-yellow-400 mt-1">3 حالات طارئة</p>
+        {/* المواعيد القادمة */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">المواعيد القادمة</p>
+              <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200">{infoDashboard.pending_appointment_count}</h3>
+              <p className="text-sm text-yellow-600 dark:text-yellow-400 mt-1">جميع الحالات</p>
+            </div>
+            <div className="w-12 h-12 bg-green-50 dark:bg-green-900 rounded-lg flex items-center justify-center">
+              <Calendar className="text-green-600 dark:text-green-400" size={24} />
+            </div>
+          </div>
         </div>
-        <div className="w-12 h-12 bg-green-50 dark:bg-green-900 rounded-lg flex items-center justify-center">
-          <Calendar className="text-green-600 dark:text-green-400" size={24} />
-        </div>
-      </div>
-    </div>
 
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">وقت الانتظار</p>
-          <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200">15 دقيقة</h3>
-          <p className="text-sm text-red-600 dark:text-red-400 mt-1">+5 دقائق عن المتوسط</p>
+        {/* وقت الانتظار إلكترونياً */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">وقت الانتظار إلكترونياً</p>
+              <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200">{preferences.waitingTime} دقيقة</h3>
+              <p className="text-sm text-red-600 dark:text-red-400 mt-1">+2 دقائق عن المتوسط</p>
+            </div>
+            <div className="w-12 h-12 bg-yellow-50 dark:bg-yellow-900 rounded-lg flex items-center justify-center">
+              <Clock className="text-yellow-600 dark:text-yellow-400" size={24} />
+            </div>
+          </div>
         </div>
-        <div className="w-12 h-12 bg-yellow-50 dark:bg-yellow-900 rounded-lg flex items-center justify-center">
-          <Clock className="text-yellow-600 dark:text-yellow-400" size={24} />
+
+        {/* إجمالي الأرباح لآخر شهر */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">إجمالي الأرباح لآخر شهر</p>
+              <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200">₪{infoDashboard.salary_for_last_month}</h3>
+              <p className="text-sm text-green-600 dark:text-green-400 mt-1">إجمالي الأرباح الشهرية</p>
+            </div>
+            <div className="w-12 h-12 bg-green-50 dark:bg-green-900 rounded-lg flex items-center justify-center">
+              <DollarSign className="text-green-600 dark:text-green-400" size={24} />
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
+
 
   {/* Charts */}
   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -99,30 +134,45 @@ export default function Dashboard() {
       </div>
     </div>
 
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
-      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">التشخيصات الشائعة</h3>
-      <div className="h-80">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={diagnosisData}
-              cx="50%"
-              cy="50%"
-              labelLine={false}
-              label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-              outerRadius={80}
-              fill="#8884d8"
-              dataKey="value"
-            >
-              {diagnosisData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
+          {/* العنوان والتنسيق */}
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 text-center mb-4">
+            إحصائيات المواعيد
+          </h3>
+
+          {/* المخطط الدائري */}
+          <div className="h-80 flex justify-center items-center">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={appointmentStats.filter((entry) => entry.value > 0)}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={true}
+                  label={renderCustomizedLabel} // استخدام دالة التسمية المخصصة
+                  outerRadius={90}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {appointmentStats
+                    .filter((entry) => entry.value > 0) // تجاهل القيم الصفرية
+                    .map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                </Pie>
+                <Tooltip />
+                <Legend align="center" verticalAlign="bottom" />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* رسالة عندما تكون المواعيد الملغاة صفرًا */}
+          {appointmentStats.find((entry) => entry.name === "المواعيد الملغاة" && entry.value === 0) && (
+            <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-2">
+              لا توجد مواعيد ملغاة.
+            </p>
+          )}
+        </div>
   </div>
 </div>
 

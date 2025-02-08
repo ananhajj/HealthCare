@@ -20,7 +20,7 @@ import {
     FaHospital,
     FaMicroscope,
 } from "react-icons/fa";
-import { UserContext } from "./UserContextProvider";
+import { UserContext } from "../../context/UserContextProvider";
 
 const iconMap = {
     General: FaStethoscope,

@@ -1,16 +1,16 @@
-import React, { createContext, useState, useMemo, useEffect } from "react";
-import { decryptData } from "../../routes/encryption";
 import axios from "axios";
+import React, { createContext, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
+import { StreamChat } from "stream-chat";
+import { decryptData } from "../routes/encryption";
+import { unsubscribeFromChannel } from "../user/utils/pusherService";
 
 export const UserContext = createContext();
-import { StreamChat } from "stream-chat";
-import { initializePusher, subscribeToChannel, unsubscribeFromChannel } from "../utils/pusherService";
 const UserContextProvider = ({ children }) => {
 
 
 
-  const apiKey = "8ghmxrx2v98h";
+  const apiKey = "84zkehkczsdp";
   const client = StreamChat.getInstance(apiKey);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -19,8 +19,9 @@ const UserContextProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [streamToken, setStreamToken] = useState(null);
   const [userId, setUserId] = useState(localStorage.getItem("currentUserId"));
-  const [notifications, setNotifications] = useState([]);
+  // const [notifications, setNotifications] = useState([]);
   const apiUrl = import.meta.env.VITE_APP_KEY;
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("userToken");
@@ -50,9 +51,7 @@ const UserContextProvider = ({ children }) => {
 
 
 
-useEffect(() => {
-    localStorage.setItem("notifications", JSON.stringify(notifications));
-}, [notifications]); // 🔄 تشغيل عند أي تحديث لـ `notifications`
+
 
 
   //الاتصال في التشات ليصبح اليوزر اونلاين
@@ -140,68 +139,6 @@ useEffect(() => {
 
 
 
-  // إدارة Pusher للإشعارات
- useEffect(() => {
-     
-    if (!userId) {
-        return;
-    }
-
-    // تهيئة Pusher مرة واحدة
-    initializePusher();
-
-    // قائمة القنوات
-    const channels = [
-        {
-            name: `appointment.reminder.${userId}`,
-            handler: (data) => {
-                console.log('تم استلام إشعار تذكير من Pusher:', data);
-                const newNotification = {
-                    id: data.id,
-                    message: data.message,
-                    sender: data.sender,
-                    source: 'pusher',
-                    type: 'reminder',
-                    read: false,
-                };
-                setNotifications((prev) => [...prev, newNotification]);
-             },
-        },
-        {
-            name: `appointment.rating.${userId}`,
-            handler: (data) => {
-                console.log('تم استلام إشعار تقييم من Pusher:', data);
-                const newNotification = {
-                    id: data.id,
-                    message: data.message,
-                    patient_id: data.patient_id,
-                    doctor_name: data.doctor_name,
-                    doctor_id: data.doctor_id,
-                    source: 'pusher',
-                    created_at: new Date().toISOString(),
-                    read: false,
-                    type: 'rating',
-                };
-                setNotifications((prev) => [...prev, newNotification]);
-             },
-        },
-    ];
-
-    // الاشتراك في القنوات
-    channels.forEach(({ name, handler }) => {
-        subscribeToChannel(name, handler);
-    });
-
-    // تنظيف الاشتراك عند إلغاء المكون
-    return () => {
-        channels.forEach(({ name }) => {
-            unsubscribeFromChannel(name);
-        });
-    };
-}, [isLoggedIn,userId]);
-
-
-
 
   const cleanupResources = () => {
     // فصل الاتصال بـ Stream Chat
@@ -235,7 +172,7 @@ useEffect(() => {
     setUserData(null);
     setStreamToken(null);
     setUserId(null);
-    setNotifications([]);
+ 
 
     // تنظيف الموارد
     cleanupResources();
@@ -348,8 +285,8 @@ useEffect(() => {
       userId,
       setUserId,
       connectToChat,
-      notifications,
-      setNotifications
+      setUnreadCount,
+      unreadCount
     }),
     [isLoggedIn, userData, loading, token, streamToken, userId]
   );

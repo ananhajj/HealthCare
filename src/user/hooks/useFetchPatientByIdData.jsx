@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { encryptData } from "../../routes/encryption";
+ 
 
 const useFetchPatientByIdData = (userId) => {
     const [patientData, setPatientData] = useState(null);

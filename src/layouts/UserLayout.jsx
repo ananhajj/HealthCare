@@ -6,7 +6,8 @@ import { StreamChat } from "stream-chat";
 import ClinicContextProvider from "../user/context/ClinicContext";
 import DoctorContextProvider from "../user/context/DoctorContext";
 import { useContext, useEffect } from "react";
-import { UserContext } from "../user/context/UserContextProvider";
+import { UserContext } from "../context/UserContextProvider";
+
 const apiKey = "8ghmxrx2v98h";
 const client = StreamChat.getInstance(apiKey);
 const UserLayout = () => {

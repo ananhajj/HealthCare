@@ -1,103 +1,44 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Stethoscope, Menu, X, User, LogIn, ChevronDown, Bell } from 'lucide-react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-import logo from '../../../assets/logo.svg';
-import { UserContext } from '../../context/UserContextProvider';
-import { useChatContext } from 'stream-chat-react';
-import { initializePusher, subscribeToChannel, unsubscribeFromChannel } from '../../utils/pusherService';
 import axios from 'axios';
+import { Bell, LogIn, Menu, User, X } from 'lucide-react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { useChatContext } from 'stream-chat-react';
+import logo from '../../../assets/logo.svg';
+import { RealTimeContext } from '../../../context/RealTimeContext';
+import { UserContext } from '../../../context/UserContextProvider';
 
 export default function Header() {
+
+    const { isLoggedIn, logout } = useContext(UserContext);
+    const {notifications,unreadCount,markAllNotificationsAsRead,markNotificationAsRead}=useContext(RealTimeContext);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { client } = useChatContext(); // الوصول إلى Stream Chat Client
     const apiUrl = import.meta.env.VITE_APP_KEY;
-    const [unreadCount, setUnreadCount] = useState(0);
 
+    console.log("Navbar notif",notifications);
 
     const [isRatingModalOpen, setIsRatingModalOpen] = useState(false); // حالة فتح/إغلاق المودال
-    const [selectedNotification, setSelectedNotification] = useState(null); // الإشعار المحدد
+const [selectedNotification, setSelectedNotification] = useState(null); // الإشعار المحدد
 
 
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false); // حالة القائمة المنسدلة
-    const dropdownRef = useRef(null);
-    const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false); // حالة القائمة المنسدلة للموبايل
-    const navigate = useNavigate();
-    const { isLoggedIn, setIsLoggedIn, logout, notifications, setNotifications, userId } = useContext(UserContext);
-    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+const [isDropdownOpen, setIsDropdownOpen] = useState(false); // حالة القائمة المنسدلة
+const dropdownRef = useRef(null);
+   // const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false); // حالة القائمة المنسدلة للموبايل
+const navigate = useNavigate();
+ 
+const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
 
-    // تخزين الإشعارات في localStorage عند تحديثها
-    useEffect(() => {
-        const storedNotifications = JSON.parse(localStorage.getItem('notifications')) || [];
-        setNotifications(storedNotifications);
-        setUnreadCount(storedNotifications.filter(notification => !notification.read).length); // حساب الإشعارات غير المقروءة
-    }, []);
 
-/*
-    useEffect(() => {
-
-        if (!userId) {
-            return;
-        }
-
-        // تهيئة Pusher مرة واحدة
-        initializePusher();
-
-        // قائمة القنوات
-        const channels = [
-            {
-                name: `appointment.reminder.${userId}`,
-                handler: (data) => {
-                    console.log('تم استلام إشعار تذكير من Pusher:', data);
-                    const newNotification = {
-                        id: data.id,
-                        message: data.message,
-                        sender: data.sender,
-                        source: 'pusher',
-                        type: 'reminder',
-                        read: false,
-                    };
-                    setNotifications((prev) => [...prev, newNotification]);
-                    setUnreadCount((prev) => prev + 1);
-                },
-            },
-            {
-                name: `appointment.rating.${userId}`,
-                handler: (data) => {
-                    console.log('تم استلام إشعار تقييم من Pusher:', data);
-                    const newNotification = {
-                        id: data.id,
-                        message: data.message,
-                        patient_id: data.patient_id,
-                        doctor_name: data.doctor_name,
-                        doctor_id: data.doctor_id,
-                        source: 'pusher',
-                        created_at: new Date().toISOString(),
-                        read: false,
-                        type: 'rating',
-                    };
-                    setNotifications((prev) => [...prev, newNotification]);
-                    setUnreadCount((prev) => prev + 1);
-                },
-            },
-        ];
-
-        // الاشتراك في القنوات
-        channels.forEach(({ name, handler }) => {
-            subscribeToChannel(name, handler);
-        });
-
-        // تنظيف الاشتراك عند إلغاء المكون
-        return () => {
-            channels.forEach(({ name }) => {
-                unsubscribeFromChannel(name);
-            });
-        };
-    }, []);
-
-*/
+useEffect(() => {
+  console.log("Updated notifications:", notifications); // تحقق من الإشعارات التي تم تحديثها
+}, [notifications]); // هذا سيعمل عندما تتغير الإشعارات
 
 
+    
+    
+
+    
 
 
 
@@ -120,8 +61,8 @@ export default function Header() {
                     read: false, // تعيين الإشعار كغير مقروء
                 };
 
-                setNotifications((prev) => [...prev, newNotification]);
-                setUnreadCount((prev) => prev + 1);
+                //setNotifications((prev) => [...prev, newNotification]);
+                //setUnreadCount((prev) => prev + 1);
             }
         };
 
@@ -131,6 +72,7 @@ export default function Header() {
             client.off("message.new", handleNewMessage);
         };
     }, [client]);
+
 
 
 
@@ -172,16 +114,7 @@ export default function Header() {
     const toggleNotifications = () => {
         setIsNotificationOpen(!isNotificationOpen);
     };
-    const markNotificationsAsRead = () => {
-        const updatedNotifications = notifications.map(notification => ({
-            ...notification,
-            read: true,
-        }));
 
-        setNotifications(updatedNotifications);
-        setUnreadCount(0);
-        localStorage.setItem('notifications', JSON.stringify(updatedNotifications));
-    };
     const sendRating = async (ratingData) => {
         try {
             const response = await axios.post(
@@ -316,13 +249,8 @@ export default function Header() {
                                                                         onClick={() => {
                                                                             if (notification.type === 'rating') {
                                                                                 // تحديث الإشعار ليصبح مقروء
-                                                                                setNotifications((prev) =>
-                                                                                    prev.map((n) =>
-                                                                                        n.id === notification.id
-                                                                                            ? { ...n, read: true }
-                                                                                            : n
-                                                                                    )
-                                                                                );
+                                                                            markNotificationAsRead(notification.id);
+
                                                                                 // حفظ جميع بيانات الإشعار
                                                                                 setSelectedNotification({
                                                                                     id: notification.id,
@@ -339,13 +267,8 @@ export default function Header() {
                                                                                 setIsRatingModalOpen(true); // فتح المودال
                                                                             } else {
                                                                                 // باقي العمليات للإشعارات الأخرى
-                                                                                setNotifications((prev) =>
-                                                                                    prev.map((n) =>
-                                                                                        n.id === notification.id
-                                                                                            ? { ...n, read: true }
-                                                                                            : n
-                                                                                    )
-                                                                                );
+                                                                                markNotificationAsRead(notification.id);
+
                                                                                 if (notification.source === 'pusher') {
                                                                                     navigate(`/appointment-details/${notification.id}`);
                                                                                 } else if (notification.source === 'stream') {
@@ -362,42 +285,28 @@ export default function Header() {
                                                 </div>
                                             )}
                                             {notifications.filter((n) => n.read).length > 0 && (
-                                                <div>
-                                                    <h3 className="text-gray-600 font-semibold mt-4 mb-2">الإشعارات المقروءة</h3>
-                                                    <div className="max-h-48 overflow-y-auto">
-                                                        <ul className="text-gray-700 text-sm space-y-2">
-                                                            {notifications
-                                                                .filter((n) => n.read)
-                                                                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-                                                                .map((notification) => (
-                                                                    <li
-                                                                        key={notification.id}
-                                                                        className="border-b border-gray-200 py-2 hover:bg-gray-100 cursor-pointer bg-gray-100"
-                                                                        onClick={() => {
-                                                                            if (notification.source === 'pusher') {
-                                                                                navigate(`/appointment-details/${notification.id}`);
-                                                                            } else if (notification.source === 'stream') {
-                                                                                navigate(`/chat?doctorId=${notification.senderId}`);
-                                                                            }
-                                                                        }}
-                                                                    >
-                                                                        {notification.source === 'pusher' ? (
-                                                                            <>
-                                                                                <strong>إشعار من Pusher:</strong> {notification.message}
-                                                                            </>
-                                                                        ) : (
-                                                                            <>
-                                                                                <strong>رسالة جديدة من {notification.senderName}</strong>: {notification.message}
-                                                                            </>
-                                                                        )}
-                                                                    </li>
-                                                                ))}
-                                                        </ul>
-                                                    </div>
-                                                </div>
+                                               <div>
+                    <h3 className="text-gray-600 font-semibold mt-4 mb-2">الإشعارات المقروءة</h3>
+                    <div className="max-h-48 overflow-y-auto">
+                        <ul className="text-gray-700 text-sm space-y-2">
+                            {notifications
+                                .filter((n) => n.read && n.source === 'pusher')
+                                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                                .map((notification) => (
+                                    <li
+                                        key={notification.id}
+                                        className="border-b border-gray-200 py-2 hover:bg-gray-100 cursor-pointer bg-gray-100"
+                                        onClick={() => navigate(`/appointment-details/${notification.id}`)}
+                                    >
+                                        <strong></strong> {notification.message}
+                                    </li>
+                                ))}
+                        </ul>
+                    </div>
+                </div>
                                             )}
                                         </div>
-                                        <button onClick={markNotificationsAsRead} className="block w-full py-2 text-center text-sm text-blue-500">
+                                        <button onClick={markAllNotificationsAsRead} className="block w-full py-2 text-center text-sm text-blue-500">
                                             علامة كـ "مقروء"
                                         </button>
                                     </div>
@@ -636,100 +545,86 @@ export default function Header() {
                                         )}
                                     </button>
 
-                                    {isNotificationOpen && (
-                                        <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-72 bg-white border border-gray-300 rounded-lg shadow-lg">
-                                            <div className="p-4">
-                                                {notifications.filter((n) => !n.read).length > 0 && (
-                                                    <div>
-                                                        <h3 className="text-gray-600 font-semibold mb-2">الإشعارات الجديدة</h3>
-                                                        <div className="max-h-48 overflow-y-auto">
-                                                            <ul className="text-gray-700 text-sm space-y-2">
-                                                                {notifications
-                                                                    .filter((n) => !n.read)
-                                                                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-                                                                    .map((notification) => (
-                                                                        <li
-                                                                            key={notification.id}
-                                                                            className="border-b border-gray-200 py-2 hover:bg-gray-100 cursor-pointer"
-                                                                            onClick={() => {
-                                                                                if (notification.type === 'rating') {
-                                                                                    // تحديث الإشعار ليصبح مقروء
-                                                                                    setNotifications((prev) =>
-                                                                                        prev.map((n) =>
-                                                                                            n.id === notification.id
-                                                                                                ? { ...n, read: true }
-                                                                                                : n
-                                                                                        )
-                                                                                    );
-                                                                                    setSelectedNotification(notification); // حفظ بيانات الإشعار
-                                                                                    setIsRatingModalOpen(true); // فتح المودال
-                                                                                } else {
-                                                                                    // باقي العمليات للإشعارات الأخرى
-                                                                                    setNotifications((prev) =>
-                                                                                        prev.map((n) =>
-                                                                                            n.id === notification.id
-                                                                                                ? { ...n, read: true }
-                                                                                                : n
-                                                                                        )
-                                                                                    );
-                                                                                    if (notification.source === 'pusher') {
-                                                                                        navigate(`/appointment-details/${notification.id}`);
-                                                                                    } else if (notification.source === 'stream') {
-                                                                                        navigate(`/chat?doctorId=${notification.senderId}`);
-                                                                                    }
-                                                                                }
-                                                                            }}
-                                                                        >
-                                                                            {notification.message}
-                                                                        </li>
-                                                                    ))}
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                                {notifications.filter((n) => n.read).length > 0 && (
-                                                    <div>
-                                                        <h3 className="text-gray-600 font-semibold mt-4 mb-2">الإشعارات المقروءة</h3>
-                                                        <div className="max-h-48 overflow-y-auto">
-                                                            <ul className="text-gray-700 text-sm space-y-2">
-                                                                {notifications
-                                                                    .filter((n) => n.read)
-                                                                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-                                                                    .map((notification) => (
-                                                                        <li
-                                                                            key={notification.id}
-                                                                            className="border-b border-gray-200 py-2 hover:bg-gray-100 cursor-pointer bg-gray-100"
-                                                                            onClick={() => {
+                                        {isNotificationOpen && (
+                                    <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 w-72 bg-white border border-gray-300 rounded-lg shadow-lg">
+                                        <div className="p-4">
+                                            {notifications.filter((n) => !n.read).length > 0 && (
+                                                <div>
+                                                    <h3 className="text-gray-600 font-semibold mb-2">الإشعارات الجديدة</h3>
+                                                    <div className="max-h-48 overflow-y-auto">
+                                                        <ul className="text-gray-700 text-sm space-y-2">
+                                                            {notifications
+                                                                .filter((n) => !n.read)
+                                                                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                                                                .map((notification) => (
+                                                                    <li
+                                                                        key={notification.id}
+                                                                        className="border-b border-gray-200 py-2 hover:bg-gray-100 cursor-pointer"
+                                                                        onClick={() => {
+                                                                            if (notification.type === 'rating') {
+                                                                                // تحديث الإشعار ليصبح مقروء
+                                                                            markNotificationAsRead(notification.id);
+
+                                                                                // حفظ جميع بيانات الإشعار
+                                                                                setSelectedNotification({
+                                                                                    id: notification.id,
+                                                                                    patient_id: notification.patient_id,
+                                                                                    appointmentId: notification.appointment_id,
+                                                                                    doctor_name: notification.doctor_name,
+                                                                                    doctor_id: notification.doctor_id,
+                                                                                    message: notification.message,
+                                                                                    type: notification.type,
+                                                                                    created_at: notification.created_at,
+                                                                                    rating: 0, // التقييم الافتراضي
+                                                                                    comment: '', // التعليق الافتراضي
+                                                                                });
+                                                                                setIsRatingModalOpen(true); // فتح المودال
+                                                                            } else {
+                                                                                // باقي العمليات للإشعارات الأخرى
+                                                                                markNotificationAsRead(notification.id);
+
                                                                                 if (notification.source === 'pusher') {
                                                                                     navigate(`/appointment-details/${notification.id}`);
                                                                                 } else if (notification.source === 'stream') {
                                                                                     navigate(`/chat?doctorId=${notification.senderId}`);
                                                                                 }
-                                                                            }}
-                                                                        >
-                                                                            {notification.source === 'pusher' ? (
-                                                                                <>
-                                                                                    <strong>إشعار من Pusher:</strong> {notification.message}
-                                                                                </>
-                                                                            ) : (
-                                                                                <>
-                                                                                    <strong>رسالة جديدة من {notification.senderName}</strong>: {notification.message}
-                                                                                </>
-                                                                            )}
-                                                                        </li>
-                                                                    ))}
-                                                            </ul>
-                                                        </div>
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        {notification.message}
+                                                                    </li>
+                                                                ))}
+                                                        </ul>
                                                     </div>
-                                                )}
-                                            </div>
-
-                                            <button onClick={markNotificationsAsRead} className="block w-full py-2 text-center text-sm text-blue-500">
-                                                علامة كـ "مقروء"
-                                            </button>
+                                                </div>
+                                            )}
+                                            {notifications.filter((n) => n.read).length > 0 && (
+                                               <div>
+                    <h3 className="text-gray-600 font-semibold mt-4 mb-2">الإشعارات المقروءة</h3>
+                    <div className="max-h-48 overflow-y-auto">
+                        <ul className="text-gray-700 text-sm space-y-2">
+                            {notifications
+                                .filter((n) => n.read && n.source === 'pusher')
+                                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                                .map((notification) => (
+                                    <li
+                                        key={notification.id}
+                                        className="border-b border-gray-200 py-2 hover:bg-gray-100 cursor-pointer bg-gray-100"
+                                        onClick={() => navigate(`/appointment-details/${notification.id}`)}
+                                    >
+                                        <strong>  </strong> {notification.message}
+                                    </li>
+                                ))}
+                        </ul>
+                    </div>
+                </div>
+                                            )}
                                         </div>
-                                    )}
-
+                                        <button onClick={markAllNotificationsAsRead} className="block w-full py-2 text-center text-sm text-blue-500">
+                                            علامة كـ "مقروء"
+                                        </button>
+                                    </div>
+                                )}
                                 </div>
 
                             }

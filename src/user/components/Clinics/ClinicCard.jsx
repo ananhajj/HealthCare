@@ -2,38 +2,39 @@ import React, { useContext } from "react";
 import { Calendar, Clock, MapPin, User } from "lucide-react";
 import { formatScheduleArabic } from "../../utils/scheduleFormatter";
 import Swal from "sweetalert2";
-import { UserContext } from "../../context/UserContextProvider";
+
 import { Navigate, useNavigate } from "react-router-dom";
+import { UserContext } from "../../../context/UserContextProvider";
 
 export const ClinicCard = ({ clinic, onBooking }) => {
     const { isLoggedIn } = useContext(UserContext); // الحصول على حالة تسجيل الدخول
     const navigate = useNavigate();
-    console.log("clinic in city",clinic);
+    console.log("clinic in city", clinic);
     const formattedSchedule = clinic.schedule ? clinic.schedule : ["غير محدد"];
     const handleBookingClick = () => {
         if (!isLoggedIn) {
             // عرض SweetAlert إذا لم يكن المستخدم مسجلًا
             Swal.fire({
-                           title: "👋 مرحباً بك!",
-                           html: `
+                title: "👋 مرحباً بك!",
+                html: `
                                <p style="font-size: 18px; line-height: 1.8; color: #444; text-align:  ;">
                                    لتتمكن من حجز موعدك بسهولة وراحة، نرجو منك تسجيل الدخول أولاً.
                                    <br />
                                    لا تقلق، العملية بسيطة وسريعة جدًا!
                                </p>
                            `,
-                           icon: "info",
-                           showCancelButton: true,
-                           confirmButtonText: "تسجيل الدخول الآن",
-                           cancelButtonText: "لاحقًا",
-                           confirmButtonColor: "#3085d6",
-                           cancelButtonColor: "#d33",
-                           customClass: {
-                               popup: "swal2-rtl", // جعل المحتوى من اليمين إلى اليسار
-                           },
-                           didOpen: () => {
-                               document.querySelector(".swal2-container").setAttribute("dir", "rtl");
-                           },
+                icon: "info",
+                showCancelButton: true,
+                confirmButtonText: "تسجيل الدخول الآن",
+                cancelButtonText: "لاحقًا",
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                customClass: {
+                    popup: "swal2-rtl", // جعل المحتوى من اليمين إلى اليسار
+                },
+                didOpen: () => {
+                    document.querySelector(".swal2-container").setAttribute("dir", "rtl");
+                },
             }).then((result) => {
                 if (result.isConfirmed) {
                     // توجيه المستخدم إلى صفحة تسجيل الدخول
@@ -42,9 +43,9 @@ export const ClinicCard = ({ clinic, onBooking }) => {
             });
         } else {
             // استدعاء دالة الحجز إذا كان المستخدم مسجل الدخول
-           
+
             navigate(`/clinic/booking/${clinic.id}`);
-            
+
         }
     };
     return (
@@ -99,18 +100,18 @@ export const ClinicCard = ({ clinic, onBooking }) => {
                 {/* الجدول */}
                 <div className="flex items-start gap-2">
                     <Calendar className="h-5 w-5 text-gray-500 mt-1" />
-<div>
-  <span className="font-semibold">الجدول الزمني:</span>
-  <ol className="list-disc pl-5 text-sm mt-1">
-    {clinic.schedule && clinic.schedule.length > 0
-      ? formatScheduleArabic(clinic.schedule).map((entry, index) => (
-          <li key={index} className="font-semibold text-blue-900">
-            {entry}
-          </li>
-        ))
-      : "غير متوفر"}
-  </ol>
-</div>
+                    <div>
+                        <span className="font-semibold">الجدول الزمني:</span>
+                        <ol className="list-disc pl-5 text-sm mt-1">
+                            {clinic.schedule && clinic.schedule.length > 0
+                                ? formatScheduleArabic(clinic.schedule).map((entry, index) => (
+                                    <li key={index} className="font-semibold text-blue-900">
+                                        {entry}
+                                    </li>
+                                ))
+                                : "غير متوفر"}
+                        </ol>
+                    </div>
 
                 </div>
             </div>

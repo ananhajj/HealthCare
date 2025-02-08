@@ -7,7 +7,8 @@ const SuccessPage = () => {
   const navigate = useNavigate();
   const sessionId = searchParams.get("session_id");
   const appointmentId = localStorage.getItem("appointment_id");
-    const apiUrl = "https://c15b-139-190-147-200.ngrok-free.app";
+  const apiUrl = import.meta.env.VITE_APP_KEY;
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,13 +26,13 @@ const SuccessPage = () => {
     if (sessionId && appointmentId) {
       axios
         .post(`${apiUrl}/api/payment/success/${appointmentId}`,
-              {
-        headers: {
-          "ngrok-skip-browser-warning": "s",
-          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
-          "Content-Type": "application/json",
-        },
-      }
+          {
+            headers: {
+              "ngrok-skip-browser-warning": "s",
+              Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+              "Content-Type": "application/json",
+            },
+          }
         )
         .then((response) => {
           console.log("Response from API:", response.data);
@@ -48,7 +49,7 @@ const SuccessPage = () => {
     }
 
     // تنظيف المستمع عند الخروج من الصفحة
-   
+
   }, [sessionId, appointmentId, navigate]);
 
   return (

@@ -21,8 +21,7 @@ export default function ClinicManagement() {
 
 
 
-
-  const [id, setId] = useState("");
+  const [id, setId] = useState();
   const [clinicName, setClinicName] = useState("");
    const [clinicEnName, setClinicEnName] = useState("");
   const [addressLine1, setAddressLine1] = useState("");
@@ -31,6 +30,7 @@ export default function ClinicManagement() {
   const [clinicPhone, setClinicPhone] = useState("");
   const [cityClinic, setCityClinic] = useState({});
   const[specialtyClinic,setSpecialtyClinic]=useState({});
+  
 const [newAppointmentTime, setNewAppointmentTime] = useState(
   clinics?.[activeClinic]?.appointmentTime || null
 );
@@ -56,7 +56,24 @@ const [newAppointmentTime, setNewAppointmentTime] = useState(
     setIsEditModalOpen(true);
   };
 
- const openModalFav = () => {
+  const openModalFav = async(clinic) => {
+    const addressParts = clinic.address ? clinic.address.split(",").map((part) => part.trim()) : [];
+    setId(clinic.id);
+    setClinicName(clinic.name);
+    setClinicEnName(clinic.en_name);
+    setCityClinic({
+      name: clinic.city.name,
+      id: clinic.city.id,
+    });
+    setSpecialtyClinic({
+      name: clinic.specialtiy.name,
+      id: clinic.specialtiy.id,
+    });
+    setAddressLine1(addressParts[0] || ""); // الخط الأول
+    setAddressLine2(addressParts[1] || ""); // الخط الثاني
+    setAddressLine3(addressParts[2] || ""); // الخط الثالث
+    setClinicPhone(clinic.phone);
+    
     setIsModalFavOpen(true);
   };
  const closeModalFav = () => {
@@ -86,7 +103,7 @@ console.log("clinic",clinics);
     };
         
 
-    console.log("ediit", updatedInfo);
+
     const response = await updateClinicInfo(updatedInfo, id);
 
     if (response) {
@@ -313,7 +330,8 @@ const handleSave= async (updatedSchedule, clinicId) => {
                 {/* تفضيلات */}
             <button
         className="p-4 text-center rounded-lg border border-gray-200 hover:border-indigo-200 hover:bg-indigo-50 transition dark:border-gray-700 hover:border-indigo-200 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-800"
-        onClick={openModalFav}
+                    onClick={() => openModalFav(clinics[activeClinic])}
+
       >
         <Users className="mx-auto mb-2 text-indigo-600 dark:text-indigo-400" size={24} />
         <span className="text-gray-600 dark:text-gray-200">تفضيلات</span>
@@ -394,7 +412,7 @@ const handleSave= async (updatedSchedule, clinicId) => {
     <option value="" disabled>اختر التخصص</option>
     {specialties.map((spec) => (
       <option key={spec.id} value={spec.id}>
-    
+        {spec.ar_name}
       </option>
     ))}
   </select>

@@ -1,7 +1,8 @@
 import { useContext, useEffect, useState } from "react";
-import { UserContext } from "../context/UserContextProvider";
+import { UserContext } from "../../context/UserContextProvider";
 import axios from "axios";
 import { formatClinicWorkingHours } from "../utils/formatClinicWorkingHours";
+ 
 
 const useFetchClinicById = (clinicId) => {
     const [clinic, setClinic] = useState(null);

@@ -6,6 +6,7 @@ import axios from 'axios';
 import useUpdateDoctorInfo from '../hooks/useUpdateDoctorInfo';
 import Loading from '../../Loading';
 import Loader from './Loader';
+import NewPassword from '../../auth/NewPassword';
 
 
 
@@ -65,6 +66,7 @@ export default function Profile() {
  
 
 
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
   const [isPersonalModalOpen, setIsPersonalModalOpen] = useState(false); // حالة المودال
 
@@ -775,12 +777,32 @@ if (error) {
      <div className="dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 rounded-xl shadow-sm p-6">
   <h2 className="font-semibold text-gray-800 dark:text-gray-100 mb-4">الأمان والخصوصية</h2>
   <div className="space-y-4">
-    <button className="w-full text-right p-4 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-indigo-200 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-800 transition">
+    <button className="w-full text-right p-4 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-indigo-200 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-800 transition"
+            onClick={() => setShowNewPassword(true)}
+    >
       <h3 className="font-semibold text-gray-800 dark:text-gray-100">تغيير كلمة المرور</h3>
       <p className="text-sm text-gray-500 dark:text-gray-400">
         قم بتحديث كلمة المرور الخاصة بك بشكل دوري
       </p>
     </button>
+          {showNewPassword && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+              <div className="relative bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg w-full max-w-md">
+                {/* زر الإغلاق */}
+                <button
+                  onClick={() => setShowNewPassword(false)}
+                  className="absolute top-4 right-4 text-gray-400 dark:text-gray-600 hover:text-red-500"
+                >
+                  <X size={20} />
+                </button>
+
+                {/* محتوى النافذة */}
+                <NewPassword />
+              </div>
+            </div>
+          )}
+
+      
     <button className="w-full text-right p-4 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-indigo-200 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-800 transition">
       <h3 className="font-semibold text-gray-800 dark:text-gray-100">التحقق بخطوتين</h3>
       <p className="text-sm text-gray-500 dark:text-gray-400">

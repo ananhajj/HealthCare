@@ -73,10 +73,9 @@ const useCompleteAppointment = () => {
             );
 
 
-            if (response.status === 200) {
-
-                return response.data;
-            }
+                console.log("succ reposrt");
+                return "200";
+            
         } catch (error) {
             console.error("❌ خطأ أثناء إرسال الطلب:", error.response?.data || error);
             setError(error);
@@ -117,10 +116,10 @@ const useCompleteAppointment = () => {
 
    
 
-            if (response.status === 200) {
+ 
 
-                return response.data;
-            }
+                return "200";
+        
         } catch (error) {
             console.error("❌ خطأ أثناء إرسال الطلب:", error.response?.data || error);
             setError(error);

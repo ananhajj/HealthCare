@@ -14,9 +14,9 @@ import {
 import "stream-chat-react/dist/css/v2/index.css";
 import { toast } from "react-toastify";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { UserContext } from "../../context/UserContextProvider";
+import { UserContext } from "../../../context/UserContextProvider";
 
-const apiKey = "8ghmxrx2v98h";
+const apiKey = "84zkehkczsdp";
 
 const Page = () => {
   const navigate = useNavigate();

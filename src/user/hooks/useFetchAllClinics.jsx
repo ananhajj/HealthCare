@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react"
-import { UserContext } from "../context/UserContextProvider";
+
 import axios from "axios";
+import { UserContext } from "../../context/UserContextProvider";
 
 const useFetchAllClinics=()=>{
     const [allClinics, setAllClinics]=useState([]);

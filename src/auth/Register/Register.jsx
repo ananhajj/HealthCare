@@ -4,7 +4,7 @@ import PatientFlow from './PatientFlow';
 import DoctorFlow from './DoctorFlow';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import registerAi from '../../../../assets/animations/register.json'
+import registerAi from '../../assets/animations/register.json'
 
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import Lottie from 'lottie-react';

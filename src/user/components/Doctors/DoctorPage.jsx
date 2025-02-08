@@ -12,11 +12,12 @@ import useFetchBookedClinicSlots from "../../hooks/useFetchBookedClinicSlots";
 import useFetchDoctorById from "../../hooks/useFetchDoctorById";
 import { generateTimeSlots } from "../../utils/generateTimeSlots";
 import Loading from "../Loading";
-import { UserContext } from "../../context/UserContextProvider";
+
 import Swal from "sweetalert2";
 import { postClinicAppointment } from "../../hooks/postClinicAppointment";
 import { postOnlineAppointment } from "../../hooks/postOnlineAppointment";
 import useFetchBookedOnlineSlots from "../../hooks/useFetchBookedOnlineSlots";
+import { UserContext } from "../../../context/UserContextProvider";
 const dayMap = {
   Sunday: "الأحد",
   Monday: "الإثنين",

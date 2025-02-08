@@ -3,14 +3,15 @@ import { User, Lock, Search } from "lucide-react"; // استيراد الأيق�
 import { useFormik } from "formik"; // إدارة النماذج باستخدام Formik
 import { Link, useNavigate } from "react-router-dom"; // للتوجيه بين الصفحات
 import * as Yup from "yup"; // لإضافة التحقق من صحة البيانات
-import { UserContext } from "../../context/UserContextProvider";
+
 import { Bounce, Slide, toast } from "react-toastify";
-import logoanimationData from '../../../assets/animations/loginAni.json'
+import logoanimationData from '../assets/animations/loginAni.json'
 import axios from "axios";
-import { encryptData } from "../../../routes/encryption";
-import useFetchPatientByIdData from "../../hooks/useFetchPatientByIdData";
 import Swal from "sweetalert2";
 import Lottie from "lottie-react";
+import { UserContext } from "../context/UserContextProvider";
+import { encryptData } from "../routes/encryption";
+
 
 // التحقق من صحة البيانات باستخدام Yup
 const validationSchema = Yup.object({
@@ -60,6 +61,7 @@ export default function Login() {
 
                 // التنقل بناءً على الدور
                 if (user.role_id === 2) {
+                    localStorage.setItem("currentUserId", user.id);
                     localStorage.setItem("currentUserId", user.id);
                     setUserId(user.id);
                     navigate("/");
