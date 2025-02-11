@@ -12,7 +12,7 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState(null);
 
-    const backendUrl = 'https://c15b-139-190-147-200.ngrok-free.app/';
+    const apiUrl = import.meta.env.VITE_APP_KEY;
 
 
     const handleSubmit = async (e) => {
@@ -21,7 +21,7 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
 
         try {
             const response = await axios.post(
-                `${backendUrl}api/verify-phone`,
+                `${apiUrl}/api/verify-phone`,
                 verificationData,
                 { headers: { "ngrok-skip-browser-warning": "s" } }
             );
@@ -36,7 +36,7 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
         } finally {
             setLoading(false);
         }
-     
+
     };
 
     const handleResend = async () => {
@@ -46,7 +46,7 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
 
         try {
             await axios.post(
-                `${backendUrl}api/resend-phone-otp`,
+                `${apiUrl}/api/resend-phone-otp`,
                 { user_id: verificationData.user_id },
                 { headers: { 'ngrok-skip-browser-warning': 's' } }
             );
@@ -73,7 +73,7 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
 
         try {
             const response = await axios.put(
-                `${backendUrl}api/update-phone`,
+                `${apiUrl}/api/update-phone`,
                 { phone: newPhone, user_id: verificationData.user_id },
                 { headers: { 'ngrok-skip-browser-warning': 's' } }
             );
@@ -91,7 +91,7 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
             setLoading(false);
         }
     };
-  
+
 
     return (
         <div className="flex flex-col items-center min-h-[50vh] justify-center min-h-screen bg-gray-50 px-4 rtl">
@@ -156,7 +156,7 @@ export default function PhoneNumberVerification({ phone, user_id, onNext }) {
                 {error && <p className="mt-4 text-center text-sm text-red-500">{error}</p>}
                 {success && (
                     <p className="mt-4 text-center text-sm text-green-500">
-                        تم التحقق من الهاتف بنجاح!
+                        تم تغير رقم الهاتف بنجاح!
                     </p>
                 )}
 

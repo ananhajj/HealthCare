@@ -30,21 +30,24 @@ import OnlineAppointments from './components/OnlineAppointments';
 import Profile from './components/Profile';
 import Reviews from './components/Reviews';
 import FinancialRecords from './components/FinancialRecords';
- function App() {
-   const [activeTab, setActiveTab] = useState('dashboard');
+import { DoctorLayoutContext } from './context/DoctorLayoutContext';
+
+function App() {
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // حالة القائمة المنسدلة
-  const {  logout } = useContext(UserContext);
+  const { logout } = useContext(UserContext);
   const navigate = useNavigate();
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const { notifications, unreadCount, markAllNotificationsAsRead, markNotificationAsRead } = useContext(RealTimeContext);
+  const { personalInfo } = useContext(DoctorLayoutContext);
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('darkMode') === 'true';
     }
     return false;
   });
-   console.log("Navbar notif",notifications);
+  console.log("Navbar notif", notifications);
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark');
@@ -209,8 +212,8 @@ import FinancialRecords from './components/FinancialRecords';
                 setIsSidebarOpen(false);
               }}
               className={`flex items-center space-x-2 space-x-reverse w-full px-4 py-3 rounded-lg ${activeTab === 'financial-records'
-                  ? 'bg-indigo-50 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400'
-                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                ? 'bg-indigo-50 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50'
                 }`}
             >
               <DollarSign size={20} />
@@ -273,7 +276,7 @@ import FinancialRecords from './components/FinancialRecords';
               >
                 <Menu size={24} />
               </button>
-              <h2 className="text-xl lg:text-2xl font-semibold text-gray-800 dark:text-white">مرحباً، د. أحمد</h2>
+              <h2 className="text-xl lg:text-2xl font-semibold text-gray-800 dark:text-white">مرحباً د.{personalInfo.first_name}</h2>
             </div>
             <div className="flex items-center space-x-4 space-x-reverse">
               <button
@@ -282,82 +285,82 @@ import FinancialRecords from './components/FinancialRecords';
               >
                 {darkMode ? <Sun size={20} /> : <Moon size={20} />}
               </button>
-              <div className='relative'> 
-         <button onClick={toggleNotifications} className="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300 relative">
-  <Bell size={20} />
+              <div className='relative'>
+                <button onClick={toggleNotifications} className="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300 relative">
+                  <Bell size={20} />
 
-  {unreadCount > 0 && (
-    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-      {unreadCount}
-    </span>
-  )}
-</button>
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {unreadCount}
+                    </span>
+                  )}
+                </button>
 
-{isNotificationOpen && (
-  <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg dark:bg-gray-800 dark:border-gray-600" style={{ width: '13rem' }}>
-    <div className="p-4">
-      {notifications.filter((n) => !n.read && n.type !== 'rating').length > 0 ? (
-        <div>
-          <h3 className="text-gray-600 dark:text-gray-200 font-semibold mb-2">الإشعارات الجديدة</h3>
-          <div className="overflow-y-auto" style={{ maxHeight: '200px' }}>
-            <ul className="text-gray-700 dark:text-gray-300 text-sm space-y-2">
-              {notifications
-                .filter((n) => !n.read && n.type !== 'rating')
-                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-                .map((notification) => (
-                  <li
-                    key={notification.id}
-                    className="border-b border-gray-200 dark:border-gray-600 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
-                    onClick={() => {
-                      markNotificationAsRead(notification.id);
-                      if (notification.source === 'pusher') {
-                        navigate(`/appointment-details/${notification.id}`);
-                      }
-                    }}
-                  >
-                    {notification.message}
-                  </li>
-                ))}
-            </ul>
-          </div>
-        </div>
-      ) : (
-        <div className="text-gray-500 dark:text-gray-400 text-sm">لا توجد إشعارات جديدة.</div>
-      )}
+                {isNotificationOpen && (
+                  <div className="absolute left-1/2 transform -translate-x-1/2 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg dark:bg-gray-800 dark:border-gray-600" style={{ width: '13rem', zIndex: 99 }}>
+                    <div className="p-4">
+                      {notifications.filter((n) => !n.read && n.type !== 'rating').length > 0 ? (
+                        <div>
+                          <h3 className="text-gray-600 dark:text-gray-200 font-semibold mb-2">الإشعارات الجديدة</h3>
+                          <div className="overflow-y-auto" style={{ maxHeight: '200px' }}>
+                            <ul className="text-gray-700 dark:text-gray-300 text-sm space-y-2">
+                              {notifications
+                                .filter((n) => !n.read && n.type !== 'rating')
+                                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                                .map((notification) => (
+                                  <li
+                                    key={notification.id}
+                                    className="border-b border-gray-200 dark:border-gray-600 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                                    onClick={() => {
+                                      markNotificationAsRead(notification.id);
+                                      if (notification.source === 'pusher') {
+                                        navigate(`/appointment-details/${notification.id}`);
+                                      }
+                                    }}
+                                  >
+                                    {notification.message}
+                                  </li>
+                                ))}
+                            </ul>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-gray-500 dark:text-gray-400 text-sm">لا توجد إشعارات جديدة.</div>
+                      )}
 
-      {notifications.filter((n) => n.read && n.type !== 'rating').length > 0 ? (
-        <div>
-          <h3 className="text-gray-600 dark:text-gray-200 font-semibold mt-4 mb-2">الإشعارات المقروءة</h3>
-          <div className="overflow-y-auto" style={{ maxHeight: '200px' }}>
-            <ul className="text-gray-700 dark:text-gray-300 text-sm space-y-2">
-              {notifications
-                .filter((n) => n.read && n.type !== 'rating' && n.source === 'pusher')
-                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-                .map((notification) => (
-                  <li
-                    key={notification.id}
-                    className="border-b border-gray-200 dark:border-gray-600 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer bg-gray-100 dark:bg-gray-700"
-                    onClick={() => navigate(`/appointment-details/${notification.id}`)}
-                  >
-                    {notification.message}
-                  </li>
-                ))}
-            </ul>
-          </div>
-        </div>
-      ) : (
-        <div className="text-gray-500 dark:text-gray-400 text-sm">لا توجد إشعارات مقروءة.</div>
-      )}
-    </div>
+                      {notifications.filter((n) => n.read && n.type !== 'rating').length > 0 ? (
+                        <div>
+                          <h3 className="text-gray-600 dark:text-gray-200 font-semibold mt-4 mb-2">الإشعارات المقروءة</h3>
+                          <div className="overflow-y-auto" style={{ maxHeight: '200px' }}>
+                            <ul className="text-gray-700 dark:text-gray-300 text-sm space-y-2">
+                              {notifications
+                                .filter((n) => n.read && n.type !== 'rating' && n.source === 'pusher')
+                                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                                .map((notification) => (
+                                  <li
+                                    key={notification.id}
+                                    className="border-b border-gray-200 dark:border-gray-600 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer bg-gray-100 dark:bg-gray-700"
+                                    onClick={() => navigate(`/appointment-details/${notification.id}`)}
+                                  >
+                                    {notification.message}
+                                  </li>
+                                ))}
+                            </ul>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-gray-500 dark:text-gray-400 text-sm">لا توجد إشعارات مقروءة.</div>
+                      )}
+                    </div>
 
-    <button onClick={markAllNotificationsAsRead} className="block w-full py-2 text-center text-sm text-blue-500 dark:text-blue-300">
-      علامة كـ "مقروء"
-    </button>
-  </div>
-)}
+                    <button onClick={markAllNotificationsAsRead} className="block w-full py-2 text-center text-sm text-blue-500 dark:text-blue-300">
+                      علامة كـ "مقروء"
+                    </button>
+                  </div>
+                )}
 
 
-</div>
+              </div>
               <div className="relative z-10">
 
                 <button
@@ -370,7 +373,7 @@ import FinancialRecords from './components/FinancialRecords';
                 </button>
                 {isDropdownOpen && (
                   <div className="absolute custome-space w-35 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg dark:bg-gray-800 dark:border-gray-600" style={{ width: '' }}>
-             
+
                     <button
                       onClick={handleLogout}
                       className="w-full text-left block px-2 py-2 text-sm text-red-500 hover:bg-gray-100 "

@@ -53,7 +53,7 @@ const validationSchema = Yup.object({
     dob: Yup.date().required('Date of birth is required'),
     speciality: Yup.string().required('Specialty is required'),
     id_number: Yup.string()
-        .length(9, 'ID number must be 10 digits')
+        .length(9, 'ID number must be 9 digits')
         .required('ID number is required'),
     password: Yup.string()
         .min(6, 'Password must be at least 6 characters')
@@ -75,24 +75,15 @@ export default function DoctorRegistration({
     onNext,
     onBack,
 }) {
-    /*   const [formData, setFormData] = useState({
-           email: email || '',
-           phone: phone || '',
-           first_name: firstName || '',
-           last_name: lastName || '',
-           dob: dob || '',
-           username: username || '',
-           speciality: speciality || '',
-           id_number: id_number || '',
-       });*/
+
     const formik = useFormik({
         initialValues: {
             email: email || '',
             phone: phone || '',
             first_name: firstName || '',
             last_name: lastName || '',
-            en_first_name:  '',
-            en_last_name:   '',
+            en_first_name: '',
+            en_last_name: '',
             dob: dob || '',
             username: username || '',
             speciality: speciality || '',
@@ -108,14 +99,15 @@ export default function DoctorRegistration({
 
     const [loading, setLoading] = useState(false);
     const [backendErrors, setBackendErrors] = useState('');
-    const backendUrl = 'https://f98b-83-244-8-231.ngrok-free.app/';
+    const apiUrl = import.meta.env.VITE_APP_KEY;
 
     const handleSubmit = async (values) => {
 
         setLoading(true);
+        console.log("submit", values);
         try {
             const response = await axios.post(
-                `${backendUrl}api/doctor/register`,
+                `${apiUrl}/api/doctor/register`,
                 values,
                 { headers: { "ngrok-skip-browser-warning": "s" } }
             );
@@ -186,7 +178,7 @@ export default function DoctorRegistration({
     };
 
     return (
-        <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6 overflow-auto md:overflow-visible max-h-screen rtl" dir="rtl">
+        <div className="max-w-5xl mx-auto    rounded-lg p-6 overflow-auto md:overflow-visible max-h-screen rtl" dir="rtl">
 
             {/* قسم العنوان */}
             <div className="text-center mb-8">
@@ -242,9 +234,7 @@ export default function DoctorRegistration({
                         {formik.errors.last_name && formik.touched.last_name && (
                             <p className="text-red-500 text-sm mt-1">{formik.errors.last_name}</p>
                         )}
-                        {backendErrors.last_name && (
-                            <p className="text-red-500 text-sm mt-1">{backendErrors.last_name[0]}</p>
-                        )}
+
                     </div>
 
                     {/* الاسم الأول في الانجليزي */}
@@ -497,8 +487,8 @@ export default function DoctorRegistration({
                                 value={formik.values.password_confirmation}
                                 onChange={formik.handleChange}
                                 className={`block w-full pr-10 pl-4 py-2.5 text-gray-700 bg-white border rounded-lg focus:outline-none ${formik.values.password !== formik.values.password_confirmation
-                                        ? 'border-red-500'
-                                        : 'border-gray-300'
+                                    ? 'border-red-500'
+                                    : 'border-gray-300'
                                     }`}
                                 required
                             />

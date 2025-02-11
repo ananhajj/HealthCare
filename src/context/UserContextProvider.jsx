@@ -63,6 +63,7 @@ const UserContextProvider = ({ children }) => {
         {
           id: userIdS, // تأكد من تمرير userId كسلسلة
           name: `User_${userData.first_name}`, // اسم المستخدم
+          image: 'https://res.cloudinary.com/dbzkboutj/image/upload/v1739075694/Doctor/f47z2b618sgofhvk9jyb.jpg',
         },
         streamToken
       );
@@ -172,7 +173,7 @@ const UserContextProvider = ({ children }) => {
     setUserData(null);
     setStreamToken(null);
     setUserId(null);
- 
+
 
     // تنظيف الموارد
     cleanupResources();

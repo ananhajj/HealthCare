@@ -14,8 +14,8 @@ function NewPassword() {
         e.preventDefault();
         setError('');
 
-    
-   
+
+
 
         if (newPassword !== confirmPassword) {
             setError('كلمة المرور الجديدة غير متطابقة');
@@ -27,7 +27,7 @@ function NewPassword() {
             return;
         }
 
-        
+
         try {
             // إرسال الطلب إلى API
             const formData = new FormData();

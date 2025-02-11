@@ -74,12 +74,12 @@ const markAllNotificationsAsRead = async (setNotifications) => {
 export const RealTimeContext = createContext();
 
 const RealTimeContextProvider = ({ children }) => {
-    const { isLoggedIn  } = useContext(UserContext);
+    const { isLoggedIn } = useContext(UserContext);
     const [userId, setUserId] = useState(localStorage.getItem("currentUserId"));
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
-    const userData=decryptData(localStorage.getItem("userData"));
-    console.log("data real",userData);
+    const userData = decryptData(localStorage.getItem("userData"));
+    console.log("data real", userData);
     useEffect(() => {
         if (isLoggedIn) {
             setUserId(localStorage.getItem("currentUserId"));
@@ -102,91 +102,91 @@ const RealTimeContextProvider = ({ children }) => {
         if (!userId) return;
 
         initializePusher();
-         let channels=[];
-       if (userData && userData.role_id === 2){
-          channels = [
-            {
-                name: `appointment.reminder.${userId}`,
-                handler: (data) => {
+        let channels = [];
+        if (userData && userData.role_id === 2) {
+            channels = [
+                {
+                    name: `appointment.reminder.${userId}`,
+                    handler: (data) => {
 
-                    const newNotification = {
-                        id: data.id,
-                        message: data.message,
-                        sender: data.sender,
-                        source: "pusher",
-                        type: "reminder",
-                        read: false,
-                    };
-                    setNotifications((prev) => [...prev, newNotification]);
+                        const newNotification = {
+                            id: data.id,
+                            message: data.message,
+                            sender: data.sender,
+                            source: "pusher",
+                            type: "reminder",
+                            read: false,
+                        };
+                        setNotifications((prev) => [...prev, newNotification]);
+                    },
                 },
-            },
-            {
-                name: `appointment.missing.patient.${userId}`,
-                handler: (data) => {
+                {
+                    name: `appointment.missing.patient.${userId}`,
+                    handler: (data) => {
 
-                    const newNotification = {
-                        id: data.id,
-                        message: data.message,
-                        sender: data.sender,
-                        source: "pusher",
-                        type: "general",
-                        read: false,
-                    };
-                    setNotifications((prev) => [...prev, newNotification]);
+                        const newNotification = {
+                            id: data.id,
+                            message: data.message,
+                            sender: data.sender,
+                            source: "pusher",
+                            type: "general",
+                            read: false,
+                        };
+                        setNotifications((prev) => [...prev, newNotification]);
+                    },
                 },
-            },
-            {
-                name: `appointment.rating.${userId}`,
-                handler: (data) => {
-                    const newNotification = {
-                        id: data.id,
-                        message: data.message,
-                        patient_id: data.patient_id,
-                        doctor_name: data.doctor_name,
-                        doctor_id: data.doctor_id,
-                        source: "pusher",
-                        created_at: new Date().toISOString(),
-                        read: false,
-                        type: "rating",
-                    };
-                    setNotifications((prev) => [...prev, newNotification]);
+                {
+                    name: `appointment.rating.${userId}`,
+                    handler: (data) => {
+                        const newNotification = {
+                            id: data.id,
+                            message: data.message,
+                            patient_id: data.patient_id,
+                            doctor_name: data.doctor_name,
+                            doctor_id: data.doctor_id,
+                            source: "pusher",
+                            created_at: new Date().toISOString(),
+                            read: false,
+                            type: "rating",
+                        };
+                        setNotifications((prev) => [...prev, newNotification]);
+                    },
                 },
-            },
-        ];
- 
-        }else if (userData && userData.role_id === 3) {
-    // إذا كانت role_id 3، على سبيل المثال
-    channels = [
-        {
-            name: `appointment.reminder.doctor.${userId}`,
-            handler: (data) => {
-                const newNotification = {
-                    id: data.id,
-                    message: data.message,
-                    sender: data.sender,
-                    source: "pusher",
-                    type: "general",
-                    read: false,
-                };
-                setNotifications((prev) => [...prev, newNotification]);
-            },
-        }, {
-            name: `appointment.to.doctor.${userId}`,
-            handler: (data) => {
-                const newNotification = {
-                    id: data.id,
-                    message: data.message,
-                    sender: data.sender,
-                    source: "pusher",
-                    type: "general",
-                    read: false,
-                };
-                setNotifications((prev) => [...prev, newNotification]);
-            },
-        },
-    
-    ];
-}
+            ];
+
+        } else if (userData && userData.role_id === 3) {
+            // إذا كانت role_id 3، على سبيل المثال
+            channels = [
+                {
+                    name: `appointment.reminder.doctor.${userId}`,
+                    handler: (data) => {
+                        const newNotification = {
+                            id: data.id,
+                            message: data.message,
+                            sender: data.sender,
+                            source: "pusher",
+                            type: "general",
+                            read: false,
+                        };
+                        setNotifications((prev) => [...prev, newNotification]);
+                    },
+                }, {
+                    name: `appointment.to.doctor.${userId}`,
+                    handler: (data) => {
+                        const newNotification = {
+                            id: data.id,
+                            message: data.message,
+                            sender: data.sender,
+                            source: "pusher",
+                            type: "general",
+                            read: false,
+                        };
+                        setNotifications((prev) => [...prev, newNotification]);
+                    },
+                },
+
+            ];
+        }
 
         channels.forEach(({ name, handler }) => subscribeToChannel(name, handler));
 

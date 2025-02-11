@@ -30,13 +30,13 @@ export default function Appointments() {
     if (!selectedClinic) return;
 
     const fetchAppointments = async () => {
-      setAppointments([]); 
+      setAppointments([]);
 
       try {
         const { allAppointments, recentAppointments } = await clinicAppointments(selectedClinic.id);
 
-        setAppointments(allAppointments); 
-        setTwentyFourHoursAgoAppointments(recentAppointments); 
+        setAppointments(allAppointments);
+        setTwentyFourHoursAgoAppointments(recentAppointments);
 
       } catch (error) {
         console.error("❌ خطأ أثناء جلب المواعيد:", error);
@@ -83,7 +83,7 @@ export default function Appointments() {
     return true; // ✅ جميع المواعيد
   })
     .filter((appointment) =>
-      appointment.patient.name.toLowerCase().includes(searchQuery.toLowerCase()) 
+      appointment.patient.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
 
@@ -125,7 +125,7 @@ export default function Appointments() {
         if (reason === "عدم حضور المريض") {
           await cancelMissedAppointment(appointment.id);
         } else {
-          await cancelAppointment(appointment.id); 
+          await cancelAppointment(appointment.id);
         }
 
 

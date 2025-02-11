@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FileText, Upload } from "lucide-react";
-import Swal from "sweetalert2"; 
+import Swal from "sweetalert2";
 
 const UploadIdPhoto = ({ onNext }) => {
     const [idPhoto, setIdPhoto] = useState(null);

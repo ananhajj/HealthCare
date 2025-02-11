@@ -42,16 +42,12 @@ function BookingPage() {
   }
   console.log("bookedSlots", bookedSlots);
   const handleDateChange = (date) => {
-    console.log("التاريخ المستلم في handleDateChange قبل التعديل:", date);
 
     // ضبط التاريخ ليكون في منتصف الليل في التوقيت المحلي
     const adjustedDate = new Date(date);
     adjustedDate.setHours(12, 0, 0, 0); // ضمان استخدام وقت وسط اليوم لتفادي الفروقات الزمنية
 
-    console.log(
-      "التاريخ المستلم في handleDateChange بعد التعديل:",
-      adjustedDate
-    );
+  
 
     setSelectedDate(adjustedDate);
     setSelectedTimeSlot(null);

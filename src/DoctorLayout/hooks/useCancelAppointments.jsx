@@ -7,32 +7,32 @@ const useCancelAppointments = () => {
   const [loading, setLoading] = useState(false); // حالة التحميل
   const [error, setError] = useState(null); // حالة الخطأ
   const apiUrl = import.meta.env.VITE_APP_KEY; // عنوان الـ API من البيئة
-  const token=localStorage.getItem("userToken");
+  const token = localStorage.getItem("userToken");
   //دالةالغاء الحجز ر
   const cancelAppointment = async (appointmentId) => {
     setLoading(true);
     setError(null);
- 
+
     try {
       const response = await axios.post(
-    `${apiUrl}/api/appointments/${appointmentId}/mark-cancel`,
-    {}, // يجب أن يكون هناك كائن فارغ لأن الطلب من نوع POST
-    {
-      headers: {
-        "ngrok-skip-browser-warning": "s",
-        Authorization: `Bearer ${token}`,  
-        "Content-Type": "application/json",
-      },
-    }
-  );
+        `${apiUrl}/api/appointments/${appointmentId}/mark-cancel`,
+        {}, // يجب أن يكون هناك كائن فارغ لأن الطلب من نوع POST
+        {
+          headers: {
+            "ngrok-skip-browser-warning": "s",
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
       if (response.status === 200) {
-Swal.fire({
-  icon: "warning", 
-  title: "تم الإلغاء!",
-  text: "تم إلغاء الحجز لعدم الحضور.",
-  timer: 3000,
-  showConfirmButton: false,
-});
+        Swal.fire({
+          icon: "warning",
+          title: "تم الإلغاء!",
+          text: "تم إلغاء الحجز لعدم الحضور.",
+          timer: 3000,
+          showConfirmButton: false,
+        });
         return response.data; // إرجاع البيانات إذا كان هناك حاجة لاستخدامها
       }
     } catch (error) {

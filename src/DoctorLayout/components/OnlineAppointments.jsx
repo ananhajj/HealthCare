@@ -11,6 +11,7 @@ import useCancelMissedAppointments from '../hooks/useCancelMissedAppointments';
 import { convertStatus, formatDateWithDay, formatTimeTo12Hour } from '../utils/formatDateAndTime';
 import Loader from './Loader';
 import useCancelAppointments from '../hooks/useCancelAppointments';
+import { useNavigate } from 'react-router-dom';
 
 export default function OnlineAppointments() {
   const { preferences, onlineSchedule, loading, onlineAppointment, fetchonlineAppointment } = useContext(DoctorLayoutContext);
@@ -20,7 +21,7 @@ export default function OnlineAppointments() {
   const [showCancelModal, setShowCancelModal] = useState(null);
   const [localOnlineSchedule, setLocalOnlineSchedule] = useState(onlineSchedule);
   const [localAppointments, setLocalAppointments] = useState(onlineAppointment);
-
+  const navigate = useNavigate();
   const { cancelMissedAppointment, loading: cancelMissedAppointmentLoading } = useCancelMissedAppointments();
   const { cancelAppointment, loading: cancelAppointmentLoading } = useCancelAppointments();
 
@@ -84,7 +85,7 @@ export default function OnlineAppointments() {
       text: 'يمكنك بدء الجلسة الآن!',
       confirmButtonText: 'ابدأ الآن',
     }).then(() => {
-      console.log(`بدء الجلسة للموعد ${appointment.id}`);
+      navigate('/video');
       // قم بإضافة أي إجراء لبدء الجلسة هنا
     });
     // يمكنك تنفيذ أي إجراء لبدء الجلسة هنا

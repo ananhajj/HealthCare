@@ -22,7 +22,7 @@ const validationSchema = Yup.object({
 export default function Login() {
     const { setUserData, setIsLoggedIn, setLoading, setUserId } = useContext(UserContext);  // الوصول إلى الدوال من السياق
     const apiUrl = import.meta.env.VITE_APP_KEY;
-    const [errorMessage, setErrorMessage] = useState(""); 
+    const [errorMessage, setErrorMessage] = useState("");
     const navigate = useNavigate();
     const formik = useFormik({
         initialValues: {
@@ -67,8 +67,8 @@ export default function Login() {
                     navigate("/");
                 } else if (user.role_id === 3) {
                     localStorage.setItem("currentUserId", user.id);
-                      localStorage.setItem("created_At",user.created_at);
-                      localStorage.setItem("update_at",user.updated_at);
+                    localStorage.setItem("created_At", user.created_at);
+                    localStorage.setItem("update_at", user.updated_at);
                     setUserId(user.id);
                     navigate("/dashboard-doctor");
                 } else if (user.role_id === 1) {

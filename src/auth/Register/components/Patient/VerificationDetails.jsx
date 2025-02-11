@@ -32,7 +32,7 @@ const VerificationDetails = ({ idPhoto, onBack, onComplete, setCurrentStep }) =>
                 formData.append("user_id", userId);
                 formData.append("reference", idPhoto);
 
-               
+
 
                 await handleSubmitDetails(formData);
             } catch (error) {
@@ -49,7 +49,7 @@ const VerificationDetails = ({ idPhoto, onBack, onComplete, setCurrentStep }) =>
     }, [idPhoto]);
 
 
-    const backendUrl = 'https://c15b-139-190-147-200.ngrok-free.app/';
+    const apiUrl = import.meta.env.VITE_APP_KEY;
 
     const handleSubmitDetails = async (formData) => {
         try {
@@ -57,7 +57,7 @@ const VerificationDetails = ({ idPhoto, onBack, onComplete, setCurrentStep }) =>
 
             // إذا كان الدور مريض
             const response = await axios.post(
-                `${backendUrl}api/patient/verification`,
+                `${apiUrl}/api/patient/verification`,
                 formData,
                 { headers: { "ngrok-skip-browser-warning": "s" } }
             );
@@ -136,7 +136,7 @@ const VerificationDetails = ({ idPhoto, onBack, onComplete, setCurrentStep }) =>
         if (localStorage.getItem("role") === "patient") {
             try {
                 if (userId) {
-                    await axios.delete(`${backendUrl}api/users/${userId}`)
+                    await axios.delete(`${apiUrl}/api/users/${userId}`)
                     console.log(`تم حذف المستخدم ذو الرقم التعريفي ${userId} بنجاح.`);
                 }
             } catch (error) {
@@ -145,7 +145,7 @@ const VerificationDetails = ({ idPhoto, onBack, onComplete, setCurrentStep }) =>
         } else {
             try {
                 if (userId) {
-                    await axios.delete(`${backendUrl}api/users/${userId}`);
+                    await axios.delete(`${apiUrl}/api/users/${userId}`);
                     console.log(`تم حذف المستخدم ذو الرقم التعريفي ${userId} بنجاح.`);
                 }
             } catch (error) {

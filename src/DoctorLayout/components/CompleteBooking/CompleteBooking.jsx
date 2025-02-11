@@ -78,26 +78,26 @@ function CompleteBooking({ appointment, clinic, personalInfo, onClose }) {
 
     try {
       // **إرسال تقرير الموعد**
-      console.log("data",completeData)
-      console.log("prescriptionFiles",prescriptionFiles)
-if (reportFile) {
-  const reportSuccess = await completeAppointmentReport(reportsData, appointment.id);
-  console.log("return this",reportSuccess);
-  if (reportSuccess === "200") {
-    // في حال تم إضافة التقرير بنجاح، يمكن إضافة الوصفة الطبية فقط إذا كانت موجودة
-    if (prescriptionFiles) {
-      console.log(prescriptionData);
-      const prescriptionSuccess = await completeAppointmentPrescriptions(prescriptionData, appointment.id);
-      if (prescriptionSuccess === "200") {
-        // إرسال ملاحظات الموعد إذا تمت إضافة الوصفة بنجاح
-        await completeAppointmentNote(completeData, appointment.id);
+      console.log("data", completeData)
+      console.log("prescriptionFiles", prescriptionFiles)
+      if (reportFile) {
+        const reportSuccess = await completeAppointmentReport(reportsData, appointment.id);
+        console.log("return this", reportSuccess);
+        if (reportSuccess === "200") {
+          // في حال تم إضافة التقرير بنجاح، يمكن إضافة الوصفة الطبية فقط إذا كانت موجودة
+          if (prescriptionFiles) {
+            console.log(prescriptionData);
+            const prescriptionSuccess = await completeAppointmentPrescriptions(prescriptionData, appointment.id);
+            if (prescriptionSuccess === "200") {
+              // إرسال ملاحظات الموعد إذا تمت إضافة الوصفة بنجاح
+              await completeAppointmentNote(completeData, appointment.id);
+            }
+          } else {
+            // إرسال ملاحظات الموعد إذا لم تكن هناك وصفة طبية
+            await completeAppointmentNote(completeData, appointment.id);
+          }
+        }
       }
-    } else {
-      // إرسال ملاحظات الموعد إذا لم تكن هناك وصفة طبية
-      await completeAppointmentNote(completeData, appointment.id);
-    }
-  }
-}
 
       // **إظهار إشعار عند النجاح**
       Swal.fire({
@@ -109,7 +109,7 @@ if (reportFile) {
       });
       onClose(true);
     } catch (error) {
- 
+
       Swal.fire({
         icon: "error",
         title: "خطأ!",
@@ -153,7 +153,7 @@ if (reportFile) {
             appointment={appointment}
             clinic={clinic}
             personalInfo={personalInfo}
-            onSave={(imgBlob, fileName) => 
+            onSave={(imgBlob, fileName) =>
               setFormData((prev) => ({
                 ...prev,
                 reports: [...prev.reports, { file: imgBlob, name: fileName }],
@@ -271,7 +271,7 @@ if (reportFile) {
             >
               إكمال الحجز
             </button>
-          
+
           </div>
         </div>
       </div>

@@ -22,7 +22,8 @@ const useFetchPatientMedicalRecord = () => {
                 });
                 // تصفية الحجوزات حسب visit_type: "online"
                 console.log("filteredBookings", response.data.data);
-                const filteredBookings = response.data.data
+                const data = Array.isArray(response.data.data[0]) ? response.data.data[0] : response.data.data;
+                const filteredBookings = data
                     .filter(item => item.visit_type === "locale")
                     .map((item)=>({
                         id:item.id,

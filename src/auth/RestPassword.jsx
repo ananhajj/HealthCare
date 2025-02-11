@@ -11,15 +11,15 @@ function RestPassword() {
     const [code, setCode] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [userId,setUserId]=useState('');
+    const [userId, setUserId] = useState('');
     const [restToken, setRestToken] = useState('');
     const apiUrl = import.meta.env.VITE_APP_KEY;
-    const navigate=useNavigate();
+    const navigate = useNavigate();
     const handleEmailSubmit = async (e) => {
         e.preventDefault();
         console.log("phone", emailOrPhone);
         try {
-             const response = await axios.post(`${apiUrl}/api/forget-password/send-otp`, {
+            const response = await axios.post(`${apiUrl}/api/forget-password/send-otp`, {
                 email_or_username_or_phone: emailOrPhone,
                 headers: { "ngrok-skip-browser-warning": "s" },
             });
@@ -27,7 +27,7 @@ function RestPassword() {
             if (response.status === 200) {
                 console.log(response.data.user_id)
                 setUserId(response.data.user_id);
-                
+
                 setStep('verify');
             } else {
                 console.log("Failed to send OTP", response.data);
@@ -56,8 +56,8 @@ function RestPassword() {
         try {
             // Send API request to generate token
             const response = await axios.post(`${apiUrl}/api/forget-password/generate-token`, {
-                user_id:userId,
-                otp:code,
+                user_id: userId,
+                otp: code,
                 headers: { "ngrok-skip-browser-warning": "s" }, // optional, based on your setup
             });
 
@@ -95,14 +95,14 @@ function RestPassword() {
         try {
             // Send API request to reset the password
             const response = await axios.post(`${apiUrl}/api/forget-password/reset-password`, {
-                password:password,
-                password_confirmation:confirmPassword,
-                token:restToken,
+                password: password,
+                password_confirmation: confirmPassword,
+                token: restToken,
             });
 
             if (response.status === 200) {
                 navigate('/login')
-                
+
             } else {
                 // Handle error if reset fails
                 setError('حدث خطأ أثناء تغيير كلمة المرور. يرجى المحاولة مرة أخرى.');
@@ -144,7 +144,7 @@ function RestPassword() {
                                 dir="rtl"
                             />
                         </div>
-                        {error && <p className="text-red-500 text-sm">{error}</p>}  
+                        {error && <p className="text-red-500 text-sm">{error}</p>}
 
                         <button
                             type="submit"
@@ -172,7 +172,7 @@ function RestPassword() {
                                 dir="rtl"
                             />
                         </div>
-                        {error && <p className="text-red-500 text-sm">{error}</p>}  
+                        {error && <p className="text-red-500 text-sm">{error}</p>}
 
                         <button
                             type="submit"
@@ -210,7 +210,7 @@ function RestPassword() {
                                 dir="rtl"
                             />
                         </div>
-                        {error && <p className="text-red-500 text-sm">{error}</p>}  
+                        {error && <p className="text-red-500 text-sm">{error}</p>}
 
                         <button
                             type="submit"

@@ -10,8 +10,8 @@ export default function FinancialRecords() {
     const { onlineAppointmentComplete, preferences } = useContext(DoctorLayoutContext);
     const [invoices, setInvoices] = useState([]);
     const apiUrl = import.meta.env.VITE_APP_KEY;
-    const [totalRevenue, setTotalRevenue]=useState(0);
-     useEffect(() => {
+    const [totalRevenue, setTotalRevenue] = useState(0);
+    useEffect(() => {
         if (onlineAppointmentComplete && onlineAppointmentComplete.length > 0) {
             const doctorId = localStorage.getItem("currentUserId"); // Replace with actual doctor ID if needed
             const fetchInvoices = async () => {
@@ -41,19 +41,19 @@ export default function FinancialRecords() {
                         // تحديث الحالة مع الاحتفاظ بالقيمة السابقة
                         setTotalRevenue((prevTotal) => prevTotal + totalRevenue);
 
-                     
-                         const patientInvoices = response.data.map(invoice => ({
+
+                        const patientInvoices = response.data.map(invoice => ({
                             ...invoice,
-                            patientName: appointment.patientName,   
-                            patientId: appointment.patientId,       
-                            appointmentDate: appointment.date,      
-                            appointmentTime: appointment.time ,    
+                            patientName: appointment.patientName,
+                            patientId: appointment.patientId,
+                            appointmentDate: appointment.date,
+                            appointmentTime: appointment.time,
                             avatar: appointment.patientAvatar
                         }));
 
-                        invoicesData.push(...patientInvoices);  
+                        invoicesData.push(...patientInvoices);
                     }
-                    setInvoices(invoicesData);  
+                    setInvoices(invoicesData);
                 } catch (error) {
                     console.error('Error fetching invoices:', error);
                 }
@@ -108,7 +108,7 @@ export default function FinancialRecords() {
 
 
     return (
-       <>
+        <>
             {preferences.onlinePrice > 0 ? (
                 <div className="space-y-6 p-4">
                     {/* العنوان وزر الفاتورة الجديدة */}

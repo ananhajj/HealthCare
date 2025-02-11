@@ -20,9 +20,12 @@ const useFetchBookingPatient = () => {
                 });
                 // تصفية الحجوزات حسب visit_type: "online"
                 console.log("filteredBookings", response.data.data);
-                const filteredBookings = transformOnlineData(response.data.data)
+                const data = Array.isArray(response.data.data[0]) ? response.data.data[0] : response.data.data;
+
+                const filteredBookings = transformOnlineData(data)
                 setOnlineBooking(filteredBookings);
                 console.log("filteredBookings", filteredBookings);
+                console.log("  onlineBooking api", onlineBooking);
             } catch (error) {
                 console.error("خطأ في جلب الحجوزات:", error);
                 setOnlineBooking([]); // إذا حدث خطأ، أعد تعيين القائمة لتكون فارغة

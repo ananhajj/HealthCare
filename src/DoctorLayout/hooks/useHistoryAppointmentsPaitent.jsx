@@ -32,8 +32,8 @@ const useHistoryAppointmentsPaitent = () => {
             }
 
             const patientHistoryInfo = data.map((appointment) => ({
-                date: formatDateWithDay(appointment.date),
-                time: formatTimeTo12Hour(appointment.time),
+                date: appointment.date ? formatDateWithDay(appointment.date) : null,
+                time: appointment.time ? formatTimeTo12Hour(appointment.time) : null,
                 visitInfo: appointment.status && appointment.clinic
                     ? ` في ${appointment.clinic.ar_name || ''}${appointment.clinic.ar_name && appointment.clinic.en_name ? ' - ' : ''}${appointment.clinic.en_name || ''}`
                     : "المعلومات غير متاحة"

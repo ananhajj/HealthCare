@@ -8,28 +8,46 @@ export default function OnlineBookingHistory() {
   const { onlineBooking: filteredBookings ,loading} = useFetchBookingPatient(); // استخدام البيانات من السياق
   const [activeTab, setActiveTab] = useState("upcoming");
   const [showAll, setShowAll] = useState(false);
-
+  console.log("filteredBookings", filteredBookings)
 if(loading){
   return(
   <Loading/>
   );
 }
+  const getBookingStatus = (bookingDate, bookingTime, status) => {
+    const currentDate = new Date(); // الوقت الحالي في الجهاز
+    const bookingDateTime = new Date(`${bookingDate} ${bookingTime}`);
+
+    // إضافة 30 دقيقة بعد موعد الحجز
+    const missedThresholdTime = new Date(bookingDateTime.getTime() + 30 * 60000);
+    console.log("missedThresholdTime", missedThresholdTime);
+    // إذا كان الوقت الحالي قد تجاوز وقت الحجز ب30 دقيقة يتم تصنيفه كـ "فائت"
+    if (missedThresholdTime < currentDate) {
+      return "missed"; 
+    }
+
+    // باقي التصنيفات
+    if (bookingDateTime > currentDate && ["confirmed", "pending"].includes(status.trim().toLowerCase())) {
+      return "upcoming"; // حجز قادم
+    }
+
+    return "pending"; // حالة حجز معلقة
+  };
 
   // تصنيف الحجوزات
+  // تصنيف الحجوزات بناءً على الوقت
   const upcomingBookings = filteredBookings.filter((booking) =>
-    ["confirmed", "pending"].includes(booking.status.trim().toLowerCase())
+    getBookingStatus(booking.bookingDate, booking.bookingTime, booking.status) === "upcoming"
   );
-  console.log("Upcoming Bookings:", upcomingBookings);
 
-  const completedBookings = filteredBookings.filter(
-    (booking) => booking.status.trim().toLowerCase() === "completed"
+  const completedBookings = filteredBookings.filter((booking) =>
+    booking.status.trim().toLowerCase() === "completed"
   );
-  console.log("Completed Bookings:", completedBookings);
 
-  const missedBookings = filteredBookings.filter(
-  (booking) => booking.status.trim().toLowerCase() === "missed"
-);
-console.log("Missed Bookings:", missedBookings);
+  const missedBookings = filteredBookings.filter((booking) =>
+    getBookingStatus(booking.bookingDate, booking.bookingTime, booking.status) === "missed"
+  );
+
 
 
   // التحكم بعدد الحجوزات المعروضة
@@ -115,18 +133,18 @@ console.log("Missed Bookings:", missedBookings);
   }`}
   onClick={() => setActiveTab("missed")}
 >
-  <div className="flex items-center gap-2 justify-center">
-    <CheckCircle className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
-    <span>الحجوزات الفائتة</span>
-    {missedBookings.length > 0 && (
-      <span className="bg-blue-200 text-blue-900 px-2 py-0.5 rounded-full text-xs sm:text-sm font-semibold">
-        {missedBookings.length}
-      </span>
-    )}
-  </div>
-  {activeTab === "missed" && (
-    <span className="absolute inset-0 rounded-lg border border-blue-500 animate-pulse" />
-  )}
+              <div className="flex items-center gap-2 justify-center">
+                <CheckCircle className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                <span>الحجوزات الفائتة</span>
+                {missedBookings.length > 0 && (
+                  <span className="bg-blue-200 text-blue-900 px-2 py-0.5 rounded-full text-xs sm:text-sm font-semibold">
+                    {missedBookings.length}
+                  </span>
+                )}
+              </div>
+              {activeTab === "missed" && (
+                <span className="absolute inset-0 rounded-lg border border-blue-500 animate-pulse" />
+              )}
 </button>
 </div>
 
@@ -150,6 +168,7 @@ console.log("Missed Bookings:", missedBookings);
                 </div>
               )
             )}
+
             {activeTab === "completed" && (
               completedBookings.length > 0 ? (
                 displayedBookings(completedBookings).map((booking) => (
@@ -165,24 +184,23 @@ console.log("Missed Bookings:", missedBookings);
                 </div>
               )
             )}
+
             {activeTab === "missed" && (
-  missedBookings.length > 0 ? (
-    displayedBookings(missedBookings).map((booking) => (
-      <BookingCard key={booking.id} booking={booking} />
-    ))
-  ) : (
-    <div className="text-center bg-white/70 backdrop-blur-lg rounded-2xl p-12 shadow-md border border-blue-200">
-      <Calendar className="w-16 h-16 text-blue-500 mx-auto mb-4" />
-      <p className="text-gray-900 text-xl font-semibold mb-2">
-        لا توجد حجوزات فائتة
-      </p>
-      <p className="text-gray-600">عندما تفوت موعدًا، سيظهر هنا</p>
-    </div>
-  )
-)}
-
+              missedBookings.length > 0 ? (
+                displayedBookings(missedBookings).map((booking) => (
+                  <BookingCard key={booking.id} booking={booking} />
+                ))
+              ) : (
+                <div className="text-center bg-white/70 backdrop-blur-lg rounded-2xl p-12 shadow-md border border-blue-200">
+                  <Calendar className="w-16 h-16 text-blue-500 mx-auto mb-4" />
+                  <p className="text-gray-900 text-xl font-semibold mb-2">
+                    لا توجد حجوزات فائتة
+                  </p>
+                  <p className="text-gray-600">عندما تفوت موعدًا، سيظهر هنا</p>
+                </div>
+              )
+            )}
           </div>
-
           {/* زر عرض المزيد */}
     <div className="text-center mt-6">
   <button

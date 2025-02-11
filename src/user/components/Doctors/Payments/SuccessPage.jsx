@@ -25,11 +25,10 @@ const SuccessPage = () => {
     // إرسال الطلب وحذف رقم الحجز
     if (sessionId && appointmentId) {
       axios
-        .post(`${apiUrl}/api/payment/success/${appointmentId}`,
+        .post(`${apiUrl}/api/payment/success/${appointmentId}`,{},
           {
             headers: {
               "ngrok-skip-browser-warning": "s",
-              Authorization: `Bearer ${localStorage.getItem("userToken")}`,
               "Content-Type": "application/json",
             },
           }

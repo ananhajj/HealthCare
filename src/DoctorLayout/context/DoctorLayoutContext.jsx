@@ -28,16 +28,17 @@ const DoctorLayoutContextProvider = ({ children }) => {
   const [medications, setMedications] = useState([]);
   const [historyPatient, setHistoryPaitent] = useState([]);
   const [reviews, setReview] = useState([]);
-  const [infoDashboard, setInfoDashboard]=useState([]);
+  const [infoDashboard, setInfoDashboard] = useState([]);
   //const [countAppointment, setCountAppointment] = useState(0);
   //console.log("countAppointment", countAppointment);
 
 
-  const fetchDetailsDash=async()=>{
+  const fetchDetailsDash = async () => {
     try {
       const response = await axios.get(`${apiUrl}/api/doctor/dashboard`, {
-        headers: { "ngrok-skip-browser-warning": "s" ,
-            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+        headers: {
+          "ngrok-skip-browser-warning": "s",
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
           "Content-Type": "application/json",
         },
       });
@@ -127,7 +128,7 @@ const DoctorLayoutContextProvider = ({ children }) => {
         waitingTime: doctorData?.online_appointment_time || "غير محدد", // Fetch the first clinic's appointment_time
       };
       setPreferences(preferencesInfo);
-       
+
 
       // Update clinics data
       if (doctorData.clinics?.data) {
@@ -179,12 +180,12 @@ const DoctorLayoutContextProvider = ({ children }) => {
           id: item.id,
           patientName: `${item.patient?.user?.first_name || ''} ${item.patient?.user?.last_name || ''}` || "غير معروف",
           patientId: item.patient?.user.id,
-          patientAvatar:item.patient?.user.avatar,
+          patientAvatar: item.patient?.user.avatar,
           time: item.time,
           date: item.date.split("T")[0], // دالة لتنسيق التاريخ (اختيارية)
-          
+
         }));
-       // دالة لتنسيق التاريخ إلى الصيغة المطلوبة
+      // دالة لتنسيق التاريخ إلى الصيغة المطلوبة
       function calculateRelativeDate(date) {
         const now = new Date(); // الوقت الحالي
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // بداية اليوم
@@ -282,7 +283,7 @@ const DoctorLayoutContextProvider = ({ children }) => {
         .map((item) => ({
           id: item.id,
           patientName: (item.user.first_name || "") + " " + (item.user.last_name || ""),
-          patientId:`p-0${item.id}`,
+          patientId: `p-0${item.id}`,
           idNumber: item.id_number,
           avatar: item.user.avatar,
         }));
@@ -302,7 +303,7 @@ const DoctorLayoutContextProvider = ({ children }) => {
       fetchMedications();
       fetchRating();
       fetchHistoryPaitent();
-      
+
     }
   }, [doctorId]);
 

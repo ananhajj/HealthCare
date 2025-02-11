@@ -106,67 +106,67 @@ export default function PatientFlow({ onBackToRoleSelection }) {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
-        <motion.div
-                className="p-6 max-w-screen-lg w-full bg-white shadow-md rounded-lg overflow-auto"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-        >
-                <div className="w-full bg-gray-300 h-2 rounded sm:h-3 mb-4">
-                <motion.div
-                    className="bg-blue-500 h-2 rounded sm:h-3"
-                    style={{ width: `${(currentStep / 4) * 100}%` }}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${(currentStep / 4) * 100}%` }}
-                    transition={{ duration: 0.5 }}
-                />
-            </div>
-
             <motion.div
-                key={currentStep}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                variants={variants}
+                className="p-6 max-w-screen-lg w-full bg-white shadow-md rounded-lg overflow-auto"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 transition={{ duration: 0.5 }}
             >
-                {currentStep === 1 && (
-                    <PatientRegistration
-                        {...userDetails}
-                        onNext={(phone, userId, details) => {
-                            setUserDetails(details);
-                            setUserId(userId);
-                            handleNextStep({ userDetails: details });
-                        }}
-                        onBack={handlePreviousStep}
+                <div className="w-full bg-gray-300 h-2 rounded sm:h-3 mb-4">
+                    <motion.div
+                        className="bg-blue-500 h-2 rounded sm:h-3"
+                        style={{ width: `${(currentStep / 4) * 100}%` }}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${(currentStep / 4) * 100}%` }}
+                        transition={{ duration: 0.5 }}
                     />
-                )}
-                {currentStep === 2 && (
-                    <PhoneNumberVerification
-                        phone={userDetails.phone}
-                        user_id={userId}
-                        onNext={handleNextStep}
-                    />
-                )}
-                {currentStep === 3 && (
-                    <UploadIdPhoto
-                        userId={userId}
-                        onBack={handlePreviousStep}
-                        onNext={(idPhoto) => handleNextStep({ idPhoto })}
-                    />
-                )}
-                {currentStep === 4 && (
-                    <VerificationDetails
-                        userId={userId}
-                        idPhoto={idPhoto}
-                        onBack={handlePreviousStep}
-                        setCurrentStep={setCurrentStep}
-                        onComplete={handleComplete}
-                    />
-                )}
+                </div>
+
+                <motion.div
+                    key={currentStep}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    variants={variants}
+                    transition={{ duration: 0.5 }}
+                >
+                    {currentStep === 1 && (
+                        <PatientRegistration
+                            {...userDetails}
+                            onNext={(phone, userId, details) => {
+                                setUserDetails(details);
+                                setUserId(userId);
+                                handleNextStep({ userDetails: details });
+                            }}
+                            onBack={handlePreviousStep}
+                        />
+                    )}
+                    {currentStep === 2 && (
+                        <PhoneNumberVerification
+                            phone={userDetails.phone}
+                            user_id={userId}
+                            onNext={handleNextStep}
+                        />
+                    )}
+                    {currentStep === 3 && (
+                        <UploadIdPhoto
+                            userId={userId}
+                            onBack={handlePreviousStep}
+                            onNext={(idPhoto) => handleNextStep({ idPhoto })}
+                        />
+                    )}
+                    {currentStep === 4 && (
+                        <VerificationDetails
+                            userId={userId}
+                            idPhoto={idPhoto}
+                            onBack={handlePreviousStep}
+                            setCurrentStep={setCurrentStep}
+                            onComplete={handleComplete}
+                        />
+                    )}
+                </motion.div>
             </motion.div>
-        </motion.div>
         </div>
     );
 }

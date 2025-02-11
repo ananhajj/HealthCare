@@ -12,9 +12,9 @@ const validationSchema = Yup.object({
     phone: Yup.string()
         .matches(/^059\d{7}$/, "رقم الهاتف غير صالح")
         .required("رقم الهاتف مطلوب"),
-  
+
     id_number: Yup.string()
-            .length(9, 'لا يقل عن 9 ارقام')
+        .length(9, 'لا يقل عن 9 ارقام')
         .required("رقم الهوية مطلوب"),
     dob: Yup.date().required("تاريخ الميلاد مطلوب"),
     gender: Yup.string().required("الجنس مطلوب"),
@@ -64,15 +64,15 @@ export default function PatientRegistration({
 
     const [loading, setLoading] = useState(false);
     const [backendErrors, setBackendErrors] = useState('');
- 
-    const backendUrl = 'https://c15b-139-190-147-200.ngrok-free.app/';
+
+    const apiUrl = import.meta.env.VITE_APP_KEY;
 
     const handleSubmit = async (values) => {
-        console.log("form register",values);
+        console.log("form register", values);
         setLoading(true);
         try {
             const response = await axios.post(
-                `${backendUrl}api/patient/register`,
+                `${apiUrl}/api/patient/register`,
                 values,
                 { headers: { "ngrok-skip-browser-warning": "s" } }
             );
@@ -149,10 +149,10 @@ export default function PatientRegistration({
                             <p className="text-red-500 text-sm mt-1">{formik.errors.first_name}</p>
                         )}
                         {backendErrors?.first_name && (
-                            <p className="text-red-500 text-sm mt-1">{backendErrors.first_name}</p>  
-                         )}
+                            <p className="text-red-500 text-sm mt-1">{backendErrors.first_name}</p>
+                        )}
                     </div>
-                 
+
                     {/* Last Name */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">الاسم الأخير</label>

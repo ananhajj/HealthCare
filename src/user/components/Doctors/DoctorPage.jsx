@@ -373,6 +373,7 @@ const normalizeTime = (time) => {
 
 
 const getOnlineTimeSlots = () => {
+  
   if (!doctor?.onlineSchedule || doctor.onlineSchedule.length === 0) {
     return [];
   }
@@ -438,7 +439,7 @@ const getOnlineTimeSlots = () => {
      };
    });
  };
-
+  console.log("availableSlots", bookedSlots);
 
 
 
@@ -519,15 +520,15 @@ const getOnlineTimeSlots = () => {
   if (doctorLoading || slotsLoading||onlineslotsLoading) {
     return <Loading />;
   }
-  if (doctorError || slotsError || !doctor) {
+ if (doctorError || slotsError || !doctor) {
     return (
       <div className="flex items-center justify-center h-screen">
         <p className="text-xl text-red-500">
-          عذرًا، حدث خطأ أثناء تحميل البيانات.
+         
         </p>
       </div>
     );
-  }
+  } 
 
   const handleBookingClick = () => {
     if (!isLoggedIn) {
@@ -734,6 +735,7 @@ const getOnlineTimeSlots = () => {
                   مواعيد العيادة
                 </button>
               )}
+              {doctor.onlineActive &&(
               <button
                 className={`py-2 px-3 text-sm md:text-base rounded-lg ${
                   viewOnlineBooking
@@ -744,6 +746,8 @@ const getOnlineTimeSlots = () => {
               >
                 المواعيد الإلكترونية
               </button>
+              )
+}
             </div>
             {/* التقويم */}
             <Calendar

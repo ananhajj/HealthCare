@@ -14,14 +14,14 @@ export default function MedicalRecords() {
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [recordDetails, setRecordDetails] = useState(null);
 
-  const [activeTab, setActiveTab] = useState('details'); 
+  const [activeTab, setActiveTab] = useState('details');
   const { historyPatient } = useContext(DoctorLayoutContext);
-  const [filteredRecords, setFilteredRecords] = useState(historyPatient); 
+  const [filteredRecords, setFilteredRecords] = useState(historyPatient);
 
-  const [selectedDate, setSelectedDate] = useState(null); 
+  const [selectedDate, setSelectedDate] = useState(null);
 
   const handleDateClick = (date) => {
-    setSelectedDate(selectedDate === date ? null : date); 
+    setSelectedDate(selectedDate === date ? null : date);
   };
 
 
@@ -38,8 +38,9 @@ export default function MedicalRecords() {
         },
       }
       );
-      console.log("detials api", response.data);
-      const data = response.data.data.map((item) => ({
+
+      const data = Array.isArray(response.data.data[0]) ? response.data.data[0] : response.data.data;
+      data.map((item) => ({
         id: item.id,
         clinicName: item.visit_type === "online" ? null : item.clinic_name, // إذا كانت الزيارة أونلاين، لا يتم عرض اسم العيادة
         date: formatDate(item.date), // تحويل التاريخ إلى الشكل المطلوب
@@ -57,6 +58,7 @@ export default function MedicalRecords() {
         quickNote: item.quick_note,
 
       }));
+      console.log("detials api", data);
 
 
       setRecordDetails(data);
@@ -78,7 +80,9 @@ export default function MedicalRecords() {
 
 
   const renderTabContent = (recordDetails) => {
-
+    if (!recordDetails) {
+      return <div className='text-gray-800 dark:text-white'>لا توجد بيانات متاحة.</div>;
+    }
     switch (activeTab) {
 
       case 'appointments':

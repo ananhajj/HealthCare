@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { 
-  Users, 
-  Calendar, 
+import {
+  Users,
+  Calendar,
   Clock,
   Activity,
   DollarSign
@@ -22,8 +22,8 @@ import {
 import { DoctorLayoutContext } from '../context/DoctorLayoutContext';
 import { formatMonthToArabic } from '../utils/formatDateAndTime';
 
- 
- 
+
+
 const COLORS = ["#4CAF50", "#F44336", "#FF9800"]; // أخضر، أحمر، برتقالي
 const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name }) => {
   const RADIAN = Math.PI / 180;
@@ -33,13 +33,13 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
 
   return (
     <text x={x} y={y} fill={"#E2E8F0"}  // تغيير اللون حسب الوضع
- textAnchor={x > cx ? "start" : "end"} dominantBaseline="central">
+      textAnchor={x > cx ? "start" : "end"} dominantBaseline="central">
       {`${name} (${(percent * 100).toFixed(0)}%)`}
     </text>
   );
 };
 export default function Dashboard() {
-  const { preferences, infoDashboard }=useContext(DoctorLayoutContext);
+  const { preferences, infoDashboard } = useContext(DoctorLayoutContext);
   console.log("infoDashboard", infoDashboard);
   const visitData = infoDashboard?.appointments_per_month?.map(item => ({
     name: formatMonthToArabic(item.month),
@@ -47,19 +47,19 @@ export default function Dashboard() {
   })) || [];  // إذا كان undefined، استخدم مصفوفة فارغة
 
   console.log(visitData);
- 
+
 
   const appointmentStats = [
     { name: "المواعيد المكتملة", value: infoDashboard?.completed_appointment_count || 0 },
     { name: "المواعيد الملغاة", value: infoDashboard?.canceled_appointment_count || 0 },
     { name: "المواعيد في الانتظار", value: infoDashboard?.pending_appointment_count || 0 }
   ];
- 
-   
+
+
 
   return (
-<div className="space-y-6 bg-gray-50 dark:bg-gray-900">
-  {/* Stats Cards */}
+    <div className="space-y-6 bg-gray-50 dark:bg-gray-900">
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {/* إجمالي المرضى */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
@@ -119,8 +119,8 @@ export default function Dashboard() {
       </div>
 
 
-  {/* Charts */}
-  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">عدد الزيارات الشهرية</h3>
           <div className="h-80">
@@ -134,7 +134,7 @@ export default function Dashboard() {
               </LineChart>
             </ResponsiveContainer>
           </div>
-        </div> 
+        </div>
 
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
           {/* العنوان والتنسيق */}
@@ -175,8 +175,8 @@ export default function Dashboard() {
             </p>
           )}
         </div>
-  </div>
-</div>
+      </div>
+    </div>
 
 
   );

@@ -16,7 +16,7 @@ import { toast } from "react-toastify";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { UserContext } from "../../../context/UserContextProvider";
 
-const apiKey = "84zkehkczsdp";
+const apiKey = "r9xpc8rq9tgq";
 
 const Page = () => {
   const navigate = useNavigate();
@@ -39,7 +39,7 @@ useEffect(() => {
       //navigate("/login");
       return;
     }
-
+     
     try {
       const token = streamToken || (await getStreamToken(userId.toString()));
     const user1Data = await getUser1(userId);
@@ -49,7 +49,7 @@ useEffect(() => {
         console.log("Disconnecting previous user:", client.userId);
         await client.disconnect();
       }
-
+  
       await connectToChat();
 
       if (doctorId) {

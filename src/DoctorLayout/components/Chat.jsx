@@ -55,9 +55,8 @@ export default function Chat() {
             <button
               key={chat.id}
               onClick={() => setSelectedChat(chat)}
-              className={`w-full text-right p-4 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 ${
-                selectedChat?.id === chat.id ? 'bg-gray-50 dark:bg-gray-700' : ''
-              }`}
+              className={`w-full text-right p-4 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 ${selectedChat?.id === chat.id ? 'bg-gray-50 dark:bg-gray-700' : ''
+                }`}
             >
               <div className="flex items-center space-x-4 space-x-reverse">
                 <img
@@ -128,18 +127,16 @@ export default function Chat() {
                 className={`flex ${msg.sender === 'doctor' ? 'justify-start' : 'justify-end'}`}
               >
                 <div
-                  className={`max-w-[70%] rounded-lg p-3 ${
-                    msg.sender === 'doctor'
+                  className={`max-w-[70%] rounded-lg p-3 ${msg.sender === 'doctor'
                       ? 'bg-gray-100 dark:bg-gray-700'
                       : 'bg-indigo-600 text-white'
-                  }`}
+                    }`}
                 >
                   <p>{msg.text}</p>
-                  <span className={`text-xs mt-1 block ${
-                    msg.sender === 'doctor'
+                  <span className={`text-xs mt-1 block ${msg.sender === 'doctor'
                       ? 'text-gray-500 dark:text-gray-400'
                       : 'text-indigo-100'
-                  }`}>
+                    }`}>
                     {msg.time}
                   </span>
                 </div>

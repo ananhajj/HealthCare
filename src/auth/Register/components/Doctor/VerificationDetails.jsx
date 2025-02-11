@@ -6,6 +6,7 @@ import axios from "axios";
 const VerificationDetails = ({ idPhoto, onBack, onComplete, setCurrentStep }) => {
     const [loading, setLoading] = useState(false);
     const isRequestSentRef = useRef(false);
+    const apiUrl = import.meta.env.VITE_APP_KEY;
 
     useEffect(() => {
         const prepareAndSubmit = async () => {
@@ -62,7 +63,7 @@ const VerificationDetails = ({ idPhoto, onBack, onComplete, setCurrentStep }) =>
         return new Blob([byteArray], { type: contentType });
     };
 
-    const backendUrl = 'https://f98b-83-244-8-231.ngrok-free.app/';
+
 
 
     const handleDeleteUser = async () => {
@@ -72,7 +73,7 @@ const VerificationDetails = ({ idPhoto, onBack, onComplete, setCurrentStep }) =>
         if (localStorage.getItem("role") === "patient") {
             try {
                 if (userId) {
-                    await axios.delete(`${backendUrl}api/users/${userId}`);
+                    await axios.delete(`${apiUrl}/api/users/${userId}`);
                     console.log(`تم حذف المستخدم بمعرف ${userId} بنجاح.`);
                 }
             } catch (error) {
@@ -81,7 +82,7 @@ const VerificationDetails = ({ idPhoto, onBack, onComplete, setCurrentStep }) =>
         } else {
             try {
                 if (userId) {
-                    await axios.delete(`${backendUrl}api/doctors/${userId}`);
+                    await axios.delete(`${apiUrl}/api/doctors/${userId}`);
                     console.log(`تم حذف المستخدم بمعرف ${userId} بنجاح.`);
                 }
             } catch (error) {
@@ -98,7 +99,7 @@ const VerificationDetails = ({ idPhoto, onBack, onComplete, setCurrentStep }) =>
     const handleSubmitDetails = async (formData) => {
         try {
             const response = await axios.post(
-                `${backendUrl}api/face/verification`,
+                `${apiUrl}/api/face/verification`,
                 formData,
                 { headers: { "ngrok-skip-browser-warning": "s" } }
             );
@@ -111,7 +112,7 @@ const VerificationDetails = ({ idPhoto, onBack, onComplete, setCurrentStep }) =>
                 Swal.fire({
                     icon: "success",
                     title: "تم التحقق بنجاح",
-                    text: "تم التحقق من هويتك أو قيد المراجعة.",
+                    text: "تم التحقق من هويتك  ",
                 }).then(() => {
                     localStorage.setItem("verificationResult", JSON.stringify(response.data));
                     onComplete();

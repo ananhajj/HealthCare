@@ -5,13 +5,13 @@ import axios from 'axios';
 
 export default function Reviews() {
   const [selectedFilter, setSelectedFilter] = useState('all');
-  const { reviews,setReview, personalInfo } = useContext(DoctorLayoutContext);
+  const { reviews, setReview, personalInfo } = useContext(DoctorLayoutContext);
   const apiUrl = import.meta.env.VITE_APP_KEY;
 
-  const [openDropdownId, setOpenDropdownId] = useState(null); 
+  const [openDropdownId, setOpenDropdownId] = useState(null);
 
   const handleDropdownToggle = (id) => {
-     setOpenDropdownId(openDropdownId === id ? null : id);
+    setOpenDropdownId(openDropdownId === id ? null : id);
   };
   const handleHideRating = async (reviewId) => {
     console.log('Hiding rating for review:', reviewId);
@@ -26,7 +26,7 @@ export default function Reviews() {
           },
         }
       );
-       setOpenDropdownId(null);
+      setOpenDropdownId(null);
       setReview(reviews.filter((review) => review.id !== reviewId));
 
     } catch (error) {
@@ -40,8 +40,8 @@ export default function Reviews() {
         key={index}
         size={16}
         className={`${index < rating
-            ? 'text-yellow-400 fill-yellow-400'
-            : 'text-gray-300'
+          ? 'text-yellow-400 fill-yellow-400'
+          : 'text-gray-300'
           }`}
       />
     ));
@@ -51,7 +51,7 @@ export default function Reviews() {
     if (selectedFilter === 'all') {
       return true;
     }
-    return review.rating === parseInt(selectedFilter); 
+    return review.rating === parseInt(selectedFilter);
   });
 
 
@@ -120,7 +120,7 @@ export default function Reviews() {
           {filteredReviews
             .slice() // لإنشاء نسخة من المصفوفة حتى لا نعدل الأصل
             .sort((a, b) => new Date(b.date) - new Date(a.date)) // الترتيب من الأحدث إلى الأقدم          
-            .map((review) =>(
+            .map((review) => (
               <div key={review.id} className="border-b dark:border-gray-700 last:border-0 pb-6 last:pb-0">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-4 space-x-reverse">
@@ -145,12 +145,12 @@ export default function Reviews() {
                   <div className="relative">
                     <button
                       className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"
-                      onClick={() => handleDropdownToggle(review.id)}  
+                      onClick={() => handleDropdownToggle(review.id)}
                     >
                       <MoreVertical size={20} className="text-gray-500 dark:text-gray-400" />
                     </button>
 
-                    {openDropdownId === review.id && ( 
+                    {openDropdownId === review.id && (
                       <div className="absolute w-32 right-[-5rem] mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10">
                         <button
                           className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition duration-200 ease-in-out"

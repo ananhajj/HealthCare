@@ -22,6 +22,7 @@ import Guide from "../user/page/Guide";
 import Login from "../auth/login";
 import RestPassword from "../auth/RestPassword";
 import PatientMedicalRecord from "../user/page/PatientMedicalRecord";
+import Video from "../Video/Video";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -154,6 +155,12 @@ const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
+    {
+        path: "/video",
+        element:(
+            <Video />
+          ),
+      },
 ]);
 export default router
  

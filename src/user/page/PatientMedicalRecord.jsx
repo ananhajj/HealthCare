@@ -7,7 +7,7 @@ export default function PatientMedicalRecord() {
     const { recordDetails, loading, error } = useFetchPatientMedicalRecord();
     const [activeTab, setActiveTab] = useState('appointments');
     const [selectedAppointment, setSelectedAppointment] = useState(null);
-
+    console.log("recordDetails", recordDetails);
     useEffect(() => {
      }, [selectedAppointment]);
 
